@@ -1,29 +1,45 @@
 class StockItem {
-  int ID;
-  String NAME;
-  String DATE;
+  int _stockItemId;
+  String _stockItemName;
+  String _stockItemExpiryDate;
 
-  StockItem(this.NAME, this.DATE);
+  StockItem(this._stockItemName, this._stockItemExpiryDate);
 
-  setName(String NAME) {
-    this.NAME = NAME;
+  setName(String stockItemName) {
+    _stockItemName = stockItemName;
   }
 
-  setDate(String DATE) {
-    this.DATE = DATE;
+  setExpiryDate(String stockItemExpiryDate) {
+    _stockItemExpiryDate = stockItemExpiryDate;
+  }
+
+  setId(int stockItemId) {
+    _stockItemId = stockItemId;
+  }
+
+  getName() {
+    return _stockItemName;
+  }
+
+  getExpiryDate() {
+    return _stockItemExpiryDate;
+  }
+
+  getId() {
+    return _stockItemId;
   }
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic> {
-      'itemName': NAME,
-      'date': DATE
+      'stockItemName': _stockItemName,
+      'stockItemExpiryDate': _stockItemExpiryDate
     };
     return map;
   } 
 
   StockItem.fromMap(Map<String, dynamic> map) {
-    ID = map['id'];
-    NAME = map['itemName'];
-    DATE = map['date'];
+    _stockItemId = map['stockItemId'];
+    _stockItemName = map['stockItemName'];
+    _stockItemExpiryDate = map['stockItemExpiryDate'];
   } 
 }

@@ -16,17 +16,17 @@ class AppTabs extends StatefulWidget {
 
 class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
 
-  TabController controller;
+  TabController _controller;
 
   @override
   void initState() {
     super.initState();
-    controller = new TabController(length: 3, vsync: this);
+    _controller = new TabController(length: 3, vsync: this);
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -37,7 +37,7 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
         title: new Text("Nosh"),
         backgroundColor: new Color(0xff5c39f8),
         bottom: new TabBar(
-          controller: controller,
+          controller: _controller,
           tabs: <Tab>[
             new Tab(child: new Text('Stock')),
             new Tab(child: new Text('List')),
@@ -46,7 +46,7 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
         )
       ),
       body: new TabBarView(
-        controller: controller,
+        controller: _controller,
         children: <Widget>[
           new stock.Stock(),
           new items.Items(),

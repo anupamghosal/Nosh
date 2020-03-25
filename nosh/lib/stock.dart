@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cupertino_date_picker/flutter_cupertino_date_picker.dart';
+import 'package:nosh/database/expiredItem.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'database/stockItem.dart' as stockItem;
 import 'database/db_helper.dart' as db;
@@ -7,25 +8,25 @@ import 'package:intl/intl.dart';
 
 class Stock extends StatefulWidget {
   @override
-  StockState createState() => StockState();
+  _StockState createState() => _StockState();
 }
 
 
-class StockState extends State<Stock> {
+class _StockState extends State<Stock> {
 
-  Future<List<stockItem.StockItem>> stockItems;
-  db.DBhelper dBhelper;
+  Future<List<stockItem.StockItem>> _stockItems;
+  db.DBhelper _dBhelper;
 
   @override
   initState() {
     super.initState();
-    dBhelper = new db.DBhelper();
+    _dBhelper = new db.DBhelper();
   }
 
   refreshItems() {
     setState(() {
-      stockItems = dBhelper.getItemsFromStock();
-      print(stockItems);
+    _stockItems = _dBhelper.getItemsFromStock();
+      print(_stockItems);
     });
   }
 
@@ -44,9 +45,12 @@ class StockState extends State<Stock> {
   createListUI(List<stockItem.StockItem> items) {
     //filter dates
     for(int i = 0; i < items.length; i++) {
-      int daysLeft = DateTime.parse(items[i].DATE).difference(DateTime.now()).inDays;
+      int daysLeft = DateTime.parse(items[i].getExpiryDate()).difference(DateTime.now()).inDays;
       if(daysLeft < 0) {
         //move the item to expired list: todo
+        ExpiredItem item = new ExpiredItem(items[i].getName(), items[i].getExpiryDate());
+        _dBhelper.saveExpiredItem(item);
+        _dBhelper.deleteItemFromStock(items[i].getName());
         items.remove(items[i]);
       }
     }
@@ -58,28 +62,28 @@ class StockState extends State<Stock> {
           leading: new MaterialButton(
             child: new Icon(Icons.edit),
             onPressed: () {
-              DateTime date = DateTime.parse(items[index].DATE);
-              createAlertDialog(context, false, name: items[index].NAME, initDate: date).then((onValue) {
+              DateTime date = DateTime.parse(items[index].getExpiryDate());
+              createAlertDialog(context, false, name: items[index].getName(), initDate: date).then((onValue) {
                 items[index].setName(onValue[0]);
                 String dateconverted = new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
-                items[index].setDate(dateconverted);
-                dBhelper.updateItemFromStock(items[index]);
+                items[index].setExpiryDate(dateconverted);
+                _dBhelper.updateItemFromStock(items[index]);
                 refreshItems();
               });
             },
           ),
-          title: new Text(items[index].NAME),
-          subtitle: new Text(items[index].DATE),
+          title: new Text(items[index].getName()),
+          subtitle: new Text(items[index].getExpiryDate()),
           trailing: new MaterialButton(
             child: new Icon(Icons.delete),
             onPressed: () {
-              dBhelper.deleteItemFromStock(items[index].NAME);
+              _dBhelper.deleteItemFromStock(items[index].getName());
               refreshItems();
             },
           ),
           ),
           decoration: new BoxDecoration(
-            color: tileColor(items[index].DATE)
+            color: tileColor(items[index].getExpiryDate())
           )
         );
       },
@@ -90,24 +94,28 @@ class StockState extends State<Stock> {
   displayListUI() {
     refreshItems();
     return FutureBuilder(
-      future: stockItems,
+      future: _stockItems,
       builder: (context, snapshot) {
-        if(snapshot.hasData) {
-          //create ListUI
-          print(snapshot.data[0].DATE);
-          return createListUI(snapshot.data);
-          //print(snapshot.data[0].NAME);
+        if(snapshot.connectionState == ConnectionState.done) {
+            //temporary remove later
+          if(snapshot.data == null || snapshot.data.length == 0){
+            return new Center(
+              child: new Text('No items added')
+            );
+            //print('no data was there');
+          }
+          if(snapshot.hasData) {
+            //create ListUI
+            print(snapshot.data[0].getExpiryDate());
+            return createListUI(snapshot.data);
+            //print(snapshot.data[0].NAME);
+          }
         }
-        //temporary remove later
-        if(snapshot.data == null || snapshot.data.length == 0){
+        else {
           return new Center(
-            child: new Text('No items added')
-          );
-          //print('no data was there');
+              child: new CircularProgressIndicator()
+            );
         }
-        return new Center(
-            child: new CircularProgressIndicator()
-          );
       },
     );
   }
@@ -181,7 +189,7 @@ class StockState extends State<Stock> {
     });
     //preventing memory leaks
     controller.dispose();
-    calendarController.dispose();
+    //calendarController.dispose();
   }
   @override
   Widget build(BuildContext context) {
@@ -193,12 +201,14 @@ class StockState extends State<Stock> {
         backgroundColor: new Color(0xff5c39f8),
         onPressed: () {
           createAlertDialog(context, true).then((onValue) {
-            print(onValue[0]);
-            print(onValue[1]);
-            String date = new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
-            stockItem.StockItem item = new stockItem.StockItem(onValue[0], date);
-            dBhelper.saveToStock(item);
-            refreshItems();
+            if(onValue != null) {
+              print(onValue[0]);
+              print(onValue[1]);
+              String date = new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
+              stockItem.StockItem item = new stockItem.StockItem(onValue[0], date);
+              _dBhelper.saveToStock(item);
+              refreshItems();
+            }
           });
         }
       )
