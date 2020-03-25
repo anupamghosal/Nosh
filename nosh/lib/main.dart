@@ -35,7 +35,7 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
     return new Scaffold(
       appBar: new AppBar(
         title: new Text("Nosh"),
-        backgroundColor: Colors.red,
+        backgroundColor: new Color(0xff5c39f8),
         bottom: new TabBar(
           controller: controller,
           tabs: <Tab>[
