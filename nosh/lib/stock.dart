@@ -31,7 +31,9 @@ class _StockState extends State<Stock> {
   }
 
   Color tileColor(String date) {
-    int daysLeft = DateTime.parse(date).difference(DateTime.now()).inDays;
+    DateTime now = new DateTime.now();
+    now = new DateTime(now.year, now.month, now.day);
+    int daysLeft = DateTime.parse(date).difference(now).inDays;
     print('daysLeft');
     print(daysLeft);
     if(daysLeft == 0)
@@ -45,7 +47,9 @@ class _StockState extends State<Stock> {
   createListUI(List<stockItem.StockItem> items) {
     //filter dates
     for(int i = 0; i < items.length; i++) {
-      int daysLeft = DateTime.parse(items[i].getExpiryDate()).difference(DateTime.now()).inDays;
+      DateTime now = new DateTime.now();
+      now = new DateTime(now.year, now.month, now.day);
+      int daysLeft = DateTime.parse(items[i].getExpiryDate()).difference(now).inDays;
       if(daysLeft < 0) {
         //move the item to expired list: todo
         ExpiredItem item = new ExpiredItem(items[i].getName(), items[i].getExpiryDate());
