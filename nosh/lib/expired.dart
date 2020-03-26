@@ -35,8 +35,12 @@ class _ExpiredState extends State<Expired> {
           trailing: new MaterialButton(
             child: new Icon(Icons.delete, color: Colors.white),
             onPressed: () {
-              _dBhelper.deleteExpiredItem(items[index].getName());
-              refreshItems();
+              createDeleteAlert(context).then((onValue) {
+                if(onValue != null && onValue) {
+                  _dBhelper.deleteExpiredItem(items[index].getName());
+                  refreshItems();
+                }
+              });
             },
           )
           ),
@@ -75,6 +79,28 @@ class _ExpiredState extends State<Expired> {
         }
       },
     );
+  }
+
+  Future createDeleteAlert(BuildContext context) {
+    return showDialog(context: context, builder: (context) {
+      return new AlertDialog(
+        title: new Text("Are you sure?"),
+        actions: <Widget>[
+          new MaterialButton(
+            child: new Text('Yes'),
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+          ),
+          new MaterialButton(
+            child: new Text('No'),
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            }
+          )
+        ]
+      );
+    });
   }
 
   @override

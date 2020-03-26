@@ -52,9 +52,11 @@ class _ItemsState extends State<Items> {
             child: new Icon(Icons.edit),
             onPressed: () {
               createAlertDialog(context, false, name: items[index].getName()).then((onValue) {
-                items[index].setName(onValue);
-                _dBhelper.updateItemFromList(items[index]);
-                refreshItems();
+                if(onValue != null) {
+                  items[index].setName(onValue);
+                  _dBhelper.updateItemFromList(items[index]);
+                  refreshItems();
+                }
               });
             },
           ),
@@ -66,28 +68,34 @@ class _ItemsState extends State<Items> {
                 onPressed: () {
                   //shift item : todo
                   createDatePicker(context).then((onValue) {
-                    String date = new DateFormat('yyyy-MM-dd').format(onValue).toString();
-                    DateTime now = new DateTime.now();
-                    now = new DateTime(now.year, now.month, now.day);
-                    int daysLeft = DateTime.parse(date).difference(now).inDays;
-                    if(daysLeft < 0) {
-                      ExpiredItem item = new ExpiredItem(items[index].getName(), date);
-                      _dBhelper.saveExpiredItem(item);
+                    if(onValue != null) {
+                      String date = new DateFormat('yyyy-MM-dd').format(onValue).toString();
+                      DateTime now = new DateTime.now();
+                      now = new DateTime(now.year, now.month, now.day);
+                      int daysLeft = DateTime.parse(date).difference(now).inDays;
+                      if(daysLeft < 0) {
+                        ExpiredItem item = new ExpiredItem(items[index].getName(), date);
+                        _dBhelper.saveExpiredItem(item);
+                      }
+                      else {
+                        StockItem item = new StockItem(items[index].getName(), date);
+                        _dBhelper.saveToStock(item);
+                      }
+                      _dBhelper.deleteItemFromList(items[index].getName());
+                      refreshItems();
                     }
-                    else {
-                      StockItem item = new StockItem(items[index].getName(), date);
-                      _dBhelper.saveToStock(item);
-                    }
-                    _dBhelper.deleteItemFromList(items[index].getName());
-                    refreshItems();
                   });
                 },
               ),
               new IconButton(
                 icon: new Icon(Icons.cancel, color: Colors.red, size: 22),
                 onPressed: () {
-                  _dBhelper.deleteItemFromList(items[index].getName());
-                  refreshItems();
+                  createDeleteAlert(context).then((onValue) {
+                    if(onValue != null && onValue) {
+                      _dBhelper.deleteItemFromList(items[index].getName());
+                      refreshItems();
+                    }
+                  });
                 },
               )
             ],
@@ -124,6 +132,28 @@ class _ItemsState extends State<Items> {
         }
       },
     );
+  }
+
+  Future createDeleteAlert(BuildContext context) {
+    return showDialog(context: context, builder: (context) {
+      return new AlertDialog(
+        title: new Text("Are you sure?"),
+        actions: <Widget>[
+          new MaterialButton(
+            child: new Text('Yes'),
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+          ),
+          new MaterialButton(
+            child: new Text('No'),
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            }
+          )
+        ]
+      );
+    });
   }
 
   Future createAlertDialog(BuildContext context, bool state, {String name = ''}) {

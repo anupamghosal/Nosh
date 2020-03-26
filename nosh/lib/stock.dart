@@ -41,7 +41,7 @@ class _StockState extends State<Stock> {
     else if(daysLeft <= 3)
       return Colors.amber;
     else
-      return Colors.white;
+      return Color(0xff5c39f8);
   }
 
   createListUI(List<stockItem.StockItem> items) {
@@ -58,11 +58,13 @@ class _StockState extends State<Stock> {
         items.remove(items[i]);
       }
     }
-    return new ListView.builder(
+    return new ListView.separated(
       itemCount: items.length,
+      separatorBuilder: (context, index) {
+        return new Divider();
+      },
       itemBuilder: (context, index) {
-        return Container(
-          child: ListTile(
+        return ListTile(
           leading: new Wrap(
               children: <Widget>[
                 new IconButton(
@@ -70,36 +72,32 @@ class _StockState extends State<Stock> {
                 onPressed: () {
                   DateTime date = DateTime.parse(items[index].getExpiryDate());
                   createAlertDialog(context, false, name: items[index].getName(), initDate: date).then((onValue) {
-                    items[index].setName(onValue[0]);
-                    String dateconverted = new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
-                    items[index].setExpiryDate(dateconverted);
-                    _dBhelper.updateItemFromStock(items[index]);
-                    refreshItems();
+                    if(onValue != null) {
+                      items[index].setName(onValue[0]);
+                      String dateconverted = new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
+                      items[index].setExpiryDate(dateconverted);
+                      _dBhelper.updateItemFromStock(items[index]);
+                      refreshItems();
+                    }
                   });
                 },
               ),
               new IconButton(
                 icon: new Icon(Icons.delete, color: Colors.red),
                 onPressed: () {
-                  _dBhelper.deleteItemFromStock(items[index].getName());
-                  refreshItems();
+                  createDeleteAlert(context).then((onValue) {
+                    if(onValue != null && onValue) {
+                      _dBhelper.deleteItemFromStock(items[index].getName());
+                      refreshItems();
+                    }
+                  });
                 },
               )
               ]),
           title: new Text(items[index].getName()),
           subtitle: new Text(items[index].getExpiryDate()),
-          trailing: new MaterialButton(
-            child: new Icon(Icons.delete, color: Colors.red),
-            onPressed: () {
-              _dBhelper.deleteItemFromStock(items[index].getName());
-              refreshItems();
-            },
-          ),
-          ),
-          decoration: new BoxDecoration(
-            color: tileColor(items[index].getExpiryDate())
-          )
-        );
+          trailing: new Icon(Icons.report, color: tileColor(items[index].getExpiryDate()))
+          );
       },
     );
   }
@@ -205,6 +203,29 @@ class _StockState extends State<Stock> {
     controller.dispose();
     //calendarController.dispose();
   }
+
+  Future createDeleteAlert(BuildContext context) {
+    return showDialog(context: context, builder: (context) {
+      return new AlertDialog(
+        title: new Text("Are you sure?"),
+        actions: <Widget>[
+          new MaterialButton(
+            child: new Text('Yes'),
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+          ),
+          new MaterialButton(
+            child: new Text('No'),
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            }
+          )
+        ]
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     print('called');
