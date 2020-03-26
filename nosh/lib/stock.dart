@@ -30,18 +30,18 @@ class _StockState extends State<Stock> {
     });
   }
 
-  Color tileColor(String date) {
+  Icon tileColor(String date) {
     DateTime now = new DateTime.now();
     now = new DateTime(now.year, now.month, now.day);
     int daysLeft = DateTime.parse(date).difference(now).inDays;
     print('daysLeft');
     print(daysLeft);
     if(daysLeft == 0)
-      return Colors.red;
+      return Icon(Icons.sentiment_neutral, color: Colors.red);
     else if(daysLeft <= 3)
-      return Colors.amber;
+      return Icon(Icons.sentiment_satisfied, color: Colors.amber);
     else
-      return Color(0xff5c39f8);
+      return Icon(Icons.sentiment_very_satisfied, color: Color(0xff5c39f8));
   }
 
   createListUI(List<stockItem.StockItem> items) {
@@ -96,7 +96,7 @@ class _StockState extends State<Stock> {
               ]),
           title: new Text(items[index].getName()),
           subtitle: new Text(items[index].getExpiryDate()),
-          trailing: new Icon(Icons.report, color: tileColor(items[index].getExpiryDate()))
+          trailing: tileColor(items[index].getExpiryDate())
           );
       },
     );

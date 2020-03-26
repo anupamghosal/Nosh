@@ -43,13 +43,15 @@ class _ItemsState extends State<Items> {
 
   createListUI(List<ListItem> items) {
     
-    return new ListView.builder(
+    return new ListView.separated(
       itemCount: items.length,
+      separatorBuilder: (context, builder) {
+        return new Divider();
+      },
       itemBuilder: (context, index) {
-        return Container(
-          child: ListTile(
-          leading: new MaterialButton(
-            child: new Icon(Icons.edit),
+        return ListTile(
+          leading: new IconButton(
+            icon: new Icon(Icons.edit, color: Colors.black),
             onPressed: () {
               createAlertDialog(context, false, name: items[index].getName()).then((onValue) {
                 if(onValue != null) {
@@ -100,8 +102,7 @@ class _ItemsState extends State<Items> {
               )
             ],
           ),
-          )
-        );
+          );
       },
     );
   }

@@ -25,15 +25,15 @@ class _ExpiredState extends State<Expired> {
 
   createListUI(List<ExpiredItem> items) {
     
-    return new ListView.builder(
+    return new ListView.separated(
       itemCount: items.length,
+      separatorBuilder: (context, index) {
+        return Divider();
+      },
       itemBuilder: (context, index) {
-        return Container(
-          child: ListTile(
-          title: new Text(items[index].getName(), style: TextStyle(color: Colors.white)),
-          subtitle: new Text(items[index].getExpiryDate(), style: TextStyle(color: Colors.white)),
-          trailing: new MaterialButton(
-            child: new Icon(Icons.delete, color: Colors.white),
+        return ListTile(
+          leading: new IconButton(
+            icon: new Icon(Icons.delete, color: Colors.red),
             onPressed: () {
               createDeleteAlert(context).then((onValue) {
                 if(onValue != null && onValue) {
@@ -42,12 +42,11 @@ class _ExpiredState extends State<Expired> {
                 }
               });
             },
-          )
           ),
-          decoration: new BoxDecoration(
-            color: Colors.black
-          )
-        );
+          title: new Text(items[index].getName()),
+          subtitle: new Text(items[index].getExpiryDate()),
+          trailing: Icon(Icons.sentiment_very_dissatisfied, color: Colors.black)
+          );
       },
     );
   }
