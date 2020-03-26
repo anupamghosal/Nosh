@@ -3,6 +3,7 @@ import 'database/listItem.dart';
 import 'database/db_helper.dart';
 import 'package:intl/intl.dart';
 import 'database/stockItem.dart';
+import 'database/expiredItem.dart';
 
 class Items extends StatefulWidget {
   @override
@@ -66,8 +67,17 @@ class _ItemsState extends State<Items> {
                   //shift item : todo
                   createDatePicker(context).then((onValue) {
                     String date = new DateFormat('yyyy-MM-dd').format(onValue).toString();
-                    StockItem item = new StockItem(items[index].getName(), date);
-                    _dBhelper.saveToStock(item);
+                    DateTime now = new DateTime.now();
+                    now = new DateTime(now.year, now.month, now.day);
+                    int daysLeft = DateTime.parse(date).difference(now).inDays;
+                    if(daysLeft < 0) {
+                      ExpiredItem item = new ExpiredItem(items[index].getName(), date);
+                      _dBhelper.saveExpiredItem(item);
+                    }
+                    else {
+                      StockItem item = new StockItem(items[index].getName(), date);
+                      _dBhelper.saveToStock(item);
+                    }
                     _dBhelper.deleteItemFromList(items[index].getName());
                     refreshItems();
                   });
