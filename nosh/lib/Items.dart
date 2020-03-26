@@ -62,7 +62,7 @@ class _ItemsState extends State<Items> {
           trailing: new Wrap(
             children: <Widget>[
               new IconButton(
-                icon: new Icon(Icons.add),
+                icon: new Icon(Icons.add_shopping_cart, color: Colors.grey[800], size: 22),
                 onPressed: () {
                   //shift item : todo
                   createDatePicker(context).then((onValue) {
@@ -84,7 +84,7 @@ class _ItemsState extends State<Items> {
                 },
               ),
               new IconButton(
-                icon: new Icon(Icons.remove),
+                icon: new Icon(Icons.cancel, color: Colors.red, size: 22),
                 onPressed: () {
                   _dBhelper.deleteItemFromList(items[index].getName());
                   refreshItems();

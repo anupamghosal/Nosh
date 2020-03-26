@@ -63,23 +63,33 @@ class _StockState extends State<Stock> {
       itemBuilder: (context, index) {
         return Container(
           child: ListTile(
-          leading: new MaterialButton(
-            child: new Icon(Icons.edit),
-            onPressed: () {
-              DateTime date = DateTime.parse(items[index].getExpiryDate());
-              createAlertDialog(context, false, name: items[index].getName(), initDate: date).then((onValue) {
-                items[index].setName(onValue[0]);
-                String dateconverted = new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
-                items[index].setExpiryDate(dateconverted);
-                _dBhelper.updateItemFromStock(items[index]);
-                refreshItems();
-              });
-            },
-          ),
+          leading: new Wrap(
+              children: <Widget>[
+                new IconButton(
+                icon: new Icon(Icons.edit, color: Colors.black, size: 22),
+                onPressed: () {
+                  DateTime date = DateTime.parse(items[index].getExpiryDate());
+                  createAlertDialog(context, false, name: items[index].getName(), initDate: date).then((onValue) {
+                    items[index].setName(onValue[0]);
+                    String dateconverted = new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
+                    items[index].setExpiryDate(dateconverted);
+                    _dBhelper.updateItemFromStock(items[index]);
+                    refreshItems();
+                  });
+                },
+              ),
+              new IconButton(
+                icon: new Icon(Icons.delete, color: Colors.red),
+                onPressed: () {
+                  _dBhelper.deleteItemFromStock(items[index].getName());
+                  refreshItems();
+                },
+              )
+              ]),
           title: new Text(items[index].getName()),
           subtitle: new Text(items[index].getExpiryDate()),
           trailing: new MaterialButton(
-            child: new Icon(Icons.delete),
+            child: new Icon(Icons.delete, color: Colors.red),
             onPressed: () {
               _dBhelper.deleteItemFromStock(items[index].getName());
               refreshItems();

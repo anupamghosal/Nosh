@@ -32,27 +32,33 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text("Nosh"),
-        backgroundColor: new Color(0xff5c39f8),
-        bottom: new TabBar(
-          controller: _controller,
-          tabs: <Tab>[
-            new Tab(child: new Text('Stock')),
-            new Tab(child: new Text('List')),
-            new Tab(child: new Text('Expired'))
-          ]
-        )
-      ),
-      body: new TabBarView(
-        controller: _controller,
-        children: <Widget>[
-          new stock.Stock(),
-          new items.Items(),
-          new expired.Expired()
-        ]
-      ),
+    return MaterialApp(
+      theme: ThemeData(primaryColor: new Color(0xff5c39f8)),
+      home: Scaffold(
+        appBar: new AppBar(
+            title: new Container(
+                padding: new EdgeInsets.only(top: 10.0),
+                child: new Image(image: AssetImage('assets/nosh.png'), width: 50.0, height: 250.0)
+
+            ),
+            bottom: new TabBar(
+                controller: _controller,
+                tabs: <Tab>[
+                  new Tab(child: new Text('Stocked')),
+                  new Tab(child: new Text('Shopping List')),
+                  new Tab(child: new Text('Expired'))
+                ]
+            )
+        ),
+        body: new TabBarView(
+            controller: _controller,
+            children: <Widget>[
+              new stock.Stock(),
+              new items.Items(),
+              new expired.Expired()
+            ]
+        ),
+      )
     );
   }
 }
