@@ -116,7 +116,11 @@ class _StockState extends State<Stock> {
         if (snapshot.connectionState == ConnectionState.done) {
           //temporary remove later
           if (snapshot.data == null || snapshot.data.length == 0) {
-            return new Center(child: new Text('No items added'));
+            return new Center(
+                child: new Text(
+              'Add food items and track their expiry',
+              style: TextStyle(color: Colors.grey[600]),
+            ));
             //print('no data was there');
           }
           if (snapshot.hasData) {
@@ -152,10 +156,12 @@ class _StockState extends State<Stock> {
         context: context,
         builder: (context) {
           return new AlertDialog(
+              contentPadding: EdgeInsets.all(25.0),
               title: new Text(submitButtonText),
               actions: <Widget>[
                 new MaterialButton(
-                    child: new Text(submitButtonText),
+                    child: new Text(submitButtonText,
+                        style: TextStyle(color: Color(0xff5c39f8))),
                     onPressed: () {
                       //print(productName);
                       //print(date);
@@ -169,7 +175,7 @@ class _StockState extends State<Stock> {
                   controller: controller,
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    hintText: 'Product name...',
+                    hintText: 'Add product name...',
                   ),
                   onChanged: (String value) {
                     productName = value;

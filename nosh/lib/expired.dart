@@ -57,7 +57,11 @@ class _ExpiredState extends State<Expired> {
         if (snapshot.connectionState == ConnectionState.done) {
           //temporary remove later
           if (snapshot.data == null || snapshot.data.length == 0) {
-            return new Center(child: new Text('No expired items'));
+            return new Center(
+                child: new Text(
+              'No expired items',
+              style: TextStyle(color: Colors.grey[600]),
+            ));
             //print('no data was there');
           }
           if (snapshot.hasData) {

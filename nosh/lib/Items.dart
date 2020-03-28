@@ -121,7 +121,11 @@ class _ItemsState extends State<Items> {
         if (snapshot.connectionState == ConnectionState.done) {
           //temporary remove later
           if (snapshot.data == null || snapshot.data.length == 0) {
-            return new Center(child: new Text('No items added'));
+            return new Center(
+                child: new Text(
+              'No items in shopping list',
+              style: TextStyle(color: Colors.grey[600]),
+            ));
             //print('no data was there');
           }
           if (snapshot.hasData) {
@@ -173,10 +177,14 @@ class _ItemsState extends State<Items> {
         context: context,
         builder: (context) {
           return new AlertDialog(
+              contentPadding: EdgeInsets.all(25.0),
               title: new Text(submitButtonText),
               actions: <Widget>[
                 new MaterialButton(
-                    child: new Text(submitButtonText),
+                    child: new Text(
+                      submitButtonText,
+                      style: TextStyle(color: Color(0xFF5C39F8)),
+                    ),
                     onPressed: () {
                       //print(productName);
                       //print(date);
