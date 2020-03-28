@@ -38,7 +38,7 @@ class _StockState extends State<Stock> {
     print(daysLeft);
     if(daysLeft == 0)
       return Icon(Icons.sentiment_neutral, color: Colors.red);
-    else if(daysLeft <= 3)
+    else if(daysLeft <= 2)
       return Icon(Icons.sentiment_satisfied, color: Colors.amber);
     else
       return Icon(Icons.sentiment_very_satisfied, color: Color(0xff5c39f8));
@@ -136,11 +136,18 @@ class _StockState extends State<Stock> {
     
     TextEditingController controller = new TextEditingController();
     CalendarController calendarController = new CalendarController();
+    //initialization of units
+    List<String> units = ['kg', 'g', 'l', 'ml', 'unit'];
+    List<DropdownMenuItem<String>> menuItems = List();
+    for(String unit in units) {
+      menuItems.add(DropdownMenuItem(value: unit, child: Text(unit)));
+    }
     DateTimePickerTheme dateTimePickerTheme = new DateTimePickerTheme(
       cancel: Text(""),
       confirm: Text(""),
       title: Text('Select Expiry Date')
     );
+    String selectedUnit = units[0];
     DateTime date = DateTime.now();
     String productName = '';
     String submitButtonText = 'Add Item';
@@ -230,7 +237,14 @@ class _StockState extends State<Stock> {
   Widget build(BuildContext context) {
     print('called');
     return new Scaffold(
-      body: displayListUI(),
+      body: Column(
+        children: <Widget>[
+          new Container(child: Center(child: new Text('hello'))),
+          Expanded(
+            child: displayListUI()
+          )
+        ],
+      ),
       floatingActionButton: new FloatingActionButton(
         child: Icon(Icons.add),
         backgroundColor: new Color(0xff5c39f8),
