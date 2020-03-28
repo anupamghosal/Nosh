@@ -143,11 +143,11 @@ class _StockState extends State<Stock> {
     //initialization of units
     List<String> units = ['kg', 'g', 'l', 'ml', 'unit'];
     List<DropdownMenuItem<String>> menuItems = List();
-    for(String unit in units) {
+    for (String unit in units) {
       menuItems.add(DropdownMenuItem(value: unit, child: Text(unit)));
     }
     DateTimePickerTheme dateTimePickerTheme = new DateTimePickerTheme(
-    cancel: Text(""), confirm: Text(""), title: Text('Select Expiry Date'));
+        cancel: Text(""), confirm: Text(""), title: Text('Select Expiry Date'));
     DateTime date = DateTime.now();
     String productName = '';
     String submitButtonText = 'Add Item';
@@ -238,11 +238,81 @@ class _StockState extends State<Stock> {
     print('called');
     return new Scaffold(
         body: Column(
-        children: <Widget>[
-            new Container(child: Center(child: new Text('hello'))),
-            Expanded(
-              child: displayListUI()
-            )
+          children: <Widget>[
+            new Container(
+              child: Row(
+                children: <Widget>[
+                  Container(
+                    child: Row(
+                      children: <Widget>[
+                        Icon(Icons.error_outline, color: Colors.white),
+                        Text('2',
+                            style: TextStyle(
+                                color: Colors.white)) //dynamic value here
+                      ],
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 5.0),
+                    height: 40.0,
+                    width: 80.0,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        gradient: LinearGradient(colors: [
+                          Colors.red,
+                          Colors.pink
+                        ])), //1Day to expire alert
+                  ),
+                  Container(
+                    child: Row(
+                      children: <Widget>[
+                        Icon(Icons.report_problem),
+                        Text('3') // dynamic value here
+                      ],
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 5.0),
+                    height: 40.0,
+                    width: 80.0,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        gradient: LinearGradient(colors: [
+                          Colors.amber,
+                          Colors.yellow
+                        ])), //3Days to expire alert
+                  ),
+                  Container(
+                    child: Row(
+                      children: <Widget>[
+                        Icon(Icons.shopping_cart, color: Colors.white),
+                        Text('3',
+                            style: TextStyle(
+                                color: Colors.white)) // dynamic value here
+                      ],
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 5.0),
+                    height: 40.0,
+                    width: 80.0,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        gradient: LinearGradient(colors: [
+                          Color(0xFF5C39F8),
+                          Colors.blue
+                        ])), //3Days to expire alert
+                  )
+                ],
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+              ),
+              padding: EdgeInsets.all(16.0),
+              margin: EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(10.0)),
+            ),
+            Expanded(child: displayListUI())
           ],
         ),
         floatingActionButton: new FloatingActionButton(
