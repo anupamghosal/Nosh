@@ -22,9 +22,8 @@ class _StockState extends State<Stock> {
   }
 
   refreshItems() {
-    Future<List<stockItem.StockItem>> items = _dBhelper.getItemsFromStock();
     setState(() {
-      _stockItems = items;
+      _stockItems = _dBhelper.getItemsFromStock();
     });
   }
 
@@ -110,7 +109,7 @@ class _StockState extends State<Stock> {
 
   //make a future builder with the dynamic list view
   displayUI() {
-    //refreshItems();
+    refreshItems();
     return FutureBuilder(
       future: _stockItems,
       builder: (context, snapshot) {
