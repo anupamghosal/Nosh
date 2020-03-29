@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import './expired.dart' as expired;
 import './Items.dart' as items;
 import './stock.dart' as stock;
 
 void main() {
-  SystemChrome.setSystemUIOverlayStyle(
-    SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarBrightness: Brightness.light,
-        systemNavigationBarIconBrightness: Brightness.light),
-  );
   runApp(new MaterialApp(home: new AppTabs()));
 }
 
@@ -38,7 +31,8 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return MaterialApp(
         theme: ThemeData(
-            primaryColor: new Color(0xff5c39f8),
+            primaryColor: Colors.white,
+            accentColor: new Color(0xff5c39f8),
             scaffoldBackgroundColor: Colors.white),
         home: Scaffold(
           appBar: new AppBar(
