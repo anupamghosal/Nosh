@@ -116,11 +116,18 @@ class _StockState extends State<Stock> {
         if (snapshot.connectionState == ConnectionState.done) {
           //temporary remove later
           if (snapshot.data == null || snapshot.data.length == 0) {
-            return new Center(
-                child: new Text(
-              'Add food items and track their expiry',
-              style: TextStyle(color: Colors.grey[600]),
-            ));
+            return Column(
+              children: <Widget>[
+                createCounterPanel([]),
+                Expanded(
+                  child: new Center(
+                          child: new Text(
+                        'Add food items and track their expiry',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ))
+                )
+              ],
+            );
             //print('no data was there');
           }
           if (snapshot.hasData) {
