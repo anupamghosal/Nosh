@@ -22,9 +22,9 @@ class _StockState extends State<Stock> {
   }
 
   refreshItems() {
+    Future<List<stockItem.StockItem>> items = _dBhelper.getItemsFromStock();
     setState(() {
-      _stockItems = _dBhelper.getItemsFromStock();
-      print(_stockItems);
+      _stockItems = items;
     });
   }
 
@@ -32,14 +32,15 @@ class _StockState extends State<Stock> {
     DateTime now = new DateTime.now();
     now = new DateTime(now.year, now.month, now.day);
     int daysLeft = DateTime.parse(date).difference(now).inDays;
-    print('daysLeft');
-    print(daysLeft);
-    if (daysLeft == 0)
+    if (daysLeft == 0) {
       return Icon(Icons.error_outline, color: Colors.red);
-    else if (daysLeft <= 3)
+    }
+    else if (daysLeft <= 2) {
       return Icon(Icons.report_problem, color: Colors.amber);
-    else
+    }
+    else {
       return null;
+    }
   }
 
   createListUI(List<stockItem.StockItem> items) {
@@ -108,8 +109,8 @@ class _StockState extends State<Stock> {
   }
 
   //make a future builder with the dynamic list view
-  displayListUI() {
-    refreshItems();
+  displayUI() {
+    //refreshItems();
     return FutureBuilder(
       future: _stockItems,
       builder: (context, snapshot) {
@@ -126,7 +127,7 @@ class _StockState extends State<Stock> {
           if (snapshot.hasData) {
             //create ListUI
             print(snapshot.data[0].getExpiryDate());
-            return createListUI(snapshot.data);
+            return createUI(snapshot.data);
             //print(snapshot.data[0].NAME);
           }
         } else {
@@ -134,6 +135,109 @@ class _StockState extends State<Stock> {
         }
       },
     );
+  }
+
+  createCounterPanel(List<stockItem.StockItem> items) {
+    int redCounter = 0, amberCounter = 0, blueCounter = 0;
+    for(stockItem.StockItem item in items) {
+      String date = item.getExpiryDate();
+      DateTime now = new DateTime.now();
+      now = new DateTime(now.year, now.month, now.day);
+      int daysLeft = DateTime.parse(date).difference(now).inDays;
+      if(daysLeft >= 0) {
+        if (daysLeft == 0) {
+          redCounter = redCounter + 1;
+        }
+        else if (daysLeft <= 2) {
+          amberCounter = amberCounter + 1;
+        }
+        else {
+          blueCounter = blueCounter + 1;
+        }
+      }
+    }
+    return new Container(
+              child: Row(
+                children: <Widget>[
+                  Container(
+                    child: Row(
+                      children: <Widget>[
+                        Icon(Icons.error_outline, color: Colors.white),
+                        Text(redCounter.toString(),
+                            style: TextStyle(
+                                color: Colors.white)) //dynamic value here
+                      ],
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 5.0),
+                    height: 40.0,
+                    width: 80.0,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        gradient: LinearGradient(colors: [
+                          Colors.red,
+                          Colors.pink
+                        ])), //1Day to expire alert
+                  ),
+                  Container(
+                    child: Row(
+                      children: <Widget>[
+                        Icon(Icons.report_problem),
+                        Text(amberCounter.toString()) // dynamic value here
+                      ],
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 5.0),
+                    height: 40.0,
+                    width: 80.0,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        gradient: LinearGradient(colors: [
+                          Colors.amber,
+                          Colors.yellow
+                        ])), //2Days to expire alert
+                  ),
+                  Container(
+                    child: Row(
+                      children: <Widget>[
+                        Icon(Icons.shopping_cart, color: Colors.white),
+                        Text(blueCounter.toString(),
+                            style: TextStyle(
+                                color: Colors.white)) // dynamic value here
+                      ],
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 5.0),
+                    height: 40.0,
+                    width: 80.0,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        gradient: LinearGradient(colors: [
+                          Color(0xFF5C39F8),
+                          Colors.blue
+                        ])), //3Days to expire alert
+                  )
+                ],
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+              ),
+              padding: EdgeInsets.all(16.0),
+              margin: EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(10.0)),
+            );
+  }
+
+  createUI(List<stockItem.StockItem> items) {
+    return Column(
+          children: <Widget>[
+            createCounterPanel(items),
+            Expanded(child: createListUI(items))
+          ],
+        );
   }
 
   Future<List> createAlertDialog(BuildContext context, bool state,
@@ -237,84 +341,7 @@ class _StockState extends State<Stock> {
   Widget build(BuildContext context) {
     print('called');
     return new Scaffold(
-        body: Column(
-          children: <Widget>[
-            new Container(
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    child: Row(
-                      children: <Widget>[
-                        Icon(Icons.error_outline, color: Colors.white),
-                        Text('2',
-                            style: TextStyle(
-                                color: Colors.white)) //dynamic value here
-                      ],
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 5.0),
-                    height: 40.0,
-                    width: 80.0,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        gradient: LinearGradient(colors: [
-                          Colors.red,
-                          Colors.pink
-                        ])), //1Day to expire alert
-                  ),
-                  Container(
-                    child: Row(
-                      children: <Widget>[
-                        Icon(Icons.report_problem),
-                        Text('3') // dynamic value here
-                      ],
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 5.0),
-                    height: 40.0,
-                    width: 80.0,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        gradient: LinearGradient(colors: [
-                          Colors.amber,
-                          Colors.yellow
-                        ])), //3Days to expire alert
-                  ),
-                  Container(
-                    child: Row(
-                      children: <Widget>[
-                        Icon(Icons.shopping_cart, color: Colors.white),
-                        Text('3',
-                            style: TextStyle(
-                                color: Colors.white)) // dynamic value here
-                      ],
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 5.0),
-                    height: 40.0,
-                    width: 80.0,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        gradient: LinearGradient(colors: [
-                          Color(0xFF5C39F8),
-                          Colors.blue
-                        ])), //3Days to expire alert
-                  )
-                ],
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-              ),
-              padding: EdgeInsets.all(16.0),
-              margin: EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(10.0)),
-            ),
-            Expanded(child: displayListUI())
-          ],
-        ),
+        body: displayUI(),
         floatingActionButton: new FloatingActionButton(
             child: Icon(Icons.add),
             backgroundColor: new Color(0xff5c39f8),
