@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import './expired.dart' as expired;
 import './Items.dart' as items;
 import './stock.dart' as stock;
 
 void main() {
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarBrightness: Brightness.light,
+      statusBarColor: Colors.transparent));
   runApp(new MaterialApp(home: new AppTabs()));
 }
 

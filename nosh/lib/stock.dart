@@ -15,6 +15,8 @@ class _StockState extends State<Stock> {
   Future<List<stockItem.StockItem>> _stockItems;
   db.DBhelper _dBhelper;
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   initState() {
     super.initState();
@@ -33,11 +35,9 @@ class _StockState extends State<Stock> {
     int daysLeft = DateTime.parse(date).difference(now).inDays;
     if (daysLeft == 0) {
       return Icon(Icons.error_outline, color: Colors.red);
-    }
-    else if (daysLeft <= 2) {
+    } else if (daysLeft <= 2) {
       return Icon(Icons.report_problem, color: Colors.amber);
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -120,12 +120,11 @@ class _StockState extends State<Stock> {
               children: <Widget>[
                 createCounterPanel([]),
                 Expanded(
-                  child: new Center(
-                          child: new Text(
-                        'Add food items and track their expiry',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ))
-                )
+                    child: new Center(
+                        child: new Text(
+                  'Add food items and track their expiry',
+                  style: TextStyle(color: Colors.grey[600]),
+                )))
               ],
             );
             //print('no data was there');
@@ -145,105 +144,98 @@ class _StockState extends State<Stock> {
 
   createCounterPanel(List<stockItem.StockItem> items) {
     int redCounter = 0, amberCounter = 0, blueCounter = 0;
-    for(stockItem.StockItem item in items) {
+    for (stockItem.StockItem item in items) {
       String date = item.getExpiryDate();
       DateTime now = new DateTime.now();
       now = new DateTime(now.year, now.month, now.day);
       int daysLeft = DateTime.parse(date).difference(now).inDays;
-      if(daysLeft >= 0) {
+      if (daysLeft >= 0) {
         if (daysLeft == 0) {
           redCounter = redCounter + 1;
-        }
-        else if (daysLeft <= 2) {
+        } else if (daysLeft <= 2) {
           amberCounter = amberCounter + 1;
-        }
-        else {
+        } else {
           blueCounter = blueCounter + 1;
         }
       }
     }
     return new Container(
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    child: Row(
-                      children: <Widget>[
-                        Icon(Icons.error_outline, color: Colors.white),
-                        Text(redCounter.toString(),
-                            style: TextStyle(
-                                color: Colors.white)) //dynamic value here
-                      ],
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 5.0),
-                    height: 40.0,
-                    width: 80.0,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        gradient: LinearGradient(colors: [
-                          Colors.red,
-                          Colors.pink
-                        ])), //1Day to expire alert
-                  ),
-                  Container(
-                    child: Row(
-                      children: <Widget>[
-                        Icon(Icons.report_problem),
-                        Text(amberCounter.toString()) // dynamic value here
-                      ],
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 5.0),
-                    height: 40.0,
-                    width: 80.0,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        gradient: LinearGradient(colors: [
-                          Colors.amber,
-                          Colors.yellow
-                        ])), //2Days to expire alert
-                  ),
-                  Container(
-                    child: Row(
-                      children: <Widget>[
-                        Icon(Icons.shopping_cart, color: Colors.white),
-                        Text(blueCounter.toString(),
-                            style: TextStyle(
-                                color: Colors.white)) // dynamic value here
-                      ],
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 5.0),
-                    height: 40.0,
-                    width: 80.0,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        gradient: LinearGradient(colors: [
-                          Color(0xFF5C39F8),
-                          Colors.blue
-                        ])), //3Days to expire alert
-                  )
-                ],
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-              ),
-              padding: EdgeInsets.all(16.0),
-              margin: EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(10.0)),
-            );
+      child: Row(
+        children: <Widget>[
+          Container(
+            child: Row(
+              children: <Widget>[
+                Icon(Icons.error_outline, color: Colors.white),
+                Text(redCounter.toString(),
+                    style: TextStyle(color: Colors.white)) //dynamic value here
+              ],
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 5.0),
+            height: 40.0,
+            width: 80.0,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10.0),
+                gradient: LinearGradient(
+                    colors: [Colors.red, Colors.pink])), //1Day to expire alert
+          ),
+          Container(
+            child: Row(
+              children: <Widget>[
+                Icon(Icons.report_problem),
+                Text(amberCounter.toString()) // dynamic value here
+              ],
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 5.0),
+            height: 40.0,
+            width: 80.0,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10.0),
+                gradient: LinearGradient(colors: [
+                  Colors.amber,
+                  Colors.yellow
+                ])), //2Days to expire alert
+          ),
+          Container(
+            child: Row(
+              children: <Widget>[
+                Icon(Icons.shopping_cart, color: Colors.white),
+                Text(blueCounter.toString(),
+                    style: TextStyle(color: Colors.white)) // dynamic value here
+              ],
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 5.0),
+            height: 40.0,
+            width: 80.0,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10.0),
+                gradient: LinearGradient(colors: [
+                  Color(0xFF5C39F8),
+                  Colors.blue
+                ])), //3Days to expire alert
+          )
+        ],
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+      ),
+      padding: EdgeInsets.all(16.0),
+      margin: EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+          color: Colors.grey[100], borderRadius: BorderRadius.circular(10.0)),
+    );
   }
 
   createUI(List<stockItem.StockItem> items) {
     return Column(
-          children: <Widget>[
-            createCounterPanel(items),
-            Expanded(child: createListUI(items))
-          ],
-        );
+      children: <Widget>[
+        createCounterPanel(items),
+        Expanded(child: createListUI(items))
+      ],
+    );
   }
 
   Future<List> createAlertDialog(BuildContext context, bool state,
@@ -281,40 +273,52 @@ class _StockState extends State<Stock> {
                     onPressed: () {
                       //print(productName);
                       //print(date);
-                      Navigator.of(context).pop([productName, date]);
+                      final form = _formKey.currentState;
+                      if (form.validate()) {
+                        Navigator.of(context).pop([productName, date]);
+                      }
                     },
                     elevation: 5.0)
               ],
               content: new SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
                   child: new Column(children: <Widget>[
-                new TextField(
-                  controller: controller,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Add product name...',
-                  ),
-                  onChanged: (String value) {
-                    productName = value;
-                  },
-                ),
-                /*new TableCalendar(
+                    new TextFormField(
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'please enter a product name';
+                        }
+                      },
+                      controller: controller,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: 'Add product name...',
+                      ),
+                      onChanged: (String value) {
+                        productName = value;
+                      },
+                    ),
+                    /*new TableCalendar(
             calendarController: calendarController,
             builders: CalendarBuilders(),
           )*/
-                SizedBox(
-                  height: 30,
+                    SizedBox(
+                      height: 30,
+                    ),
+                    new DatePickerWidget(
+                      minDateTime: DateTime(2018),
+                      maxDateTime: DateTime(2030),
+                      initialDateTime: date,
+                      locale: DATETIME_PICKER_LOCALE_DEFAULT,
+                      pickerTheme: dateTimePickerTheme,
+                      onChange: (dateTime, index) {
+                        date = dateTime;
+                      },
+                    )
+                  ]),
                 ),
-                new DatePickerWidget(
-                  minDateTime: DateTime(2018),
-                  maxDateTime: DateTime(2030),
-                  initialDateTime: date,
-                  locale: DATETIME_PICKER_LOCALE_DEFAULT,
-                  pickerTheme: dateTimePickerTheme,
-                  onChange: (dateTime, index) {
-                    date = dateTime;
-                  },
-                )
-              ])));
+              ));
         });
     //preventing memory leaks
     controller.dispose();

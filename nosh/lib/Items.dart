@@ -14,6 +14,8 @@ class _ItemsState extends State<Items> {
   Future<List<ListItem>> _listItems;
   DBhelper _dBhelper;
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   initState() {
     super.initState();
@@ -34,7 +36,11 @@ class _ItemsState extends State<Items> {
       lastDate: DateTime(2030),
       builder: (BuildContext context, Widget child) {
         return Theme(
-          data: ThemeData.dark(),
+          data: ThemeData(
+              primaryColor: Color(0xFF5C39F8),
+              accentColor: Color(0xFF5C39F8),
+              cardColor: Color(0xFF5C39F8),
+              backgroundColor: Colors.white),
           child: child,
         );
       },
@@ -188,23 +194,34 @@ class _ItemsState extends State<Items> {
                     onPressed: () {
                       //print(productName);
                       //print(date);
-                      Navigator.of(context).pop(productName);
+                      final form = _formKey.currentState;
+                      if (form.validate()) {
+                        Navigator.of(context).pop(productName);
+                      }
                     },
                     elevation: 5.0)
               ],
               content: new SingleChildScrollView(
-                  child: new Column(children: <Widget>[
-                new TextField(
-                  controller: controller,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Product name...',
-                  ),
-                  onChanged: (String value) {
-                    productName = value;
-                  },
-                )
-              ])));
+                  child: Form(
+                key: _formKey,
+                child: Column(children: <Widget>[
+                  new TextFormField(
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Please enter a product name';
+                      }
+                    },
+                    controller: controller,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'Product name...',
+                    ),
+                    onChanged: (String value) {
+                      productName = value;
+                    },
+                  )
+                ]),
+              )));
         });
     //preventing memory leaks
     controller.dispose();
