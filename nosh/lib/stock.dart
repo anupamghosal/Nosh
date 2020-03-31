@@ -243,6 +243,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
       },
       itemBuilder: (context, index) {
         return ListTile(
+            onTap: () {},
             contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
             leading: new Wrap(children: <Widget>[
               new IconButton(
@@ -314,8 +315,10 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             //print(snapshot.data[0].NAME);
           }
         } else {
-          _currentStockItems = null;
-          return new Center(child: new CircularProgressIndicator());
+          return new Center(
+              child: new CircularProgressIndicator(
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(Color(0xff5c39f8))));
         }
       },
     );
@@ -356,8 +359,10 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             width: 80.0,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
-                gradient: LinearGradient(
-                    colors: [Colors.red, Colors.pink])), //1Day to expire alert
+                gradient: LinearGradient(colors: [
+                  Colors.red[800],
+                  Colors.deepOrange
+                ])), //1Day to expire alert
           ),
           Container(
             child: Row(
@@ -374,7 +379,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
                 gradient: LinearGradient(colors: [
-                  Colors.amber,
+                  Colors.amber[700],
                   Colors.yellow
                 ])), //2Days to expire alert
           ),
@@ -490,15 +495,20 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                     SizedBox(
                       height: 30,
                     ),
-                    new DatePickerWidget(
-                      minDateTime: DateTime(2018),
-                      maxDateTime: DateTime(2030),
-                      initialDateTime: date,
-                      locale: DATETIME_PICKER_LOCALE_DEFAULT,
-                      pickerTheme: dateTimePickerTheme,
-                      onChange: (dateTime, index) {
-                        date = dateTime;
+                    GestureDetector(
+                      onTap: () {
+                        FocusScope.of(context).unfocus();
                       },
+                      child: new DatePickerWidget(
+                        minDateTime: DateTime(2018),
+                        maxDateTime: DateTime(2030),
+                        initialDateTime: date,
+                        locale: DATETIME_PICKER_LOCALE_DEFAULT,
+                        pickerTheme: dateTimePickerTheme,
+                        onChange: (dateTime, index) {
+                          date = dateTime;
+                        },
+                      ),
                     )
                   ]),
                 ),
@@ -517,13 +527,15 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
               title: new Text("Are you sure?"),
               actions: <Widget>[
                 new MaterialButton(
-                  child: new Text('Yes'),
+                  child: new Text('Yes',
+                      style: TextStyle(color: Color(0xff5c39f8))),
                   onPressed: () {
                     Navigator.of(context).pop(true);
                   },
                 ),
                 new MaterialButton(
-                    child: new Text('No'),
+                    child: new Text('No',
+                        style: TextStyle(color: Color(0xff5c39f8))),
                     onPressed: () {
                       Navigator.of(context).pop(false);
                     })
@@ -533,7 +545,6 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    print('called');
     return new Scaffold(
         body: displayUI(),
         floatingActionButton: new FloatingActionButton(

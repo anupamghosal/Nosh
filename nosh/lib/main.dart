@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import './expired.dart' as expired;
 import './Items.dart' as items;
 import './stock.dart' as stock;
+import './recipe.dart' as showRecipe;
+import './util/slide.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -35,12 +37,23 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return MaterialApp(
         theme: ThemeData(
+            dividerColor: Color(0xff5c39f8),
             primaryColor: Colors.white,
-            accentColor: new Color(0xff5c39f8),
+            accentColor: Color(0xff5c39f8),
             scaffoldBackgroundColor: Colors.white),
         home: Scaffold(
           appBar: new AppBar(
-              backgroundColor: Color(0xFFFFFFFF),
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(
+                    Icons.book,
+                    color: Color(0xff5c39f8),
+                  ),
+                  onPressed: () {
+                    Navigator.push(context, Slide(page: showRecipe.Recipe()));
+                  },
+                )
+              ],
               elevation: 0.0,
               title: new Container(
                   padding: new EdgeInsets.only(top: 10.0),
