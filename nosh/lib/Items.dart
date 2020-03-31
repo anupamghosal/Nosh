@@ -37,7 +37,8 @@ class _ItemsState extends State<Items> {
       builder: (BuildContext context, Widget child) {
         return Theme(
           data: ThemeData(
-              primaryColor: Color(0xFF5C39F8),
+              primarySwatch: Colors.deepPurple,
+              primaryColor: Colors.white,
               accentColor: Color(0xFF5C39F8),
               cardColor: Color(0xFF5C39F8),
               backgroundColor: Colors.white),
@@ -154,13 +155,15 @@ class _ItemsState extends State<Items> {
               title: new Text("Are you sure?"),
               actions: <Widget>[
                 new MaterialButton(
-                  child: new Text('Yes'),
+                  child: new Text('Yes',
+                      style: TextStyle(color: Color(0xff5c39f8))),
                   onPressed: () {
                     Navigator.of(context).pop(true);
                   },
                 ),
                 new MaterialButton(
-                    child: new Text('No'),
+                    child: new Text('No',
+                        style: TextStyle(color: Color(0xff5c39f8))),
                     onPressed: () {
                       Navigator.of(context).pop(false);
                     })

@@ -65,6 +65,7 @@ class _StockState extends State<Stock> {
       },
       itemBuilder: (context, index) {
         return ListTile(
+            onTap: () {},
             contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
             leading: new Wrap(children: <Widget>[
               new IconButton(
@@ -338,13 +339,15 @@ class _StockState extends State<Stock> {
               title: new Text("Are you sure?"),
               actions: <Widget>[
                 new MaterialButton(
-                  child: new Text('Yes'),
+                  child: new Text('Yes',
+                      style: TextStyle(color: Color(0xff5c39f8))),
                   onPressed: () {
                     Navigator.of(context).pop(true);
                   },
                 ),
                 new MaterialButton(
-                    child: new Text('No'),
+                    child: new Text('No',
+                        style: TextStyle(color: Color(0xff5c39f8))),
                     onPressed: () {
                       Navigator.of(context).pop(false);
                     })
@@ -354,7 +357,6 @@ class _StockState extends State<Stock> {
 
   @override
   Widget build(BuildContext context) {
-    print('called');
     return new Scaffold(
         body: displayUI(),
         floatingActionButton: new FloatingActionButton(
