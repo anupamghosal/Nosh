@@ -306,15 +306,20 @@ class _StockState extends State<Stock> {
                     SizedBox(
                       height: 30,
                     ),
-                    new DatePickerWidget(
-                      minDateTime: DateTime(2018),
-                      maxDateTime: DateTime(2030),
-                      initialDateTime: date,
-                      locale: DATETIME_PICKER_LOCALE_DEFAULT,
-                      pickerTheme: dateTimePickerTheme,
-                      onChange: (dateTime, index) {
-                        date = dateTime;
+                    GestureDetector(
+                      onTap: () {
+                        FocusScope.of(context).unfocus();
                       },
+                      child: new DatePickerWidget(
+                        minDateTime: DateTime(2018),
+                        maxDateTime: DateTime(2030),
+                        initialDateTime: date,
+                        locale: DATETIME_PICKER_LOCALE_DEFAULT,
+                        pickerTheme: dateTimePickerTheme,
+                        onChange: (dateTime, index) {
+                          date = dateTime;
+                        },
+                      ),
                     )
                   ]),
                 ),
