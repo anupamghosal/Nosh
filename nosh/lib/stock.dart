@@ -137,7 +137,10 @@ class _StockState extends State<Stock> {
             //print(snapshot.data[0].NAME);
           }
         } else {
-          return new Center(child: new CircularProgressIndicator());
+          return new Center(
+              child: new CircularProgressIndicator(
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(Color(0xff5c39f8))));
         }
       },
     );
@@ -178,8 +181,10 @@ class _StockState extends State<Stock> {
             width: 80.0,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
-                gradient: LinearGradient(
-                    colors: [Colors.red, Colors.pink])), //1Day to expire alert
+                gradient: LinearGradient(colors: [
+                  Colors.red[800],
+                  Colors.deepOrange
+                ])), //1Day to expire alert
           ),
           Container(
             child: Row(
@@ -196,7 +201,7 @@ class _StockState extends State<Stock> {
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
                 gradient: LinearGradient(colors: [
-                  Colors.amber,
+                  Colors.amber[700],
                   Colors.yellow
                 ])), //2Days to expire alert
           ),

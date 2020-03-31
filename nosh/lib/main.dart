@@ -4,6 +4,7 @@ import './expired.dart' as expired;
 import './Items.dart' as items;
 import './stock.dart' as stock;
 import './recipe.dart' as showRecipe;
+import './util/slide.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -49,8 +50,7 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
                     color: Color(0xff5c39f8),
                   ),
                   onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => showRecipe.Recipe()));
+                    Navigator.push(context, Slide(page: showRecipe.Recipe()));
                   },
                 )
               ],
