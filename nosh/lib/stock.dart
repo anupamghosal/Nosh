@@ -2,26 +2,204 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cupertino_date_picker/flutter_cupertino_date_picker.dart';
 import 'package:nosh/database/expiredItem.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'database/stockItem.dart' as stockItem;
-import 'database/db_helper.dart' as db;
+import 'database/stockItem.dart';
+import 'database/db_helper.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class Stock extends StatefulWidget {
   @override
   _StockState createState() => _StockState();
 }
 
-class _StockState extends State<Stock> {
-  Future<List<stockItem.StockItem>> _stockItems;
-  db.DBhelper _dBhelper;
+class _StockState extends State<Stock> with WidgetsBindingObserver {
+  Future<List<StockItem>> _stockItems;
+  List<StockItem> _currentStockItems;
+  DBhelper _dBhelper;
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
   final _formKey = GlobalKey<FormState>();
 
   @override
-  initState() {
+  void initState() {
     super.initState();
-    _dBhelper = new db.DBhelper();
+    WidgetsBinding.instance.addObserver(this);
+    _dBhelper = new DBhelper();
+    initializeAndCancelNotifications();
   }
+
+  initializeAndCancelNotifications() {
+    if(flutterLocalNotificationsPlugin == null) {
+      //initialize notifications
+      flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+      var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
+      var initializationSettingsIOS = IOSInitializationSettings();
+      var initializationSettings = InitializationSettings(
+          initializationSettingsAndroid, initializationSettingsIOS);
+      flutterLocalNotificationsPlugin.initialize(initializationSettings).then((value) {
+        print('initialized');
+        flutterLocalNotificationsPlugin.cancelAll().then((value) {
+          print('cancelled all notifications');
+        });
+      });
+    }
+    else {
+      flutterLocalNotificationsPlugin.cancelAll().then((value) {
+        print('canceled all notifications');
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    switch(state) {
+      case AppLifecycleState.paused :
+        scheduleNotifications();
+        break;
+      case AppLifecycleState.inactive :
+        print('inactive');
+        break;
+      case AppLifecycleState.detached :
+        print('detached');
+        break;
+      case AppLifecycleState.resumed :
+        initializeAndCancelNotifications();
+        break;
+    }
+  }
+
+  scheduleNotifications() {
+    print(_currentStockItems);
+    if(_currentStockItems != null && _currentStockItems.length != 0) {
+      for(StockItem item in _currentStockItems) {
+        String date = item.getExpiryDate();
+        DateTime now = new DateTime.now();
+        now = new DateTime(now.year, now.month, now.day);
+        int daysLeft = DateTime.parse(date).difference(now).inDays;
+        if(daysLeft >= 0) {
+          if (daysLeft == 0) {
+            //red
+            notifyWhenExpires(item);
+          } else if (daysLeft <= 2) {
+            //amber
+            notifyWhenExpires(item);
+            notifyWhenJustExpires(item);
+          } else {
+            //blue
+            notifyWhenExpires(item);
+            notifyWhenJustExpires(item);
+            notifyWhenAboutToExpire(item);
+          }
+        }
+      }
+    }
+  }
+
+  notifyWhenExpires(StockItem item) {
+    DateTime scheduledDate = DateTime.now().add(Duration(seconds: 5));
+    //DateTime scheduledDate = DateTime.parse(item.getExpiryDate());
+    String groupKey = scheduledDate.toString();
+    groupKey = groupKey.substring(0, groupKey.indexOf('.'));
+    String groupChannelId = 'Black';
+    String groupChannelName = 'Expired Items';
+    String groupChannelDescription = 'This channel is associated with expired items';
+
+    AndroidNotificationDetails androidNotificationDetails =
+    AndroidNotificationDetails(
+        groupChannelId, groupChannelName, groupChannelDescription,
+        importance: Importance.Max,
+        priority: Priority.High,
+        groupKey: groupKey);
+    IOSNotificationDetails iosNotificationDetails = IOSNotificationDetails();
+    NotificationDetails notificationDetails = NotificationDetails(androidNotificationDetails,
+    iosNotificationDetails);
+
+    //schedule notification
+    flutterLocalNotificationsPlugin.schedule(
+      item.getId(), 
+      item.getName(), 
+      'Expired', 
+      scheduledDate, 
+      notificationDetails
+    ).then((value) {
+      print('Scheduled Notification for ' + scheduledDate.toString() + ' ' + item.getName());
+    });
+  }
+
+  notifyWhenJustExpires(StockItem item) async {
+    //DateTime scheduledDate = DateTime.parse(item.getExpiryDate()).subtract(Duration(days: 1));
+    DateTime scheduledDate = DateTime.now().add(Duration(seconds: 5));
+    //6 notifications every 4 hrs
+    for(int i = 1; i <= 6; i++) {
+      String groupKey = scheduledDate.toString();
+      groupKey = groupKey.substring(0, groupKey.indexOf('.'));
+      String groupChannelId = 'Red';
+      String groupChannelName = 'Just Expiring Items';
+      String groupChannelDescription = 'This channel is associated with items expiring in one day';
+
+      AndroidNotificationDetails androidNotificationDetails =
+      AndroidNotificationDetails(
+          groupChannelId, groupChannelName, groupChannelDescription,
+          importance: Importance.Max,
+          priority: Priority.High,
+          groupKey: groupKey);
+      IOSNotificationDetails iosNotificationDetails = IOSNotificationDetails();
+      NotificationDetails notificationDetails = NotificationDetails(androidNotificationDetails,
+      iosNotificationDetails);
+      
+      await flutterLocalNotificationsPlugin.schedule(
+        item.getId(), 
+        item.getName(), 
+        'Expiring in 1 day', 
+        scheduledDate, 
+        notificationDetails
+      );
+      print('Scheduled Notification for ' + scheduledDate.toString() + ' ' + item.getName());
+      print(groupKey);
+      scheduledDate = scheduledDate.add(Duration(seconds: 4));
+    }
+  }
+
+  notifyWhenAboutToExpire(StockItem item) async {
+    //DateTime scheduledDate = DateTime.parse(item.getExpiryDate()).subtract(Duration(days: 2));
+    DateTime scheduledDate = DateTime.now().add(Duration(seconds: 5));
+    //3 notifications every 8 hrs
+    for(int i = 1; i <= 3; i++) {
+      String groupKey = scheduledDate.toString();
+      groupKey = groupKey.substring(0, groupKey.indexOf('.'));
+      String groupChannelId = 'Amber';
+      String groupChannelName = 'About To Expire Items';
+      String groupChannelDescription = 'This channel is associated with items expiring in two days';
+
+      AndroidNotificationDetails androidNotificationDetails =
+      AndroidNotificationDetails(
+          groupChannelId, groupChannelName, groupChannelDescription,
+          importance: Importance.Max,
+          priority: Priority.High,
+          groupKey: groupKey);
+      IOSNotificationDetails iosNotificationDetails = IOSNotificationDetails();
+      NotificationDetails notificationDetails = NotificationDetails(androidNotificationDetails,
+      iosNotificationDetails);
+
+      await flutterLocalNotificationsPlugin.schedule(
+        item.getId(), 
+        item.getName(), 
+        'Expiring in two days', 
+        scheduledDate, 
+        notificationDetails
+      );
+      print('Scheduled Notification for ' + scheduledDate.toString() + ' ' + item.getName());
+      print(groupKey);
+      scheduledDate = scheduledDate.add(Duration(seconds: 8));
+    }
+  } 
 
   refreshItems() {
     setState(() {
@@ -42,7 +220,7 @@ class _StockState extends State<Stock> {
     }
   }
 
-  createListUI(List<stockItem.StockItem> items) {
+  createListUI(List<StockItem> items) {
     //filter dates
     for (int i = 0; i < items.length; i++) {
       DateTime now = new DateTime.now();
@@ -114,6 +292,7 @@ class _StockState extends State<Stock> {
       future: _stockItems,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
+          _currentStockItems = snapshot.data;
           //temporary remove later
           if (snapshot.data == null || snapshot.data.length == 0) {
             return Column(
@@ -131,20 +310,20 @@ class _StockState extends State<Stock> {
           }
           if (snapshot.hasData) {
             //create ListUI
-            print(snapshot.data[0].getExpiryDate());
             return createUI(snapshot.data);
             //print(snapshot.data[0].NAME);
           }
         } else {
+          _currentStockItems = null;
           return new Center(child: new CircularProgressIndicator());
         }
       },
     );
   }
 
-  createCounterPanel(List<stockItem.StockItem> items) {
+  createCounterPanel(List<StockItem> items) {
     int redCounter = 0, amberCounter = 0, blueCounter = 0;
-    for (stockItem.StockItem item in items) {
+    for (StockItem item in items) {
       String date = item.getExpiryDate();
       DateTime now = new DateTime.now();
       now = new DateTime(now.year, now.month, now.day);
@@ -229,12 +408,17 @@ class _StockState extends State<Stock> {
     );
   }
 
-  createUI(List<stockItem.StockItem> items) {
-    return Column(
-      children: <Widget>[
-        createCounterPanel(items),
-        Expanded(child: createListUI(items))
-      ],
+  createUI(List<StockItem> items) {
+    return RefreshIndicator(
+        child: Column(
+        children: <Widget>[
+          createCounterPanel(items),
+          Expanded(child: createListUI(items))
+        ],
+      ),
+      onRefresh: () {
+        refreshItems();
+      },
     );
   }
 
@@ -363,8 +547,8 @@ class _StockState extends State<Stock> {
                   String date = new DateFormat('yyyy-MM-dd')
                       .format(onValue[1])
                       .toString();
-                  stockItem.StockItem item =
-                      new stockItem.StockItem(onValue[0], date);
+                  StockItem item =
+                      new StockItem(onValue[0], date);
                   _dBhelper.saveToStock(item);
                   refreshItems();
                 }
