@@ -37,7 +37,6 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return MaterialApp(
         theme: ThemeData(
-            dividerColor: Color(0xff5c39f8),
             primaryColor: Colors.white,
             accentColor: Color(0xff5c39f8),
             scaffoldBackgroundColor: Colors.white),
