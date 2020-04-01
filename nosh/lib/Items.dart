@@ -22,6 +22,7 @@ class _ItemsState extends State<Items> {
   initState() {
     super.initState();
     _dBhelper = new DBhelper();
+    refreshItems();
   }
 
   refreshItems() {
@@ -147,7 +148,7 @@ class _ItemsState extends State<Items> {
   }
 
   displayListUI() {
-    refreshItems();
+    // refreshItems();
     return FutureBuilder(
       future: _listItems,
       builder: (context, snapshot) {
@@ -276,7 +277,6 @@ class _ItemsState extends State<Items> {
                         child: Text("cancel"),
                         color: Color(0xff5c39f8),
                         textColor: Colors.white,
-                        disabledColor: Colors.grey[300],
                         onPressed: () {
                           setState(() {
                             _longPressEventActive = false;
