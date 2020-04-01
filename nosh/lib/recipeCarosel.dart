@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 import './util/slide.dart';
+import './models/Recipe.dart';
 
 class RecipeCarosel extends StatefulWidget {
   String query;
@@ -17,6 +18,7 @@ class RecipeCaroselState extends State<RecipeCarosel> {
   RecipeCaroselState(this.query);
 
   Future<List<Recipe>> getRecipes() async {
+    print('started'); // delete karr dena
     String url = "https://recipe-puppy.p.rapidapi.com/?i=" + query;
     var response = await http.get(Uri.encodeFull(url), headers: {
       "x-rapidapi-host": "recipe-puppy.p.rapidapi.com",
@@ -33,6 +35,7 @@ class RecipeCaroselState extends State<RecipeCarosel> {
           r["ingredients"].trim(), r["thumbnail"].trim());
       recipes.add(recipe);
     }
+    print('done'); // delete karr dena
 
     return recipes;
   }
@@ -59,7 +62,6 @@ class RecipeCaroselState extends State<RecipeCarosel> {
                   ),
                 );
               } else {
-                print(snapshot.data.length);
                 return ListView.builder(
                   itemCount: snapshot.data.length,
                   itemBuilder: (BuildContext context, int index) {
@@ -81,15 +83,6 @@ class RecipeCaroselState extends State<RecipeCarosel> {
           ),
         ));
   }
-}
-
-class Recipe {
-  String title;
-  String recipeUri;
-  String ingredients;
-  String picture;
-
-  Recipe(this.title, this.recipeUri, this.ingredients, this.picture);
 }
 
 // recipe detail

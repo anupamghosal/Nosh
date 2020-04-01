@@ -13,6 +13,8 @@ class Items extends StatefulWidget {
 class _ItemsState extends State<Items> {
   Future<List<ListItem>> _listItems;
   DBhelper _dBhelper;
+  bool _longPressEventActive = false;
+  final _selectedItems = Set<String>();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -55,20 +57,44 @@ class _ItemsState extends State<Items> {
         return new Divider();
       },
       itemBuilder: (context, index) {
+        final name = items[index].getName();
+        final alreadySelected = _selectedItems.contains(name);
         return ListTile(
-          leading: new IconButton(
-            icon: new Icon(Icons.edit, color: Colors.black),
-            onPressed: () {
-              createAlertDialog(context, false, name: items[index].getName())
-                  .then((onValue) {
-                if (onValue != null) {
-                  items[index].setName(onValue);
-                  _dBhelper.updateItemFromList(items[index]);
-                  refreshItems();
-                }
-              });
-            },
-          ),
+          onTap: () {
+            setState(() {
+              if (alreadySelected) {
+                _selectedItems.remove(name);
+              } else {
+                _selectedItems.add(name);
+              }
+            });
+          },
+          onLongPress: () {
+            setState(() {
+              _longPressEventActive = true;
+            });
+          },
+          leading: _longPressEventActive
+              ? new IconButton(
+                  icon: new Icon(Icons.edit, color: Colors.black),
+                  onPressed: () {
+                    createAlertDialog(context, false,
+                            name: items[index].getName())
+                        .then((onValue) {
+                      if (onValue != null) {
+                        items[index].setName(onValue);
+                        _dBhelper.updateItemFromList(items[index]);
+                        refreshItems();
+                      }
+                    });
+                  },
+                )
+              : Icon(
+                  alreadySelected
+                      ? Icons.check_circle
+                      : Icons.check_circle_outline,
+                  color: alreadySelected ? Color(0xff5c39f8) : null,
+                ),
           title: new Text(items[index].getName()),
           trailing: new Wrap(
             children: <Widget>[
@@ -234,7 +260,34 @@ class _ItemsState extends State<Items> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        body: displayListUI(),
+        body: Container(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Expanded(
+                child: displayListUI(),
+              ),
+              _longPressEventActive
+                  ? Container(
+                      padding: EdgeInsets.all(20.0),
+                      child: RaisedButton(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0)),
+                        child: Text("cancel"),
+                        color: Color(0xff5c39f8),
+                        textColor: Colors.white,
+                        disabledColor: Colors.grey[300],
+                        onPressed: () {
+                          setState(() {
+                            _longPressEventActive = false;
+                          });
+                        },
+                      ),
+                    )
+                  : Container()
+            ],
+          ),
+        ),
         floatingActionButton: new FloatingActionButton(
             child: Icon(Icons.add),
             backgroundColor: new Color(0xff5c39f8),
