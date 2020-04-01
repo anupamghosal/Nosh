@@ -491,8 +491,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
       controller.text = productName;
       submitButtonText = 'Update Item';
     }
-    if(name != '')
-      controller.text = name;
+    if (name != '') controller.text = name;
 
     return showDialog(
         context: context,
@@ -590,20 +589,20 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
 
   creatFAB() {
     return new Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            new FloatingActionButton.extended(
-              icon: Icon(Icons.camera_alt),
-              label: Text('Scan'),
-              onPressed: () async {
-                await scan();
-                print(_barcode);
-              },
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            new FloatingActionButton(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: <Widget>[
+        new FloatingActionButton.extended(
+          icon: Icon(Icons.camera_alt),
+          label: Text('Scan'),
+          onPressed: () async {
+            await scan();
+            print(_barcode);
+          },
+        ),
+        SizedBox(
+          width: 10,
+        ),
+        new FloatingActionButton(
             child: Icon(Icons.add),
             backgroundColor: new Color(0xff5c39f8),
             onPressed: () {
@@ -619,9 +618,9 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                   refreshItems();
                 }
               });
-            })  
-          ],
-        );
+            })
+      ],
+    );
   }
 
   createStyledFAB() {
@@ -689,26 +688,51 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
         );
   }
 
+  showError() {
+    final snackBar = SnackBar(
+      content: Text('Product not found! Enter manually?'),
+      action: SnackBarAction(
+        label: 'OK',
+        onPressed: () {
+          createAlertDialog(context, true).then((onValue) {
+            if (onValue != null) {
+              print(onValue[0]);
+              print(onValue[1]);
+              String date =
+                  new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
+              StockItem item = new StockItem(onValue[0], date);
+              _dBhelper.saveToStock(item);
+              refreshItems();
+            }
+          });
+        },
+      ),
+    );
+
+    Scaffold.of(context).showSnackBar(snackBar);
+  }
+
   Future scan() async {
     try {
       String barcode = await BarcodeScanner.scan();
       String productName = await getProduct(barcode);
-      if(productName == null)
-        productName = '';
+      if (productName == null) productName = '';
       print(productName);
-      createAlertDialog(context, true, name: productName).then((onValue) {
-        if (onValue != null) {
-                  print(onValue[0]);
-                  print(onValue[1]);
-                  String date = new DateFormat('yyyy-MM-dd')
-                      .format(onValue[1])
-                      .toString();
-                  StockItem item =
-                      new StockItem(onValue[0], date);
-                  _dBhelper.saveToStock(item);
-                  refreshItems();
-                }
-      });
+      if (productName == "404") {
+        showError();
+      } else {
+        createAlertDialog(context, true, name: productName).then((onValue) {
+          if (onValue != null) {
+            print(onValue[0]);
+            print(onValue[1]);
+            String date =
+                new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
+            StockItem item = new StockItem(onValue[0], date);
+            _dBhelper.saveToStock(item);
+            refreshItems();
+          }
+        });
+      }
     } on PlatformException catch (e) {
       if (e.code == BarcodeScanner.CameraAccessDenied) {
         setState(() {
@@ -719,27 +743,29 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
           _barcode = 'Unknown error: $e';
         });
       }
-    } on FormatException{
+    } on FormatException {
       setState(() {
-        _barcode = 'null (User returned using the "back"-button before scanning anything. Result)';
+        _barcode =
+            'null (User returned using the "back"-button before scanning anything. Result)';
       });
     } catch (e) {
       setState(() {
-        _barcode = 'null (User returned using the "back"-button before scanning anything. Result)';
+        _barcode =
+            'null (User returned using the "back"-button before scanning anything. Result)';
       });
     }
   }
 
   Future<String> getProduct(String barcode) async {
-  ProductResult result =
-      await OpenFoodAPIClient.getProduct(barcode, User.LANGUAGE_EN);
+    ProductResult result =
+        await OpenFoodAPIClient.getProduct(barcode, User.LANGUAGE_EN);
 
-  if (result.status == 1) {
-    return result.product.productName;
-  } else {
-    return "product not found, please insert data for " + barcode;
+    if (result.status == 1) {
+      return result.product.productName;
+    } else {
+      return "404";
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
