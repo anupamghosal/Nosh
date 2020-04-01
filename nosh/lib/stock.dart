@@ -6,6 +6,10 @@ import 'database/stockItem.dart';
 import 'database/db_helper.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:barcode_scan/barcode_scan.dart';
+import 'package:flutter/services.dart';
+import 'package:openfoodfacts/openfoodfacts.dart';
 
 class Stock extends StatefulWidget {
   @override
@@ -17,6 +21,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   List<StockItem> _currentStockItems;
   DBhelper _dBhelper;
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  String _barcode = '';
 
   final _formKey = GlobalKey<FormState>();
 
@@ -448,6 +453,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
       controller.text = productName;
       submitButtonText = 'Update Item';
     }
+    if(name != '')
+      controller.text = name;
 
     return showDialog(
         context: context,
@@ -543,11 +550,22 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
         });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-        body: displayUI(),
-        floatingActionButton: new FloatingActionButton(
+  creatFAB() {
+    return new Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            new FloatingActionButton.extended(
+              icon: Icon(Icons.camera_alt),
+              label: Text('Scan'),
+              onPressed: () async {
+                await scan();
+                print(_barcode);
+              },
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            new FloatingActionButton(
             child: Icon(Icons.add),
             backgroundColor: new Color(0xff5c39f8),
             onPressed: () {
@@ -564,6 +582,103 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                   refreshItems();
                 }
               });
-            }));
+            })  
+          ],
+        );
+  }
+
+  createStyledFAB() {
+    return SpeedDial(
+          animatedIcon: AnimatedIcons.event_add,
+          animatedIconTheme: IconThemeData(size: 22),
+          backgroundColor: Color(0xFF801E48),
+          visible: true,
+          curve: Curves.bounceIn,
+          children: [
+                // FAB 1
+                SpeedDialChild(
+                child: Icon(Icons.assignment_turned_in),
+                backgroundColor: Color(0xFF801E48),
+                onTap: () { /* do anything */ },
+                label: 'Button 1',
+                labelStyle: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                    fontSize: 16.0),
+                labelBackgroundColor: Color(0xFF801E48)),
+                // FAB 2
+                SpeedDialChild(
+                child: Icon(Icons.assignment_turned_in),
+                backgroundColor: Color(0xFF801E48),
+                onTap: () {
+                },
+                label: 'Button 2',
+                labelStyle: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                    fontSize: 16.0),
+                labelBackgroundColor: Color(0xFF801E48))
+          ],
+        );
+  }
+
+  Future scan() async {
+    try {
+      String barcode = await BarcodeScanner.scan();
+      String productName = await getProduct(barcode);
+      if(productName == null)
+        productName = '';
+      print(productName);
+      createAlertDialog(context, true, name: productName).then((onValue) {
+        if (onValue != null) {
+                  print(onValue[0]);
+                  print(onValue[1]);
+                  String date = new DateFormat('yyyy-MM-dd')
+                      .format(onValue[1])
+                      .toString();
+                  StockItem item =
+                      new StockItem(onValue[0], date);
+                  _dBhelper.saveToStock(item);
+                  refreshItems();
+                }
+      });
+    } on PlatformException catch (e) {
+      if (e.code == BarcodeScanner.CameraAccessDenied) {
+        setState(() {
+          _barcode = 'The user did not grant the camera permission!';
+        });
+      } else {
+        setState(() {
+          _barcode = 'Unknown error: $e';
+        });
+      }
+    } on FormatException{
+      setState(() {
+        _barcode = 'null (User returned using the "back"-button before scanning anything. Result)';
+      });
+    } catch (e) {
+      setState(() {
+        _barcode = 'null (User returned using the "back"-button before scanning anything. Result)';
+      });
+    }
+  }
+
+  Future<String> getProduct(String barcode) async {
+  ProductResult result =
+      await OpenFoodAPIClient.getProduct(barcode, User.LANGUAGE_EN);
+
+  if (result.status == 1) {
+    return result.product.productName;
+  } else {
+    return "product not found, please insert data for " + barcode;
+  }
+}
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+        body: displayUI(),
+        floatingActionButton: creatFAB(),
+        );
   }
 }
