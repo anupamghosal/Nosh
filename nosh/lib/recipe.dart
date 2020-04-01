@@ -26,35 +26,38 @@ class RecipeState extends State<Recipe> {
   }
 
   buildRow(List<stockItem.StockItem> items) {
-    return new ListView.separated(
-      itemCount: items.length,
-      separatorBuilder: (context, index) {
-        return new Divider();
-      },
-      itemBuilder: (context, index) {
-        final name = items[index].getName();
-        final alreadySelected = _selectedFood.contains(name);
-        return ListTile(
-          onTap: () {
-            setState(() {
-              if (alreadySelected) {
-                _selectedFood.remove(name);
-              } else {
-                _selectedFood.add(name);
-              }
-            });
-          },
-          contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
-          leading: alreadySelected
-              ? Icon(
-                  Icons.check_circle,
-                  color: Color(0xff5c39f8),
-                )
-              : Icon(Icons.check_circle_outline),
-          title: new Text(items[index].getName()),
-          subtitle: new Text(items[index].getExpiryDate()),
-        );
-      },
+    return Theme(
+      data: ThemeData(accentColor: Color(0xff5c39f8)),
+      child: ListView.separated(
+        itemCount: items.length,
+        separatorBuilder: (context, index) {
+          return Divider();
+        },
+        itemBuilder: (context, index) {
+          final name = items[index].getName();
+          final alreadySelected = _selectedFood.contains(name);
+          return ListTile(
+            onTap: () {
+              setState(() {
+                if (alreadySelected) {
+                  _selectedFood.remove(name);
+                } else {
+                  _selectedFood.add(name);
+                }
+              });
+            },
+            contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
+            leading: alreadySelected
+                ? Icon(
+                    Icons.check_circle,
+                    color: Color(0xff5c39f8),
+                  )
+                : Icon(Icons.check_circle_outline),
+            title: new Text(items[index].getName()),
+            subtitle: new Text(items[index].getExpiryDate()),
+          );
+        },
+      ),
     );
   }
 
@@ -104,7 +107,8 @@ class RecipeState extends State<Recipe> {
                         }
                       }
 
-                      Navigator.push(context, Slide(page: RecipeCarosel()));
+                      Navigator.push(
+                          context, Slide(page: RecipeCarosel(query: query)));
                     }
                   : null,
             ),

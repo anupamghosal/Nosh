@@ -24,6 +24,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   String _barcode = '';
 
   final _formKey = GlobalKey<FormState>();
+  bool _longPressedEventActive = false;
 
   @override
   void initState() {
@@ -31,24 +32,27 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     _dBhelper = new DBhelper();
     initializeAndCancelNotifications();
+    refreshItems();
   }
 
   initializeAndCancelNotifications() {
-    if(flutterLocalNotificationsPlugin == null) {
+    if (flutterLocalNotificationsPlugin == null) {
       //initialize notifications
       flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-      var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
+      var initializationSettingsAndroid =
+          AndroidInitializationSettings('app_icon');
       var initializationSettingsIOS = IOSInitializationSettings();
       var initializationSettings = InitializationSettings(
           initializationSettingsAndroid, initializationSettingsIOS);
-      flutterLocalNotificationsPlugin.initialize(initializationSettings).then((value) {
+      flutterLocalNotificationsPlugin
+          .initialize(initializationSettings)
+          .then((value) {
         print('initialized');
         flutterLocalNotificationsPlugin.cancelAll().then((value) {
           print('cancelled all notifications');
         });
       });
-    }
-    else {
+    } else {
       flutterLocalNotificationsPlugin.cancelAll().then((value) {
         print('canceled all notifications');
       });
@@ -64,17 +68,17 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    switch(state) {
-      case AppLifecycleState.paused :
+    switch (state) {
+      case AppLifecycleState.paused:
         scheduleNotifications();
         break;
-      case AppLifecycleState.inactive :
+      case AppLifecycleState.inactive:
         print('inactive');
         break;
-      case AppLifecycleState.detached :
+      case AppLifecycleState.detached:
         print('detached');
         break;
-      case AppLifecycleState.resumed :
+      case AppLifecycleState.resumed:
         initializeAndCancelNotifications();
         break;
     }
@@ -82,13 +86,13 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
 
   scheduleNotifications() {
     print(_currentStockItems);
-    if(_currentStockItems != null && _currentStockItems.length != 0) {
-      for(StockItem item in _currentStockItems) {
+    if (_currentStockItems != null && _currentStockItems.length != 0) {
+      for (StockItem item in _currentStockItems) {
         String date = item.getExpiryDate();
         DateTime now = new DateTime.now();
         now = new DateTime(now.year, now.month, now.day);
         int daysLeft = DateTime.parse(date).difference(now).inDays;
-        if(daysLeft >= 0) {
+        if (daysLeft >= 0) {
           if (daysLeft == 0) {
             //red
             notifyWhenExpires(item);
@@ -114,27 +118,28 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     groupKey = groupKey.substring(0, groupKey.indexOf('.'));
     String groupChannelId = 'Black';
     String groupChannelName = 'Expired Items';
-    String groupChannelDescription = 'This channel is associated with expired items';
+    String groupChannelDescription =
+        'This channel is associated with expired items';
 
     AndroidNotificationDetails androidNotificationDetails =
-    AndroidNotificationDetails(
-        groupChannelId, groupChannelName, groupChannelDescription,
-        importance: Importance.Max,
-        priority: Priority.High,
-        groupKey: groupKey);
+        AndroidNotificationDetails(
+            groupChannelId, groupChannelName, groupChannelDescription,
+            importance: Importance.Max,
+            priority: Priority.High,
+            groupKey: groupKey);
     IOSNotificationDetails iosNotificationDetails = IOSNotificationDetails();
-    NotificationDetails notificationDetails = NotificationDetails(androidNotificationDetails,
-    iosNotificationDetails);
+    NotificationDetails notificationDetails =
+        NotificationDetails(androidNotificationDetails, iosNotificationDetails);
 
     //schedule notification
-    flutterLocalNotificationsPlugin.schedule(
-      item.getId(), 
-      item.getName(), 
-      'Expired', 
-      scheduledDate, 
-      notificationDetails
-    ).then((value) {
-      print('Scheduled Notification for ' + scheduledDate.toString() + ' ' + item.getName());
+    flutterLocalNotificationsPlugin
+        .schedule(item.getId(), item.getName(), 'Expired', scheduledDate,
+            notificationDetails)
+        .then((value) {
+      print('Scheduled Notification for ' +
+          scheduledDate.toString() +
+          ' ' +
+          item.getName());
     });
   }
 
@@ -142,31 +147,34 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     //DateTime scheduledDate = DateTime.parse(item.getExpiryDate()).subtract(Duration(days: 1));
     DateTime scheduledDate = DateTime.now().add(Duration(seconds: 5));
     //6 notifications every 4 hrs
-    for(int i = 1; i <= 6; i++) {
+    for (int i = 1; i <= 6; i++) {
       String groupKey = scheduledDate.toString();
       groupKey = groupKey.substring(0, groupKey.indexOf('.'));
       String groupChannelId = 'Red';
       String groupChannelName = 'Just Expiring Items';
-      String groupChannelDescription = 'This channel is associated with items expiring in one day';
+      String groupChannelDescription =
+          'This channel is associated with items expiring in one day';
 
       AndroidNotificationDetails androidNotificationDetails =
-      AndroidNotificationDetails(
-          groupChannelId, groupChannelName, groupChannelDescription,
-          importance: Importance.Max,
-          priority: Priority.High,
-          groupKey: groupKey);
+          AndroidNotificationDetails(
+              groupChannelId, groupChannelName, groupChannelDescription,
+              importance: Importance.Max,
+              priority: Priority.High,
+              groupKey: groupKey);
       IOSNotificationDetails iosNotificationDetails = IOSNotificationDetails();
-      NotificationDetails notificationDetails = NotificationDetails(androidNotificationDetails,
-      iosNotificationDetails);
-      
+      NotificationDetails notificationDetails = NotificationDetails(
+          androidNotificationDetails, iosNotificationDetails);
+
       await flutterLocalNotificationsPlugin.schedule(
-        item.getId(), 
-        item.getName(), 
-        'Expiring in 1 day', 
-        scheduledDate, 
-        notificationDetails
-      );
-      print('Scheduled Notification for ' + scheduledDate.toString() + ' ' + item.getName());
+          item.getId(),
+          item.getName(),
+          'Expiring in 1 day',
+          scheduledDate,
+          notificationDetails);
+      print('Scheduled Notification for ' +
+          scheduledDate.toString() +
+          ' ' +
+          item.getName());
       print(groupKey);
       scheduledDate = scheduledDate.add(Duration(seconds: 4));
     }
@@ -176,35 +184,38 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     //DateTime scheduledDate = DateTime.parse(item.getExpiryDate()).subtract(Duration(days: 2));
     DateTime scheduledDate = DateTime.now().add(Duration(seconds: 5));
     //3 notifications every 8 hrs
-    for(int i = 1; i <= 3; i++) {
+    for (int i = 1; i <= 3; i++) {
       String groupKey = scheduledDate.toString();
       groupKey = groupKey.substring(0, groupKey.indexOf('.'));
       String groupChannelId = 'Amber';
       String groupChannelName = 'About To Expire Items';
-      String groupChannelDescription = 'This channel is associated with items expiring in two days';
+      String groupChannelDescription =
+          'This channel is associated with items expiring in two days';
 
       AndroidNotificationDetails androidNotificationDetails =
-      AndroidNotificationDetails(
-          groupChannelId, groupChannelName, groupChannelDescription,
-          importance: Importance.Max,
-          priority: Priority.High,
-          groupKey: groupKey);
+          AndroidNotificationDetails(
+              groupChannelId, groupChannelName, groupChannelDescription,
+              importance: Importance.Max,
+              priority: Priority.High,
+              groupKey: groupKey);
       IOSNotificationDetails iosNotificationDetails = IOSNotificationDetails();
-      NotificationDetails notificationDetails = NotificationDetails(androidNotificationDetails,
-      iosNotificationDetails);
+      NotificationDetails notificationDetails = NotificationDetails(
+          androidNotificationDetails, iosNotificationDetails);
 
       await flutterLocalNotificationsPlugin.schedule(
-        item.getId(), 
-        item.getName(), 
-        'Expiring in two days', 
-        scheduledDate, 
-        notificationDetails
-      );
-      print('Scheduled Notification for ' + scheduledDate.toString() + ' ' + item.getName());
+          item.getId(),
+          item.getName(),
+          'Expiring in two days',
+          scheduledDate,
+          notificationDetails);
+      print('Scheduled Notification for ' +
+          scheduledDate.toString() +
+          ' ' +
+          item.getName());
       print(groupKey);
       scheduledDate = scheduledDate.add(Duration(seconds: 8));
     }
-  } 
+  }
 
   refreshItems() {
     setState(() {
@@ -241,49 +252,58 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
         items.remove(items[i]);
       }
     }
-    return new ListView.separated(
+    return ListView.separated(
       itemCount: items.length,
       separatorBuilder: (context, index) {
-        return new Divider();
+        return Divider();
       },
       itemBuilder: (context, index) {
         return ListTile(
-            onTap: () {},
-            contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
-            leading: new Wrap(children: <Widget>[
-              new IconButton(
-                padding: new EdgeInsets.all(0.0),
-                icon: new Icon(Icons.edit, color: Colors.black, size: 22),
-                onPressed: () {
-                  DateTime date = DateTime.parse(items[index].getExpiryDate());
-                  createAlertDialog(context, false,
-                          name: items[index].getName(), initDate: date)
-                      .then((onValue) {
-                    if (onValue != null) {
-                      items[index].setName(onValue[0]);
-                      String dateconverted = new DateFormat('yyyy-MM-dd')
-                          .format(onValue[1])
-                          .toString();
-                      items[index].setExpiryDate(dateconverted);
-                      _dBhelper.updateItemFromStock(items[index]);
-                      refreshItems();
-                    }
-                  });
-                },
-              ),
-              new IconButton(
-                icon: new Icon(Icons.delete, color: Colors.red),
-                padding: new EdgeInsets.all(0.0),
-                onPressed: () {
-                  createDeleteAlert(context).then((onValue) {
-                    if (onValue != null && onValue) {
-                      _dBhelper.deleteItemFromStock(items[index].getName());
-                      refreshItems();
-                    }
-                  });
-                },
-              )
-            ]),
+            onLongPress: () {
+              setState(() {
+                _longPressedEventActive = true;
+              });
+            },
+            leading: _longPressedEventActive
+                ? Wrap(children: <Widget>[
+                    IconButton(
+                      padding: new EdgeInsets.all(0.0),
+                      icon: new Icon(Icons.edit, color: Colors.black, size: 22),
+                      onPressed: () {
+                        DateTime date =
+                            DateTime.parse(items[index].getExpiryDate());
+                        createAlertDialog(context, false,
+                                name: items[index].getName(), initDate: date)
+                            .then((onValue) {
+                          if (onValue != null) {
+                            items[index].setName(onValue[0]);
+                            String dateconverted = new DateFormat('yyyy-MM-dd')
+                                .format(onValue[1])
+                                .toString();
+                            items[index].setExpiryDate(dateconverted);
+                            _dBhelper.updateItemFromStock(items[index]);
+                            refreshItems();
+                          }
+                        });
+                      },
+                    ),
+                    IconButton(
+                      icon: new Icon(Icons.delete, color: Colors.red),
+                      padding: new EdgeInsets.all(0.0),
+                      onPressed: () {
+                        createDeleteAlert(context).then((onValue) {
+                          if (onValue != null && onValue) {
+                            _dBhelper
+                                .deleteItemFromStock(items[index].getName());
+                            refreshItems();
+                          }
+                        });
+                      },
+                    )
+                  ])
+                : Container(
+                    child: Text(""),
+                  ),
             title: new Text(items[index].getName()),
             subtitle: new Text(items[index].getExpiryDate()),
             trailing: tileColor(items[index].getExpiryDate()));
@@ -293,7 +313,6 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
 
   //make a future builder with the dynamic list view
   displayUI() {
-    refreshItems();
     return FutureBuilder(
       future: _stockItems,
       builder: (context, snapshot) {
@@ -420,10 +439,28 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
 
   createUI(List<StockItem> items) {
     return RefreshIndicator(
-        child: Column(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           createCounterPanel(items),
-          Expanded(child: createListUI(items))
+          Expanded(child: createListUI(items)),
+          _longPressedEventActive
+              ? Container(
+                  padding: EdgeInsets.all(20.0),
+                  child: RaisedButton(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0)),
+                    child: Text("cancel"),
+                    color: Color(0xff5c39f8),
+                    textColor: Colors.white,
+                    onPressed: () {
+                      setState(() {
+                        _longPressedEventActive = false;
+                      });
+                    },
+                  ),
+                )
+              : Container()
         ],
       ),
       onRefresh: () {
@@ -576,8 +613,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                   String date = new DateFormat('yyyy-MM-dd')
                       .format(onValue[1])
                       .toString();
-                  StockItem item =
-                      new StockItem(onValue[0], date);
+                  StockItem item = new StockItem(onValue[0], date);
                   _dBhelper.saveToStock(item);
                   refreshItems();
                 }

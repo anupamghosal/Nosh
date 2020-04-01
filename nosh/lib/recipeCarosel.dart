@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 import './util/slide.dart';
+import './models/Recipe.dart';
+import './recipeDetails.dart';
 
 class RecipeCarosel extends StatefulWidget {
   String query;
@@ -59,22 +61,31 @@ class RecipeCaroselState extends State<RecipeCarosel> {
                   ),
                 );
               } else {
-                print(snapshot.data.length);
-                return ListView.builder(
-                  itemCount: snapshot.data.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return ListTile(
-                      onTap: () {
-                        Navigator.push(
-                            context, Slide(page: snapshot.data[index]));
+                return Theme(
+                  data: ThemeData(accentColor: Color(0xff5c39f8)),
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: ListView.builder(
+                      itemExtent: 80.0,
+                      itemCount: snapshot.data.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return ListTile(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                Slide(
+                                    page: RecipeDetail(snapshot.data[index])));
+                          },
+                          leading: CircleAvatar(
+                            radius: 30.0,
+                            backgroundImage:
+                                NetworkImage(snapshot.data[index].picture),
+                          ),
+                          title: Text(snapshot.data[index].title),
+                        );
                       },
-                      leading: CircleAvatar(
-                        backgroundImage:
-                            NetworkImage(snapshot.data[index].picture),
-                      ),
-                      title: Text(snapshot.data[index].title),
-                    );
-                  },
+                    ),
+                  ),
                 );
               }
             },
@@ -83,29 +94,4 @@ class RecipeCaroselState extends State<RecipeCarosel> {
   }
 }
 
-class Recipe {
-  String title;
-  String recipeUri;
-  String ingredients;
-  String picture;
-
-  Recipe(this.title, this.recipeUri, this.ingredients, this.picture);
-}
-
 // recipe detail
-
-class RecipeDetail extends StatelessWidget {
-  final Recipe recipe;
-
-  RecipeDetail(this.recipe);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xff5c30f8),
-        title: Text(recipe.title),
-      ),
-    );
-  }
-}

@@ -10,7 +10,9 @@ void main() {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarBrightness: Brightness.light,
       statusBarColor: Colors.transparent));
-  runApp(new MaterialApp(home: new AppTabs()));
+  runApp(new MaterialApp(
+    home: new AppTabs(),
+  ));
 }
 
 class AppTabs extends StatefulWidget {
@@ -36,8 +38,8 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
-            dividerColor: Color(0xff5c39f8),
             primaryColor: Colors.white,
             accentColor: Color(0xff5c39f8),
             scaffoldBackgroundColor: Colors.white),
@@ -59,7 +61,7 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
                   padding: new EdgeInsets.only(top: 10.0),
                   child: new Image(
                       image: AssetImage('assets/nosh.png'),
-                      width: 50.0,
+                      width: 65.0,
                       height: 250.0)),
               bottom: new TabBar(
                 controller: _controller,
