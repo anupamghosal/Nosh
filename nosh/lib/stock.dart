@@ -10,6 +10,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/services.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Stock extends StatefulWidget {
   @override
@@ -625,35 +626,65 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
 
   createStyledFAB() {
     return SpeedDial(
-          animatedIcon: AnimatedIcons.event_add,
-          animatedIconTheme: IconThemeData(size: 22),
-          backgroundColor: Color(0xFF801E48),
+          animatedIcon: AnimatedIcons.menu_close,
+          animatedIconTheme: IconThemeData(size: 22, color: Color(0xff5c39f8)),
+          backgroundColor: Colors.white,
           visible: true,
           curve: Curves.bounceIn,
           children: [
                 // FAB 1
                 SpeedDialChild(
-                child: Icon(Icons.assignment_turned_in),
-                backgroundColor: Color(0xFF801E48),
-                onTap: () { /* do anything */ },
-                label: 'Button 1',
+                child: Icon(Icons.filter_center_focus, color: Color(0xff5c39f8)),
+                backgroundColor: Colors.white,
+                onTap: () async {
+                  await scan();
+                  print(_barcode);
+                },
+                label: 'Scan Barcode',
                 labelStyle: TextStyle(
                     fontWeight: FontWeight.w500,
-                    color: Colors.white,
+                    color: Color(0xff5c39f8),
                     fontSize: 16.0),
-                labelBackgroundColor: Color(0xFF801E48)),
+                labelBackgroundColor: Colors.white
+                /*labelWidget: Text('Scan Barcode',
+                    style: GoogleFonts.roboto(
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xff5c39f8),
+                      fontSize: 16.0
+                    ))*/
+                ),
                 // FAB 2
                 SpeedDialChild(
-                child: Icon(Icons.assignment_turned_in),
-                backgroundColor: Color(0xFF801E48),
+                child: Icon(Icons.add, color: Color(0xff5c39f8),),
+                backgroundColor: Colors.white,
                 onTap: () {
+                    createAlertDialog(context, true).then((onValue) {
+                    if (onValue != null) {
+                      print(onValue[0]);
+                      print(onValue[1]);
+                      String date = new DateFormat('yyyy-MM-dd')
+                          .format(onValue[1])
+                          .toString();
+                      StockItem item = new StockItem(onValue[0], date);
+                      _dBhelper.saveToStock(item);
+                      refreshItems();
+                    }
+                  });
                 },
-                label: 'Button 2',
+                label: 'Type Manually',
                 labelStyle: TextStyle(
                     fontWeight: FontWeight.w500,
-                    color: Colors.white,
+                    color: Color(0xff5c39f8),
                     fontSize: 16.0),
-                labelBackgroundColor: Color(0xFF801E48))
+                labelBackgroundColor: Colors.white,
+                /*labelWidget: Text('TYPE MANUALLY',
+                    style: GoogleFonts.robotoCondensed(
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xff5c39f8),
+                      fontSize: 16.0
+                    )
+                  )*/
+                )
           ],
         );
   }
@@ -714,7 +745,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return new Scaffold(
         body: displayUI(),
-        floatingActionButton: creatFAB(),
+        floatingActionButton: createStyledFAB(),
         );
   }
 }
