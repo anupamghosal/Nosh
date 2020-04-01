@@ -63,21 +63,28 @@ class RecipeCaroselState extends State<RecipeCarosel> {
               } else {
                 return Theme(
                   data: ThemeData(accentColor: Color(0xff5c39f8)),
-                  child: ListView.builder(
-                    itemCount: snapshot.data.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return ListTile(
-                        onTap: () {
-                          Navigator.push(context,
-                              Slide(page: RecipeDetail(snapshot.data[index])));
-                        },
-                        leading: CircleAvatar(
-                          backgroundImage:
-                              NetworkImage(snapshot.data[index].picture),
-                        ),
-                        title: Text(snapshot.data[index].title),
-                      );
-                    },
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: ListView.builder(
+                      itemExtent: 80.0,
+                      itemCount: snapshot.data.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return ListTile(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                Slide(
+                                    page: RecipeDetail(snapshot.data[index])));
+                          },
+                          leading: CircleAvatar(
+                            radius: 30.0,
+                            backgroundImage:
+                                NetworkImage(snapshot.data[index].picture),
+                          ),
+                          title: Text(snapshot.data[index].title),
+                        );
+                      },
+                    ),
                   ),
                 );
               }

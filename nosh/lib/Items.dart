@@ -90,11 +90,14 @@ class _ItemsState extends State<Items> {
                     });
                   },
                 )
-              : Icon(
-                  alreadySelected
-                      ? Icons.check_circle
-                      : Icons.check_circle_outline,
-                  color: alreadySelected ? Color(0xff5c39f8) : null,
+              : Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Icon(
+                    alreadySelected
+                        ? Icons.check_circle
+                        : Icons.check_circle_outline,
+                    color: alreadySelected ? Color(0xff5c39f8) : null,
+                  ),
                 ),
           title: new Text(items[index].getName()),
           trailing: new Wrap(
