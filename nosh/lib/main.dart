@@ -58,7 +58,7 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
                   padding: new EdgeInsets.only(top: 10.0),
                   child: new Image(
                       image: AssetImage('assets/nosh.png'),
-                      width: 50.0,
+                      width: 65.0,
                       height: 250.0)),
               bottom: new TabBar(
                 controller: _controller,
