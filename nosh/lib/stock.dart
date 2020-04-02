@@ -179,12 +179,12 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
           ' ' +
           item.getName());
       print(groupKey);
-      scheduledDate = scheduledDate.add(Duration(seconds: 4));
+      scheduledDate = scheduledDate.add(Duration(hours: 4));
     }
   }
 
   notifyWhenAboutToExpire(StockItem item) async {
-    DateTime scheduledDate = DateTime.parse(item.getExpiryDate()).subtract(Duration(days: 1));
+    DateTime scheduledDate = DateTime.parse(item.getExpiryDate()).add(Duration(days: 1));
     //DateTime scheduledDate = DateTime.now().add(Duration(seconds: 5));
     //3 notifications every 8 hrs
     for (int i = 1; i <= 3; i++) {
@@ -216,7 +216,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
           ' ' +
           item.getName());
       print(groupKey);
-      scheduledDate = scheduledDate.add(Duration(seconds: 8));
+      scheduledDate = scheduledDate.add(Duration(hours: 8));
     }
   }
 
