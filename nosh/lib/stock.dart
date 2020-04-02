@@ -585,6 +585,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     String submitButtonText = 'Add Item';
     File imageFile = null;
     String uri = null;
+    bool enable = false;
     if(link.startsWith('https'))
       uri = link;
     else if(link != '')
@@ -626,7 +627,6 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                     key: _formKey,
                     child: StatefulBuilder(
                       builder: (context, setState) {
-                        bool enable = false;
                         return Column(children: <Widget>[
                       Stack(
                         alignment: AlignmentDirectional.bottomEnd,
@@ -698,11 +698,12 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                         onChanged: (value) {
                           setState(() {
                             enable = value;
+                            print(enable);
                           });
                         },
                       ),
                       AbsorbPointer(
-                        absorbing: enable,
+                        absorbing: !enable,
                         child: DatePickerWidget(
                           minDateTime: DateTime(2018),
                           maxDateTime: DateTime(2030),
