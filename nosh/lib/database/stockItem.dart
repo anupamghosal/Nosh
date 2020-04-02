@@ -18,6 +18,10 @@ class StockItem {
     _stockItemId = stockItemId;
   }
 
+  setImage(String image) {
+    _image = image;
+  }
+
   getName() {
     return _stockItemName;
   }

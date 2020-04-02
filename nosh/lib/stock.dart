@@ -21,7 +21,6 @@ class Stock extends StatefulWidget {
 }
 
 class _StockState extends State<Stock> with WidgetsBindingObserver {
-  File _imageFile;
   Future<List<StockItem>> _stockItems;
   List<StockItem> _currentStockItems;
   DBhelper _dBhelper;
@@ -278,7 +277,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                         DateTime date =
                             DateTime.parse(items[index].getExpiryDate());
                         createAlertDialog(context, false,
-                                name: items[index].getName(), initDate: date)
+                                name: items[index].getName(), link: items[index].getImage(), initDate: date)
                             .then((onValue) {
                           if (onValue != null) {
                             items[index].setName(onValue[0]);
@@ -286,6 +285,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                                 .format(onValue[1])
                                 .toString();
                             items[index].setExpiryDate(dateconverted);
+                            items[index].setImage(onValue[2]);
                             _dBhelper.updateItemFromStock(items[index]);
                             refreshItems();
                           }
@@ -300,6 +300,9 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                           if (onValue != null && onValue) {
                             _dBhelper
                                 .deleteItemFromStock(items[index].getName());
+                            //delete image file
+                            if(!items[index].getImage().startsWith('https') && items[index].getImage() != '')
+                              File(items[index].getImage()).delete();
                             refreshItems();
                           }
                         });
@@ -309,7 +312,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                 : Container(
                     child: CircleAvatar(
                             radius: 30.0,
-                            backgroundImage: FileImage(File(items[index].getImage())),
+                            backgroundImage: selectImageType(items[index].getImage()),
+                            child: selectImageType(items[index].getImage()) == null ? Icon(Icons.fastfood) : null
                           ),
                   ),
             title: new Text(items[index].getName()),
@@ -317,6 +321,15 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             trailing: tileColor(items[index].getExpiryDate()));
       },
     );
+  }
+
+  selectImageType(String link) {
+    if(link.startsWith('https'))
+      return NetworkImage(link);
+    else if(link == '')
+      return null;
+    else
+      return FileImage(File(link));
   }
 
   //make a future builder with the dynamic list view
@@ -478,7 +491,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     );
   }
 
-  Future<void> alertForSource(BuildContext context, StateSetter setState) {
+  Future<File> alertForSourceAndGetImage() {
     return showDialog(
       context: context,
       builder: (context) {
@@ -495,7 +508,10 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                       Text('Camera')
                     ],
                   ),
-                  onTap: () {openCamera(context, setState);},
+                  onTap: () async {
+                    var img = await openCamera();
+                    Navigator.of(context).pop(img);
+                  },
                 ),
                 SizedBox(height: 20,),
                 GestureDetector(
@@ -506,7 +522,10 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                       Text('Gallery')
                     ],
                   ),
-                  onTap: () {openGallery(context, setState);},
+                  onTap: () async {
+                    var img = await openGallery();
+                    Navigator.of(context).pop(img);
+                  },
                 )
               ]
             )
@@ -516,7 +535,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     );
   }
 
-  openGallery(BuildContext context, StateSetter setState) async {
+  openGallery() async {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
     var cropped_image = await ImageCropper.cropImage(sourcePath: image.path);
     Directory directory = await getApplicationDocumentsDirectory();
@@ -525,13 +544,10 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     String fileName = file.substring(file.lastIndexOf('/') + 1, file.length - 1);
     print(fileName);
     var cropped_saved_img = await cropped_image.copy('$path/' + fileName);
-    setState(() {
-      _imageFile = cropped_saved_img;
-    });
-    Navigator.of(context).pop();
+    return cropped_saved_img;
   }
 
-  openCamera(BuildContext context, StateSetter setState) async {
+  openCamera() async {
     var image = await ImagePicker.pickImage(source: ImageSource.camera);
     var cropped_image = await ImageCropper.cropImage(sourcePath: image.path);
     Directory directory = await getApplicationDocumentsDirectory();
@@ -540,28 +556,26 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     String fileName = file.substring(file.lastIndexOf('/') + 1, file.length - 1);
     print(fileName);
     var cropped_saved_img = await cropped_image.copy('$path/' + fileName);
-    setState(() {
-      _imageFile = cropped_saved_img;
-    });
-    Navigator.of(context).pop();
+    return cropped_saved_img;
   }  
 
   Future<List> createAlertDialog(BuildContext context, bool state,
-      {String name = '', String uri = null, DateTime initDate = null}) {
+      {String name = '', String link = '', DateTime initDate = null}) {
     TextEditingController controller = new TextEditingController();
-    CalendarController calendarController = new CalendarController();
-    _imageFile = null;
     //initialization of units
     List<String> units = ['kg', 'g', 'l', 'ml', 'unit'];
     List<DropdownMenuItem<String>> menuItems = List();
-    for (String unit in units) {
-      menuItems.add(DropdownMenuItem(value: unit, child: Text(unit)));
-    }
     DateTimePickerTheme dateTimePickerTheme = new DateTimePickerTheme(
         cancel: Text(""), confirm: Text(""), title: Text('Select Expiry Date'));
     DateTime date = DateTime.now();
     String productName = name;
     String submitButtonText = 'Add Item';
+    File imageFile = null;
+    String uri = null;
+    if(link.startsWith('https'))
+      uri = link;
+    else if(link != '')
+      imageFile = File(link);
     if (state == false) {
       date = initDate;
       productName = name;
@@ -585,7 +599,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                       //print(date);
                       final form = _formKey.currentState;
                       if (form.validate()) {
-                        Navigator.of(context).pop([productName, date]);
+                        Navigator.of(context).pop([productName, date, uri == null ? imageFile == null ? '' : imageFile.path : uri]);
                       }
                     },
                     elevation: 5.0)
@@ -596,14 +610,14 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                   child: new Column(children: <Widget>[
                     StatefulBuilder(
                       builder: (context, setState) {
-                      print(_imageFile.toString());
+                      //print(_imageFile.path);
                         return Stack(
                       alignment: AlignmentDirectional.bottomEnd,
                       children: <Widget>[
                       CircleAvatar(
                       radius: 50,
-                      child: _imageFile == null ? Icon(Icons.fastfood) : null,
-                      backgroundImage: _imageFile == null ? uri == null ? null : NetworkImage(uri) : FileImage(_imageFile), 
+                      child: uri == null && imageFile == null ? Icon(Icons.fastfood) : null,
+                      backgroundImage: uri == null ? imageFile == null ? null : FileImage(imageFile) : NetworkImage(uri), 
                       ),
                       GestureDetector(
                         child: CircleAvatar(radius: 20, child: Icon(Icons.camera_alt)),
@@ -618,7 +632,12 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                             ),
                           );
                           Scaffold.of(this.context).showSnackBar(snackBar);*/
-                          alertForSource(context, setState);
+                          alertForSourceAndGetImage().then((img) {
+                            setState(() {
+                              imageFile = img;
+                              uri = null;
+                            });
+                          });
                         },
                       ),
                       ]
@@ -775,7 +794,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                       String date = new DateFormat('yyyy-MM-dd')
                           .format(onValue[1])
                           .toString();
-                      StockItem item = new StockItem(onValue[0], date, _imageFile.path);
+                      StockItem item = new StockItem(onValue[0], date, onValue[2]);
                       _dBhelper.saveToStock(item);
                       refreshItems();
                     }
@@ -811,7 +830,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
               print(onValue[1]);
               String date =
                   new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
-              StockItem item = new StockItem(onValue[0], date, _imageFile.path);
+              StockItem item = new StockItem(onValue[0], date, onValue[2]);
               _dBhelper.saveToStock(item);
               refreshItems();
             }
@@ -827,20 +846,24 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     try {
       String barcode = await BarcodeScanner.scan();
       List<String> product = await getProduct(barcode);
-      String productName, productImg;
+      String productName, productImg = '';
+      productName = product[0];
       if (product[0] == null) productName = '';
+      if (product[1] == null) productImg = '';
       if (product[1] != "404") productImg = product[1];
+      print('product img');
+      print(product[1]);
       print(productName);
       if (productName == "404") {
         showError();
       } else {
-        createAlertDialog(context, true, name: productName, uri: productImg).then((onValue) {
+        createAlertDialog(context, true, name: productName, link: productImg).then((onValue) {
           if (onValue != null) {
             print(onValue[0]);
             print(onValue[1]);
             String date =
                 new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
-            StockItem item = new StockItem(onValue[0], date, _imageFile.path);
+            StockItem item = new StockItem(onValue[0], date, onValue[2]);
             _dBhelper.saveToStock(item);
             refreshItems();
           }
