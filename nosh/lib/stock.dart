@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cupertino_date_picker/flutter_cupertino_date_picker.dart';
 import 'package:nosh/database/expiredItem.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'database/stockItem.dart';
 import 'database/db_helper.dart';
 import 'package:intl/intl.dart';
@@ -493,46 +492,44 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
 
   Future<File> alertForSourceAndGetImage() {
     return showDialog(
-      context: context,
-      builder: (context) {
-        return new AlertDialog(
-          title: Text('Select'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                GestureDetector(
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.camera_alt),
-                      SizedBox(width: 10),
-                      Text('Camera')
-                    ],
-                  ),
-                  onTap: () async {
-                    var img = await openCamera();
-                    Navigator.of(context).pop(img);
-                  },
+        context: context,
+        builder: (context) {
+          return new AlertDialog(
+            title: Text('Select'),
+            content: SingleChildScrollView(
+                child: ListBody(children: <Widget>[
+              GestureDetector(
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.camera_alt),
+                    SizedBox(width: 10),
+                    Text('Camera')
+                  ],
                 ),
-                SizedBox(height: 20,),
-                GestureDetector(
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.album),
-                      SizedBox(width: 10),
-                      Text('Gallery')
-                    ],
-                  ),
-                  onTap: () async {
-                    var img = await openGallery();
-                    Navigator.of(context).pop(img);
-                  },
-                )
-              ]
-            )
-          ),
-        );
-      } 
-    );
+                onTap: () async {
+                  var img = await openCamera();
+                  Navigator.of(context).pop(img);
+                },
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              GestureDetector(
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.album),
+                    SizedBox(width: 10),
+                    Text('Gallery')
+                  ],
+                ),
+                onTap: () async {
+                  var img = await openGallery();
+                  Navigator.of(context).pop(img);
+                },
+              )
+            ])),
+          );
+        });
   }
 
   openGallery() async {
@@ -541,7 +538,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     Directory directory = await getApplicationDocumentsDirectory();
     String path = directory.path;
     String file = cropped_image.toString();
-    String fileName = file.substring(file.lastIndexOf('/') + 1, file.length - 1);
+    String fileName =
+        file.substring(file.lastIndexOf('/') + 1, file.length - 1);
     print(fileName);
     var cropped_saved_img = await cropped_image.copy('$path/' + fileName);
     return cropped_saved_img;
@@ -553,7 +551,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     Directory directory = await getApplicationDocumentsDirectory();
     String path = directory.path;
     String file = cropped_image.toString();
-    String fileName = file.substring(file.lastIndexOf('/') + 1, file.length - 1);
+    String fileName =
+        file.substring(file.lastIndexOf('/') + 1, file.length - 1);
     print(fileName);
     var cropped_saved_img = await cropped_image.copy('$path/' + fileName);
     return cropped_saved_img;
@@ -587,93 +586,106 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     return showDialog(
         context: context,
         builder: (context) {
-          return new AlertDialog(
-              contentPadding: EdgeInsets.all(25.0),
-              title: new Text(submitButtonText),
-              actions: <Widget>[
-                new MaterialButton(
-                    child: new Text(submitButtonText,
-                        style: TextStyle(color: Color(0xff5c39f8))),
-                    onPressed: () {
-                      //print(productName);
-                      //print(date);
-                      final form = _formKey.currentState;
-                      if (form.validate()) {
-                        Navigator.of(context).pop([productName, date, uri == null ? imageFile == null ? '' : imageFile.path : uri]);
-                      }
-                    },
-                    elevation: 5.0)
-              ],
-              content: new SingleChildScrollView(
-                child: Form(
-                  key: _formKey,
-                  child: new Column(children: <Widget>[
-                    StatefulBuilder(
-                      builder: (context, setState) {
-                      //print(_imageFile.path);
-                        return Stack(
-                      alignment: AlignmentDirectional.bottomEnd,
-                      children: <Widget>[
-                      CircleAvatar(
-                      radius: 50,
-                      child: uri == null && imageFile == null ? Icon(Icons.fastfood) : null,
-                      backgroundImage: uri == null ? imageFile == null ? null : FileImage(imageFile) : NetworkImage(uri), 
-                      ),
-                      GestureDetector(
-                        child: CircleAvatar(radius: 20, child: Icon(Icons.camera_alt)),
-                        onTap: () {
-                          /*final snackBar = SnackBar(
-                            backgroundColor: Colors.white,
-                            content: Row(
-                              children: <Widget>[
-                                Column(children: <Widget>[Icon(Icons.album), Text('Gallery')]),
-                                Column(children: <Widget>[Icon(Icons.camera_alt), Text('Camera')])
-                              ],
-                            ),
-                          );
-                          Scaffold.of(this.context).showSnackBar(snackBar);*/
-                          alertForSourceAndGetImage().then((img) {
-                            setState(() {
-                              imageFile = img;
-                              uri = null;
-                            });
-                          });
-                        },
-                      ),
-                      ]
-                    );
-                      },
-                    ),
-                    SizedBox(
-                      height: 30,
-                    ),
-                    new TextFormField(
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return 'please enter a product name';
+          return GestureDetector(
+            onTap: () {
+              FocusScope.of(context).unfocus();
+            },
+            child: new AlertDialog(
+                contentPadding: EdgeInsets.all(25.0),
+                title: new Text(submitButtonText),
+                actions: <Widget>[
+                  new MaterialButton(
+                      child: new Text(submitButtonText,
+                          style: TextStyle(color: Color(0xff5c39f8))),
+                      onPressed: () {
+                        //print(productName);
+                        //print(date);
+                        final form = _formKey.currentState;
+                        if (form.validate()) {
+                          Navigator.of(context).pop([productName, date, imageFile == null ? uri == null ? '' : uri : imageFile.path]);
                         }
                       },
-                      controller: controller,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'Add product name...',
+                      elevation: 5.0)
+                ],
+                content: new SingleChildScrollView(
+                  child: Form(
+                    key: _formKey,
+                    child: new Column(children: <Widget>[
+                      StatefulBuilder(
+                        builder: (context, setState) {
+                          //print(_imageFile.toString());
+                          return Stack(
+                              alignment: AlignmentDirectional.bottomEnd,
+                              children: <Widget>[
+                                CircleAvatar(
+                                  backgroundColor: Colors.grey[100],
+                                  radius: 50,
+                                  child: imageFile == null && uri == null
+                                      ? Icon(
+                                          Icons.fastfood,
+                                          color: Colors.grey[900],
+                                        )
+                                      : null,
+                                  backgroundImage: imageFile == null
+                                      ? uri == null ? null : NetworkImage(uri)
+                                      : FileImage(imageFile),
+                                ),
+                                GestureDetector(
+                                  child: CircleAvatar(
+                                      backgroundColor: Color(0xff5c39f8),
+                                      radius: 20,
+                                      child: Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.white,
+                                      )),
+                                  onTap: () {
+                                    /*final snackBar = SnackBar(
+                              backgroundColor: Colors.white,
+                              content: Row(
+                                children: <Widget>[
+                                  Column(children: <Widget>[Icon(Icons.album), Text('Gallery')]),
+                                  Column(children: <Widget>[Icon(Icons.camera_alt), Text('Camera')])
+                                ],
+                              ),
+                            );
+                            Scaffold.of(this.context).showSnackBar(snackBar);*/
+                                    alertForSourceAndGetImage().then((img) {
+                                    setState(() {
+                                      imageFile = img;
+                                      uri = null;
+                                    });
+                                    });
+                                  },
+                                ),
+                              ]);
+                        },
                       ),
-                      onChanged: (String value) {
-                        productName = value;
-                      },
-                    ),
-                    /*new TableCalendar(
-            calendarController: calendarController,
-            builders: CalendarBuilders(),
-          )*/
-                    SizedBox(
-                      height: 30,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        FocusScope.of(context).unfocus();
-                      },
-                      child: new DatePickerWidget(
+                      SizedBox(
+                        height: 30,
+                      ),
+                      new TextFormField(
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'please enter a product name';
+                          }
+                        },
+                        controller: controller,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Add product name...',
+                        ),
+                        onChanged: (String value) {
+                          productName = value;
+                        },
+                      ),
+                      /*new TableCalendar(
+              calendarController: calendarController,
+              builders: CalendarBuilders(),
+            )*/
+                      SizedBox(
+                        height: 20,
+                      ),
+                      DatePickerWidget(
                         minDateTime: DateTime(2018),
                         maxDateTime: DateTime(2030),
                         initialDateTime: date,
@@ -683,10 +695,10 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                           date = dateTime;
                         },
                       ),
-                    )
-                  ]),
-                ),
-              ));
+                    ]),
+                  ),
+                )),
+          );
         });
     //preventing memory leaks
     controller.dispose();
@@ -755,67 +767,70 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
 
   createStyledFAB() {
     return SpeedDial(
-          animatedIcon: AnimatedIcons.menu_close,
-          animatedIconTheme: IconThemeData(size: 22, color: Color(0xff5c39f8)),
-          backgroundColor: Colors.white,
-          visible: true,
-          curve: Curves.bounceIn,
-          children: [
-                // FAB 1
-                SpeedDialChild(
-                child: Icon(Icons.filter_center_focus, color: Color(0xff5c39f8)),
-                backgroundColor: Colors.white,
-                onTap: () async {
-                  await scan();
-                  print(_barcode);
-                },
-                label: 'Scan Barcode',
-                labelStyle: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xff5c39f8),
-                    fontSize: 16.0),
-                labelBackgroundColor: Colors.white
-                /*labelWidget: Text('Scan Barcode',
+      animatedIcon: AnimatedIcons.menu_close,
+      animatedIconTheme: IconThemeData(size: 22, color: Color(0xff5c39f8)),
+      backgroundColor: Colors.white,
+      visible: true,
+      curve: Curves.bounceIn,
+      children: [
+        // FAB 1
+        SpeedDialChild(
+            child: Icon(Icons.filter_center_focus, color: Color(0xff5c39f8)),
+            backgroundColor: Colors.white,
+            onTap: () async {
+              await scan();
+              print(_barcode);
+            },
+            label: 'Scan Barcode',
+            labelStyle: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Color(0xff5c39f8),
+                fontSize: 16.0),
+            labelBackgroundColor: Colors.white
+            /*labelWidget: Text('Scan Barcode',
                     style: GoogleFonts.roboto(
                       fontWeight: FontWeight.w500,
                       color: Color(0xff5c39f8),
                       fontSize: 16.0
                     ))*/
-                ),
-                // FAB 2
-                SpeedDialChild(
-                child: Icon(Icons.add, color: Color(0xff5c39f8),),
-                backgroundColor: Colors.white,
-                onTap: () {
-                    createAlertDialog(context, true).then((onValue) {
-                    if (onValue != null) {
-                      print(onValue[0]);
-                      print(onValue[1]);
-                      String date = new DateFormat('yyyy-MM-dd')
-                          .format(onValue[1])
-                          .toString();
-                      StockItem item = new StockItem(onValue[0], date, onValue[2]);
-                      _dBhelper.saveToStock(item);
-                      refreshItems();
-                    }
-                  });
-                },
-                label: 'Type Manually',
-                labelStyle: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xff5c39f8),
-                    fontSize: 16.0),
-                labelBackgroundColor: Colors.white,
-                /*labelWidget: Text('TYPE MANUALLY',
+            ),
+        // FAB 2
+        SpeedDialChild(
+          child: Icon(
+            Icons.add,
+            color: Color(0xff5c39f8),
+          ),
+          backgroundColor: Colors.white,
+          onTap: () {
+            createAlertDialog(context, true).then((onValue) {
+              if (onValue != null) {
+                print(onValue[0]);
+                print(onValue[1]);
+                String date =
+                    new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
+                StockItem item =
+                    new StockItem(onValue[0], date, onValue[2]);
+                _dBhelper.saveToStock(item);
+                refreshItems();
+              }
+            });
+          },
+          label: 'Type Manually',
+          labelStyle: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: Color(0xff5c39f8),
+              fontSize: 16.0),
+          labelBackgroundColor: Colors.white,
+          /*labelWidget: Text('TYPE MANUALLY',
                     style: GoogleFonts.robotoCondensed(
                       fontWeight: FontWeight.w500,
                       color: Color(0xff5c39f8),
                       fontSize: 16.0
                     )
                   )*/
-                )
-          ],
-        );
+        )
+      ],
+    );
   }
 
   showError() {
@@ -857,7 +872,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
       if (productName == "404") {
         showError();
       } else {
-        createAlertDialog(context, true, name: productName, link: productImg).then((onValue) {
+        createAlertDialog(context, true, name: productName, link: productImg)
+            .then((onValue) {
           if (onValue != null) {
             print(onValue[0]);
             print(onValue[1]);
@@ -906,8 +922,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        body: displayUI(),
-        floatingActionButton: createStyledFAB(),
-        );
+      body: displayUI(),
+      floatingActionButton: createStyledFAB(),
+    );
   }
 }

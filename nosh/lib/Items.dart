@@ -292,8 +292,8 @@ class _ItemsState extends State<Items> {
           ),
         ),
         floatingActionButton: new FloatingActionButton(
-            child: Icon(Icons.add),
-            backgroundColor: new Color(0xff5c39f8),
+            child: Icon(Icons.add, color: Color(0xff5c39f8)),
+            backgroundColor: Colors.white,
             onPressed: () {
               createAlertDialog(context, true).then((onValue) {
                 if (onValue != null) {
