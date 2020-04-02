@@ -4,6 +4,11 @@ import 'database/db_helper.dart';
 import 'package:intl/intl.dart';
 import 'database/stockItem.dart';
 import 'database/expiredItem.dart';
+import 'package:flutter_cupertino_date_picker/flutter_cupertino_date_picker.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:path_provider/path_provider.dart';
 
 class Items extends StatefulWidget {
   @override
@@ -31,24 +36,164 @@ class _ItemsState extends State<Items> {
     });
   }
 
-  Future<DateTime> createDatePicker(BuildContext context) {
-    return showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2018),
-      lastDate: DateTime(2030),
-      builder: (BuildContext context, Widget child) {
-        return Theme(
-          data: ThemeData(
-              primarySwatch: Colors.deepPurple,
-              primaryColor: Colors.white,
-              accentColor: Color(0xFF5C39F8),
-              cardColor: Color(0xFF5C39F8),
-              backgroundColor: Colors.white),
-          child: child,
-        );
-      },
-    );
+  Future<List> createImageAndDateAlertDialog(BuildContext context) {
+    DateTimePickerTheme dateTimePickerTheme = new DateTimePickerTheme(
+        cancel: Text(""), confirm: Text(""), title: Text('Select Expiry Date'));
+    DateTime date = DateTime.now();
+    File imageFile = null;
+
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return GestureDetector(
+            onTap: () {
+              FocusScope.of(context).unfocus();
+            },
+            child: new AlertDialog(
+                contentPadding: EdgeInsets.all(25.0),
+                title: new Text('Add Item to Stock'),
+                actions: <Widget>[
+                  new MaterialButton(
+                      child: new Text('Add Item to Stock',
+                          style: TextStyle(color: Color(0xff5c39f8))),
+                      onPressed: () {
+                        //print(productName);
+                        //print(date);
+                        final form = _formKey.currentState;
+                        if (form.validate()) {
+                          Navigator.of(context).pop([date, imageFile.path]);
+                        }
+                      },
+                      elevation: 5.0)
+                ],
+                content: new SingleChildScrollView(
+                  child: Form(
+                    key: _formKey,
+                    child: new Column(children: <Widget>[
+                      StatefulBuilder(
+                        builder: (context, setState) {
+                          //print(_imageFile.toString());
+                          return Stack(
+                              alignment: AlignmentDirectional.bottomEnd,
+                              children: <Widget>[
+                                CircleAvatar(
+                                  backgroundColor: Colors.grey[100],
+                                  radius: 50,
+                                  child: imageFile == null
+                                      ? Icon(
+                                          Icons.fastfood,
+                                          color: Colors.grey[900],
+                                        )
+                                      : null,
+                                  backgroundImage: imageFile == null
+                                      ? null
+                                      : FileImage(imageFile),
+                                ),
+                                GestureDetector(
+                                  child: CircleAvatar(
+                                      backgroundColor: Color(0xff5c39f8),
+                                      radius: 20,
+                                      child: Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.white,
+                                      )),
+                                  onTap: () {
+                                    alertForSourceAndGetImage().then((img) {
+                                    setState(() {
+                                      imageFile = img;
+                                    });
+                                    });
+                                  },
+                                ),
+                              ]);
+                        },
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      DatePickerWidget(
+                        minDateTime: DateTime(2018),
+                        maxDateTime: DateTime(2030),
+                        initialDateTime: date,
+                        locale: DATETIME_PICKER_LOCALE_DEFAULT,
+                        pickerTheme: dateTimePickerTheme,
+                        onChange: (dateTime, index) {
+                          date = dateTime;
+                        },
+                      ),
+                    ]),
+                  ),
+                )),
+          );
+        });
+  }
+
+  Future<File> alertForSourceAndGetImage() {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return new AlertDialog(
+            title: Text('Select'),
+            content: SingleChildScrollView(
+                child: ListBody(children: <Widget>[
+                GestureDetector(
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.camera_alt),
+                    SizedBox(width: 10),
+                    Text('Camera')
+                  ],
+                ),
+                onTap: () async {
+                  var img = await openCamera();
+                  Navigator.of(context).pop(img);
+                },
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              GestureDetector(
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.album),
+                    SizedBox(width: 10),
+                    Text('Gallery')
+                  ],
+                ),
+                onTap: () async {
+                  var img = await openGallery();
+                  Navigator.of(context).pop(img);
+                },
+              )
+            ])),
+          );
+        });
+  }
+
+  openGallery() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    var cropped_image = await ImageCropper.cropImage(sourcePath: image.path);
+    Directory directory = await getApplicationDocumentsDirectory();
+    String path = directory.path;
+    String file = cropped_image.toString();
+    String fileName =
+        file.substring(file.lastIndexOf('/') + 1, file.length - 1);
+    print(fileName);
+    var cropped_saved_img = await cropped_image.copy('$path/' + fileName);
+    return cropped_saved_img;
+  }
+
+  openCamera() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.camera);
+    var cropped_image = await ImageCropper.cropImage(sourcePath: image.path);
+    Directory directory = await getApplicationDocumentsDirectory();
+    String path = directory.path;
+    String file = cropped_image.toString();
+    String fileName =
+        file.substring(file.lastIndexOf('/') + 1, file.length - 1);
+    print(fileName);
+    var cropped_saved_img = await cropped_image.copy('$path/' + fileName);
+    return cropped_saved_img;
   }
 
   createListUI(List<ListItem> items) {
@@ -107,10 +252,10 @@ class _ItemsState extends State<Items> {
                     color: Colors.grey[800], size: 22),
                 onPressed: () {
                   //shift item : todo
-                  createDatePicker(context).then((onValue) {
+                  createImageAndDateAlertDialog(context).then((onValue) {
                     if (onValue != null) {
                       String date = new DateFormat('yyyy-MM-dd')
-                          .format(onValue)
+                          .format(onValue[0])
                           .toString();
                       DateTime now = new DateTime.now();
                       now = new DateTime(now.year, now.month, now.day);
@@ -118,11 +263,11 @@ class _ItemsState extends State<Items> {
                           DateTime.parse(date).difference(now).inDays;
                       if (daysLeft < 0) {
                         ExpiredItem item =
-                            new ExpiredItem(items[index].getName(), date);
+                            new ExpiredItem(items[index].getName(), date, onValue[1]);
                         _dBhelper.saveExpiredItem(item);
                       } else {
                         StockItem item =
-                            new StockItem(items[index].getName(), date, '');
+                            new StockItem(items[index].getName(), date, onValue[1]);
                         _dBhelper.saveToStock(item);
                       }
                       _dBhelper.deleteItemFromList(items[index].getName());

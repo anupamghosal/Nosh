@@ -240,21 +240,6 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   }
 
   createListUI(List<StockItem> items) {
-    //filter dates
-    for (int i = 0; i < items.length; i++) {
-      DateTime now = new DateTime.now();
-      now = new DateTime(now.year, now.month, now.day);
-      int daysLeft =
-          DateTime.parse(items[i].getExpiryDate()).difference(now).inDays;
-      if (daysLeft < 0) {
-        //move the item to expired list: todo
-        ExpiredItem item =
-            new ExpiredItem(items[i].getName(), items[i].getExpiryDate());
-        _dBhelper.saveExpiredItem(item);
-        _dBhelper.deleteItemFromStock(items[i].getName());
-        items.remove(items[i]);
-      }
-    }
     return ListView.separated(
       itemCount: items.length,
       separatorBuilder: (context, index) {
@@ -308,7 +293,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                       },
                     )
                   ])
-                : Container(
+                  : Container(
                     child: CircleAvatar(
                             radius: 30.0,
                             backgroundImage: selectImageType(items[index].getImage()),
@@ -356,7 +341,36 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
           if (snapshot.hasData) {
             //create ListUI
             print(snapshot.data[0].getImage());
-            return createUI(snapshot.data);
+            List<StockItem> items = snapshot.data;
+            //filter dates
+            for (int i = 0; i < items.length; i++) {
+              DateTime now = new DateTime.now();
+              now = new DateTime(now.year, now.month, now.day);
+              int daysLeft =
+                  DateTime.parse(items[i].getExpiryDate()).difference(now).inDays;
+              if (daysLeft < 0) {
+                //move the item to expired list: todo
+                ExpiredItem item =
+                    new ExpiredItem(items[i].getName(), items[i].getExpiryDate(), items[i].getImage());
+                _dBhelper.saveExpiredItem(item);
+                _dBhelper.deleteItemFromStock(items[i].getName());
+                items.remove(items[i]);
+              }
+            }
+            if(items.length == 0) {
+              return Column(
+                children: <Widget>[
+                  createCounterPanel([]),
+                  Expanded(
+                      child: new Center(
+                          child: new Text(
+                    'Add food items and track their expiry',
+                    style: TextStyle(color: Colors.grey[600]),
+                  )))
+                ],
+              );
+            }
+            return createUI(items);
             //print(snapshot.data[0].NAME);
           }
         } else {
@@ -610,13 +624,13 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                 content: new SingleChildScrollView(
                   child: Form(
                     key: _formKey,
-                    child: new Column(children: <Widget>[
-                      StatefulBuilder(
-                        builder: (context, setState) {
-                          //print(_imageFile.toString());
-                          return Stack(
-                              alignment: AlignmentDirectional.bottomEnd,
-                              children: <Widget>[
+                    child: StatefulBuilder(
+                      builder: (context, setState) {
+                        bool enable = false;
+                        return Column(children: <Widget>[
+                      Stack(
+                        alignment: AlignmentDirectional.bottomEnd,
+                        children: <Widget>[
                                 CircleAvatar(
                                   backgroundColor: Colors.grey[100],
                                   radius: 50,
@@ -657,9 +671,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                                     });
                                   },
                                 ),
-                              ]);
-                        },
-                      ),
+                              ]),
                       SizedBox(
                         height: 30,
                       ),
@@ -678,24 +690,33 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                           productName = value;
                         },
                       ),
-                      /*new TableCalendar(
-              calendarController: calendarController,
-              builders: CalendarBuilders(),
-            )*/
                       SizedBox(
                         height: 20,
                       ),
-                      DatePickerWidget(
-                        minDateTime: DateTime(2018),
-                        maxDateTime: DateTime(2030),
-                        initialDateTime: date,
-                        locale: DATETIME_PICKER_LOCALE_DEFAULT,
-                        pickerTheme: dateTimePickerTheme,
-                        onChange: (dateTime, index) {
-                          date = dateTime;
+                      Checkbox(
+                        value: enable,
+                        onChanged: (value) {
+                          setState(() {
+                            enable = value;
+                          });
                         },
                       ),
-                    ]),
+                      AbsorbPointer(
+                        absorbing: enable,
+                        child: DatePickerWidget(
+                          minDateTime: DateTime(2018),
+                          maxDateTime: DateTime(2030),
+                          initialDateTime: date,
+                          locale: DATETIME_PICKER_LOCALE_DEFAULT,
+                          pickerTheme: dateTimePickerTheme,
+                          onChange: (dateTime, index) {
+                            date = dateTime;
+                          },
+                        )
+                      )
+                    ]);
+                      }
+                    )
                   ),
                 )),
           );

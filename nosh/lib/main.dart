@@ -48,7 +48,7 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
               actions: <Widget>[
                 IconButton(
                   icon: Icon(
-                    Icons.book,
+                    Icons.restaurant_menu,
                     color: Color(0xff5c39f8),
                   ),
                   onPressed: () {

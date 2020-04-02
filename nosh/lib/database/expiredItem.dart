@@ -2,8 +2,9 @@ class ExpiredItem {
   int _expiredItemId;
   String _expiredItemName;
   String _expiredItemExpiryDate;
+  String _image;
 
-  ExpiredItem(this._expiredItemName, this._expiredItemExpiryDate);
+  ExpiredItem(this._expiredItemName, this._expiredItemExpiryDate, this._image);
 
   setName(String expiredItemName) {
     _expiredItemName = expiredItemName;
@@ -29,10 +30,15 @@ class ExpiredItem {
     return _expiredItemId;
   }
 
+  getImage() {
+    return _image;
+  }
+
   Map<String, dynamic> toMap() {
     var map = <String, dynamic> {
       'expiredItemName': _expiredItemName,
-      'expiredItemExpiryDate': _expiredItemExpiryDate
+      'expiredItemExpiryDate': _expiredItemExpiryDate,
+      'expiredItemImage': _image
     };
     return map;
   } 
@@ -41,5 +47,6 @@ class ExpiredItem {
     _expiredItemId = map['expiredItemId'];
     _expiredItemName = map['expiredItemName'];
     _expiredItemExpiryDate = map['expiredItemExpiryDate'];
+    _image = map['expiredItemImage'];
   } 
 }

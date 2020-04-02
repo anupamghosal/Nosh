@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'database/expiredItem.dart';
 import 'database/db_helper.dart';
+import 'dart:io';
 
 class Expired extends StatefulWidget {
   @override
@@ -10,6 +11,7 @@ class Expired extends StatefulWidget {
 class _ExpiredState extends State<Expired> {
   Future<List<ExpiredItem>> _expiredItems;
   DBhelper _dBhelper;
+  bool _longPressedEventActive = false;
 
   @override
   initState() {
@@ -23,6 +25,37 @@ class _ExpiredState extends State<Expired> {
     });
   }
 
+  createUI(List<ExpiredItem> items) {
+    return RefreshIndicator(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Expanded(child: createListUI(items)),
+          _longPressedEventActive
+              ? Container(
+                  padding: EdgeInsets.all(20.0),
+                  child: RaisedButton(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0)),
+                    child: Text("cancel"),
+                    color: Color(0xff5c39f8),
+                    textColor: Colors.white,
+                    onPressed: () {
+                      setState(() {
+                        _longPressedEventActive = false;
+                      });
+                    },
+                  ),
+                )
+              : Container()
+        ],
+      ),
+      onRefresh: () {
+        refreshItems();
+      },
+    );
+  }
+
   createListUI(List<ExpiredItem> items) {
     return new ListView.separated(
       itemCount: items.length,
@@ -31,22 +64,46 @@ class _ExpiredState extends State<Expired> {
       },
       itemBuilder: (context, index) {
         return ListTile(
-            leading: new IconButton(
+            onLongPress: () {
+              setState(() {
+                _longPressedEventActive = true;
+              });
+            },
+            leading: _longPressedEventActive
+            ? new IconButton(
               icon: new Icon(Icons.delete, color: Colors.red),
               onPressed: () {
                 createDeleteAlert(context).then((onValue) {
                   if (onValue != null && onValue) {
                     _dBhelper.deleteExpiredItem(items[index].getName());
+                    if(!items[index].getImage().startsWith('https') && items[index].getImage() != '')
+                        File(items[index].getImage()).delete();
                     refreshItems();
                   }
                 });
               },
-            ),
+            )
+            : Container(
+              child: CircleAvatar(
+                        radius: 30.0,
+                        backgroundImage: selectImageType(items[index].getImage()),
+                        child: selectImageType(items[index].getImage()) == null ? Icon(Icons.fastfood) : null
+                      ),
+              ),
             title: new Text(items[index].getName()),
             subtitle: new Text(items[index].getExpiryDate()),
             trailing: Icon(Icons.report, color: Colors.red[900]));
       },
     );
+  }
+
+  selectImageType(String link) {
+    if(link.startsWith('https'))
+      return NetworkImage(link);
+    else if(link == '')
+      return null;
+    else
+      return FileImage(File(link));
   }
 
   displayListUI() {
@@ -67,7 +124,7 @@ class _ExpiredState extends State<Expired> {
           if (snapshot.hasData) {
             //create ListUI
             print(snapshot.data[0].getExpiryDate());
-            return createListUI(snapshot.data);
+            return createUI(snapshot.data);
             //print(snapshot.data[0].NAME);
           }
         } else {

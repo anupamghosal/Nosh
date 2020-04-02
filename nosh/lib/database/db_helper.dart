@@ -25,6 +25,7 @@ class DBhelper {
   static const String ENAME = 'expiredItemName';
   static const String EDATE = 'expiredItemExpiryDate';
   static const String EID = 'expiredItemId';
+  static const String EIMG = 'expiredItemImage';
 
   Future<Database> get db async {
     if(_db != null) {
@@ -44,7 +45,7 @@ class DBhelper {
   onCreate(Database db, int version) async {
     await db.execute("CREATE TABLE $STOCKTABLE ($SID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $SNAME TEXT, $SDATE TEXT, $SIMG TEXT)");
     await db.execute("CREATE TABLE $LISTTABLE ($LID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $LNAME TEXT)");
-    await db.execute("CREATE TABLE $EXPIREDTABLE ($EID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $ENAME TEXT, $EDATE TEXT)");
+    await db.execute("CREATE TABLE $EXPIREDTABLE ($EID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $ENAME TEXT, $EDATE TEXT, $EIMG TEXT)");
 
   }
 
