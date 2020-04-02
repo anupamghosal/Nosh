@@ -2,8 +2,9 @@ class StockItem {
   int _stockItemId;
   String _stockItemName;
   String _stockItemExpiryDate;
+  String _image;
 
-  StockItem(this._stockItemName, this._stockItemExpiryDate);
+  StockItem(this._stockItemName, this._stockItemExpiryDate, this._image);
 
   setName(String stockItemName) {
     _stockItemName = stockItemName;
@@ -29,10 +30,15 @@ class StockItem {
     return _stockItemId;
   }
 
+  getImage() {
+    return _image;
+  }
+
   Map<String, dynamic> toMap() {
     var map = <String, dynamic> {
       'stockItemName': _stockItemName,
-      'stockItemExpiryDate': _stockItemExpiryDate
+      'stockItemExpiryDate': _stockItemExpiryDate,
+      'stockItemImage': _image
     };
     return map;
   } 
@@ -41,5 +47,6 @@ class StockItem {
     _stockItemId = map['stockItemId'];
     _stockItemName = map['stockItemName'];
     _stockItemExpiryDate = map['stockItemExpiryDate'];
+    _image = map['stockItemImage'];
   } 
 }

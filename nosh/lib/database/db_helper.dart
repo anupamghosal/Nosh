@@ -15,6 +15,7 @@ class DBhelper {
   static const String SNAME = 'stockItemName';
   static const String SDATE = 'stockItemExpiryDate';
   static const String SID = 'stockItemId';
+  static const String SIMG = 'stockItemImage';
   //list table
   static const String LISTTABLE = 'List';
   static const String LNAME = 'listItemName';
@@ -41,7 +42,7 @@ class DBhelper {
   }
 
   onCreate(Database db, int version) async {
-    await db.execute("CREATE TABLE $STOCKTABLE ($SID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $SNAME TEXT, $SDATE TEXT)");
+    await db.execute("CREATE TABLE $STOCKTABLE ($SID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $SNAME TEXT, $SDATE TEXT, $SIMG TEXT)");
     await db.execute("CREATE TABLE $LISTTABLE ($LID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $LNAME TEXT)");
     await db.execute("CREATE TABLE $EXPIREDTABLE ($EID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $ENAME TEXT, $EDATE TEXT)");
 

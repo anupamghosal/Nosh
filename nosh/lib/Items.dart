@@ -122,7 +122,7 @@ class _ItemsState extends State<Items> {
                         _dBhelper.saveExpiredItem(item);
                       } else {
                         StockItem item =
-                            new StockItem(items[index].getName(), date);
+                            new StockItem(items[index].getName(), date, '');
                         _dBhelper.saveToStock(item);
                       }
                       _dBhelper.deleteItemFromList(items[index].getName());
