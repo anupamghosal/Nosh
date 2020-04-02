@@ -122,6 +122,7 @@ class SelectPanelState extends State<SelectPanel> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          elevation: 0.0,
           title: Text('Select food items'),
           backgroundColor: Color(0xff5c39f8),
         ),

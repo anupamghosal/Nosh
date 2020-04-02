@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import './expired.dart' as expired;
 import './Items.dart' as items;
 import './stock.dart' as stock;
-import './recipe.dart' as showRecipe;
+import './selectPanel.dart';
 import './util/slide.dart';
 
 void main() {
@@ -38,7 +38,6 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
         theme: ThemeData(
             primaryColor: Colors.white,
             accentColor: Color(0xff5c39f8),
@@ -48,11 +47,11 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
               actions: <Widget>[
                 IconButton(
                   icon: Icon(
-                    Icons.restaurant_menu,
+                    Icons.restaurant,
                     color: Color(0xff5c39f8),
                   ),
                   onPressed: () {
-                    Navigator.push(context, Slide(page: showRecipe.Recipe()));
+                    Navigator.push(context, Slide(page: SelectPanel()));
                   },
                 )
               ],

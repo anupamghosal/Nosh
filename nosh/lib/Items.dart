@@ -39,8 +39,9 @@ class _ItemsState extends State<Items> {
   Future<List> createImageAndDateAlertDialog(BuildContext context) {
     DateTimePickerTheme dateTimePickerTheme = new DateTimePickerTheme(
         cancel: Text(""), confirm: Text(""), title: Text('Select Expiry Date'));
-    DateTime date = DateTime.now();
+    DateTime date = null;
     File imageFile = null;
+    bool enable = false;
 
     return showDialog(
         context: context,
@@ -61,7 +62,8 @@ class _ItemsState extends State<Items> {
                         //print(date);
                         final form = _formKey.currentState;
                         if (form.validate()) {
-                          Navigator.of(context).pop([date, imageFile.path]);
+                          Navigator.of(context).pop(
+                              [date, imageFile == null ? '' : imageFile.path]);
                         }
                       },
                       elevation: 5.0)
@@ -99,9 +101,9 @@ class _ItemsState extends State<Items> {
                                       )),
                                   onTap: () {
                                     alertForSourceAndGetImage().then((img) {
-                                    setState(() {
-                                      imageFile = img;
-                                    });
+                                      setState(() {
+                                        imageFile = img;
+                                      });
                                     });
                                   },
                                 ),
@@ -111,16 +113,46 @@ class _ItemsState extends State<Items> {
                       SizedBox(
                         height: 20,
                       ),
-                      DatePickerWidget(
-                        minDateTime: DateTime(2018),
-                        maxDateTime: DateTime(2030),
-                        initialDateTime: date,
-                        locale: DATETIME_PICKER_LOCALE_DEFAULT,
-                        pickerTheme: dateTimePickerTheme,
-                        onChange: (dateTime, index) {
-                          date = dateTime;
-                        },
-                      ),
+                      StatefulBuilder(builder: (context, setState) {
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: <Widget>[
+                                Text("Enter an expiry?"),
+                                Checkbox(
+                                  activeColor: Color(0xff5c39f8),
+                                  value: enable,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      enable = value;
+                                      print(enable);
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 10.0,
+                            ),
+                            enable
+                                ? AbsorbPointer(
+                                    absorbing: !enable,
+                                    child: DatePickerWidget(
+                                      minDateTime: DateTime(2018),
+                                      maxDateTime: DateTime(2030),
+                                      initialDateTime: date,
+                                      locale: DATETIME_PICKER_LOCALE_DEFAULT,
+                                      pickerTheme: dateTimePickerTheme,
+                                      onChange: (dateTime, index) {
+                                        date = dateTime;
+                                      },
+                                    ))
+                                : Text("")
+                          ],
+                        );
+                      })
                     ]),
                   ),
                 )),
@@ -136,7 +168,7 @@ class _ItemsState extends State<Items> {
             title: Text('Select'),
             content: SingleChildScrollView(
                 child: ListBody(children: <Widget>[
-                GestureDetector(
+              GestureDetector(
                 child: Row(
                   children: <Widget>[
                     Icon(Icons.camera_alt),
@@ -245,51 +277,61 @@ class _ItemsState extends State<Items> {
                   ),
                 ),
           title: new Text(items[index].getName()),
-          trailing: new Wrap(
-            children: <Widget>[
-              new IconButton(
-                icon: new Icon(Icons.add_shopping_cart,
-                    color: Colors.grey[800], size: 22),
-                onPressed: () {
-                  //shift item : todo
-                  createImageAndDateAlertDialog(context).then((onValue) {
-                    if (onValue != null) {
-                      String date = new DateFormat('yyyy-MM-dd')
-                          .format(onValue[0])
-                          .toString();
-                      DateTime now = new DateTime.now();
-                      now = new DateTime(now.year, now.month, now.day);
-                      int daysLeft =
-                          DateTime.parse(date).difference(now).inDays;
-                      if (daysLeft < 0) {
-                        ExpiredItem item =
-                            new ExpiredItem(items[index].getName(), date, onValue[1]);
-                        _dBhelper.saveExpiredItem(item);
-                      } else {
-                        StockItem item =
-                            new StockItem(items[index].getName(), date, onValue[1]);
-                        _dBhelper.saveToStock(item);
-                      }
-                      _dBhelper.deleteItemFromList(items[index].getName());
-                      refreshItems();
-                    }
-                  });
-                },
-              ),
-              new IconButton(
-                icon: new Icon(Icons.remove_circle_outline,
-                    color: Colors.red, size: 22),
-                onPressed: () {
-                  createDeleteAlert(context).then((onValue) {
-                    if (onValue != null && onValue) {
-                      _dBhelper.deleteItemFromList(items[index].getName());
-                      refreshItems();
-                    }
-                  });
-                },
-              )
-            ],
-          ),
+          trailing: _longPressEventActive
+              ? new Wrap(
+                  children: <Widget>[
+                    new IconButton(
+                      icon: new Icon(Icons.add_shopping_cart,
+                          color: Colors.grey[800], size: 22),
+                      onPressed: () {
+                        //shift item : todo
+                        createImageAndDateAlertDialog(context).then((onValue) {
+                          if (onValue != null) {
+                            if (onValue[0] != null) {
+                              String date = new DateFormat('yyyy-MM-dd')
+                                  .format(onValue[0])
+                                  .toString();
+                              DateTime now = new DateTime.now();
+                              now = new DateTime(now.year, now.month, now.day);
+                              int daysLeft =
+                                  DateTime.parse(date).difference(now).inDays;
+                              if (daysLeft < 0) {
+                                ExpiredItem item = new ExpiredItem(
+                                    items[index].getName(), date, onValue[1]);
+                                _dBhelper.saveExpiredItem(item);
+                              } else {
+                                StockItem item = new StockItem(
+                                    items[index].getName(), date, onValue[1]);
+                                _dBhelper.saveToStock(item);
+                              }
+                            } else {
+                              StockItem item = new StockItem(
+                                  items[index].getName(), '', onValue[1]);
+                              _dBhelper.saveToStock(item);
+                            }
+                            _dBhelper
+                                .deleteItemFromList(items[index].getName());
+                            refreshItems();
+                          }
+                        });
+                      },
+                    ),
+                    new IconButton(
+                      icon: new Icon(Icons.remove_circle_outline,
+                          color: Colors.red, size: 22),
+                      onPressed: () {
+                        createDeleteAlert(context).then((onValue) {
+                          if (onValue != null && onValue) {
+                            _dBhelper
+                                .deleteItemFromList(items[index].getName());
+                            refreshItems();
+                          }
+                        });
+                      },
+                    )
+                  ],
+                )
+              : SizedBox(),
         );
       },
     );
