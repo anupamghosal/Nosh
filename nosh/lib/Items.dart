@@ -39,8 +39,9 @@ class _ItemsState extends State<Items> {
   Future<List> createImageAndDateAlertDialog(BuildContext context) {
     DateTimePickerTheme dateTimePickerTheme = new DateTimePickerTheme(
         cancel: Text(""), confirm: Text(""), title: Text('Select Expiry Date'));
-    DateTime date = DateTime.now();
+    DateTime date = null;
     File imageFile = null;
+    bool enable = false;
 
     return showDialog(
         context: context,
@@ -61,7 +62,7 @@ class _ItemsState extends State<Items> {
                         //print(date);
                         final form = _formKey.currentState;
                         if (form.validate()) {
-                          Navigator.of(context).pop([date, imageFile.path]);
+                          Navigator.of(context).pop([date, imageFile == null ? '' : imageFile.path]);
                         }
                       },
                       elevation: 5.0)
@@ -111,16 +112,35 @@ class _ItemsState extends State<Items> {
                       SizedBox(
                         height: 20,
                       ),
-                      DatePickerWidget(
-                        minDateTime: DateTime(2018),
-                        maxDateTime: DateTime(2030),
-                        initialDateTime: date,
-                        locale: DATETIME_PICKER_LOCALE_DEFAULT,
-                        pickerTheme: dateTimePickerTheme,
-                        onChange: (dateTime, index) {
-                          date = dateTime;
-                        },
-                      ),
+                      StatefulBuilder(
+                        builder: (context, setState) {
+                          return Column(
+                            children: <Widget>[
+                              Checkbox(
+                                value: enable,
+                                onChanged: (value) {
+                                  setState(() {
+                                    enable = value;
+                                  });
+                                },
+                              ),
+                              AbsorbPointer(
+                                absorbing: !enable,
+                                child: DatePickerWidget(
+                                  minDateTime: DateTime(2018),
+                                  maxDateTime: DateTime(2030),
+                                  initialDateTime: date,
+                                  locale: DATETIME_PICKER_LOCALE_DEFAULT,
+                                  pickerTheme: dateTimePickerTheme,
+                                  onChange: (dateTime, index) {
+                                    date = dateTime;
+                                  },
+                                )
+                              ) 
+                            ],
+                          );
+                        }
+                      )
                     ]),
                   ),
                 )),
@@ -254,21 +274,28 @@ class _ItemsState extends State<Items> {
                   //shift item : todo
                   createImageAndDateAlertDialog(context).then((onValue) {
                     if (onValue != null) {
-                      String date = new DateFormat('yyyy-MM-dd')
-                          .format(onValue[0])
-                          .toString();
-                      DateTime now = new DateTime.now();
-                      now = new DateTime(now.year, now.month, now.day);
-                      int daysLeft =
-                          DateTime.parse(date).difference(now).inDays;
-                      if (daysLeft < 0) {
-                        ExpiredItem item =
-                            new ExpiredItem(items[index].getName(), date, onValue[1]);
-                        _dBhelper.saveExpiredItem(item);
-                      } else {
+                      if(onValue[0] != null) {
+                        String date = new DateFormat('yyyy-MM-dd')
+                            .format(onValue[0])
+                            .toString();
+                        DateTime now = new DateTime.now();
+                        now = new DateTime(now.year, now.month, now.day);
+                        int daysLeft =
+                            DateTime.parse(date).difference(now).inDays;
+                        if (daysLeft < 0) {
+                          ExpiredItem item =
+                              new ExpiredItem(items[index].getName(), date, onValue[1]);
+                          _dBhelper.saveExpiredItem(item);
+                        } else {
+                          StockItem item =
+                              new StockItem(items[index].getName(), date, onValue[1]);
+                          _dBhelper.saveToStock(item);
+                        }
+                      }
+                      else {
                         StockItem item =
-                            new StockItem(items[index].getName(), date, onValue[1]);
-                        _dBhelper.saveToStock(item);
+                              new StockItem(items[index].getName(), '', onValue[1]);
+                          _dBhelper.saveToStock(item);
                       }
                       _dBhelper.deleteItemFromList(items[index].getName());
                       refreshItems();

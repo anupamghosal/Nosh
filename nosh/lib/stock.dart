@@ -115,8 +115,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   }
 
   notifyWhenExpires(StockItem item) {
-    DateTime scheduledDate = DateTime.now().add(Duration(seconds: 5));
-    //DateTime scheduledDate = DateTime.parse(item.getExpiryDate());
+    //DateTime scheduledDate = DateTime.now().add(Duration(seconds: 5));
+    DateTime scheduledDate = DateTime.parse(item.getExpiryDate()).subtract(Duration(days: 1));
     String groupKey = scheduledDate.toString();
     groupKey = groupKey.substring(0, groupKey.indexOf('.'));
     String groupChannelId = 'Black';
@@ -147,8 +147,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   }
 
   notifyWhenJustExpires(StockItem item) async {
-    //DateTime scheduledDate = DateTime.parse(item.getExpiryDate()).subtract(Duration(days: 1));
-    DateTime scheduledDate = DateTime.now().add(Duration(seconds: 5));
+    DateTime scheduledDate = DateTime.parse(item.getExpiryDate());
+    //DateTime scheduledDate = DateTime.now().add(Duration(seconds: 5));
     //6 notifications every 4 hrs
     for (int i = 1; i <= 6; i++) {
       String groupKey = scheduledDate.toString();
@@ -184,8 +184,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   }
 
   notifyWhenAboutToExpire(StockItem item) async {
-    //DateTime scheduledDate = DateTime.parse(item.getExpiryDate()).subtract(Duration(days: 2));
-    DateTime scheduledDate = DateTime.now().add(Duration(seconds: 5));
+    DateTime scheduledDate = DateTime.parse(item.getExpiryDate()).subtract(Duration(days: 1));
+    //DateTime scheduledDate = DateTime.now().add(Duration(seconds: 5));
     //3 notifications every 8 hrs
     for (int i = 1; i <= 3; i++) {
       String groupKey = scheduledDate.toString();
@@ -227,6 +227,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   }
 
   Icon tileColor(String date) {
+    if(date == '') return null;
     DateTime now = new DateTime.now();
     now = new DateTime(now.year, now.month, now.day);
     int daysLeft = DateTime.parse(date).difference(now).inDays;
@@ -265,9 +266,11 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                             .then((onValue) {
                           if (onValue != null) {
                             items[index].setName(onValue[0]);
-                            String dateconverted = new DateFormat('yyyy-MM-dd')
-                                .format(onValue[1])
-                                .toString();
+                            String dateconverted = '';
+                            if(onValue[1] != null)
+                                  dateconverted = new DateFormat('yyyy-MM-dd')
+                                  .format(onValue[1])
+                                  .toString();
                             items[index].setExpiryDate(dateconverted);
                             items[index].setImage(onValue[2]);
                             _dBhelper.updateItemFromStock(items[index]);
@@ -301,7 +304,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                           ),
                   ),
             title: new Text(items[index].getName()),
-            subtitle: new Text(items[index].getExpiryDate()),
+            subtitle: new Text(items[index].getExpiryDate() == '' ? 'No Expiry Date' : items[index].getExpiryDate()),
             trailing: tileColor(items[index].getExpiryDate()));
       },
     );
@@ -344,6 +347,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             List<StockItem> items = snapshot.data;
             //filter dates
             for (int i = 0; i < items.length; i++) {
+              if(items[i].getExpiryDate() == '') continue;
               DateTime now = new DateTime.now();
               now = new DateTime(now.year, now.month, now.day);
               int daysLeft =
@@ -387,6 +391,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     int redCounter = 0, amberCounter = 0, blueCounter = 0;
     for (StockItem item in items) {
       String date = item.getExpiryDate();
+      if(date == '') continue;
       DateTime now = new DateTime.now();
       now = new DateTime(now.year, now.month, now.day);
       int daysLeft = DateTime.parse(date).difference(now).inDays;
@@ -580,7 +585,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     List<DropdownMenuItem<String>> menuItems = List();
     DateTimePickerTheme dateTimePickerTheme = new DateTimePickerTheme(
         cancel: Text(""), confirm: Text(""), title: Text('Select Expiry Date'));
-    DateTime date = DateTime.now();
+    DateTime date = null;
     String productName = name;
     String submitButtonText = 'Add Item';
     File imageFile = null;
@@ -828,7 +833,9 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
               if (onValue != null) {
                 print(onValue[0]);
                 print(onValue[1]);
-                String date =
+                String date = '';
+                if(onValue[1] != null)
+                    date =
                     new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
                 StockItem item =
                     new StockItem(onValue[0], date, onValue[2]);
@@ -865,7 +872,9 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             if (onValue != null) {
               print(onValue[0]);
               print(onValue[1]);
-              String date =
+              String date = '';
+              if(onValue[1] != null)
+                  date =
                   new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
               StockItem item = new StockItem(onValue[0], date, onValue[2]);
               _dBhelper.saveToStock(item);
@@ -899,7 +908,9 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
           if (onValue != null) {
             print(onValue[0]);
             print(onValue[1]);
-            String date =
+            String date= '';
+            if(onValue[1] != null)
+                date =
                 new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
             StockItem item = new StockItem(onValue[0], date, onValue[2]);
             _dBhelper.saveToStock(item);
