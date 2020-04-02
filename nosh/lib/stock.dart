@@ -308,9 +308,9 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                   ])
                 : Container(
                     child: CircleAvatar(
-                            radius: 30.0,
-                            backgroundImage: FileImage(File(items[index].getImage())),
-                          ),
+                      radius: 30.0,
+                      backgroundImage: FileImage(File(items[index].getImage())),
+                    ),
                   ),
             title: new Text(items[index].getName()),
             subtitle: new Text(items[index].getExpiryDate()),
@@ -480,40 +480,42 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
 
   Future<void> alertForSource(BuildContext context, StateSetter setState) {
     return showDialog(
-      context: context,
-      builder: (context) {
-        return new AlertDialog(
-          title: Text('Select'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                GestureDetector(
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.camera_alt),
-                      SizedBox(width: 10),
-                      Text('Camera')
-                    ],
-                  ),
-                  onTap: () {openCamera(context, setState);},
+        context: context,
+        builder: (context) {
+          return new AlertDialog(
+            title: Text('Select'),
+            content: SingleChildScrollView(
+                child: ListBody(children: <Widget>[
+              GestureDetector(
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.camera_alt),
+                    SizedBox(width: 10),
+                    Text('Camera')
+                  ],
                 ),
-                SizedBox(height: 20,),
-                GestureDetector(
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.album),
-                      SizedBox(width: 10),
-                      Text('Gallery')
-                    ],
-                  ),
-                  onTap: () {openGallery(context, setState);},
-                )
-              ]
-            )
-          ),
-        );
-      } 
-    );
+                onTap: () {
+                  openCamera(context, setState);
+                },
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              GestureDetector(
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.album),
+                    SizedBox(width: 10),
+                    Text('Gallery')
+                  ],
+                ),
+                onTap: () {
+                  openGallery(context, setState);
+                },
+              )
+            ])),
+          );
+        });
   }
 
   openGallery(BuildContext context, StateSetter setState) async {
@@ -522,7 +524,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     Directory directory = await getApplicationDocumentsDirectory();
     String path = directory.path;
     String file = cropped_image.toString();
-    String fileName = file.substring(file.lastIndexOf('/') + 1, file.length - 1);
+    String fileName =
+        file.substring(file.lastIndexOf('/') + 1, file.length - 1);
     print(fileName);
     var cropped_saved_img = await cropped_image.copy('$path/' + fileName);
     setState(() {
@@ -537,14 +540,15 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     Directory directory = await getApplicationDocumentsDirectory();
     String path = directory.path;
     String file = cropped_image.toString();
-    String fileName = file.substring(file.lastIndexOf('/') + 1, file.length - 1);
+    String fileName =
+        file.substring(file.lastIndexOf('/') + 1, file.length - 1);
     print(fileName);
     var cropped_saved_img = await cropped_image.copy('$path/' + fileName);
     setState(() {
       _imageFile = cropped_saved_img;
     });
     Navigator.of(context).pop();
-  }  
+  }
 
   Future<List> createAlertDialog(BuildContext context, bool state,
       {String name = '', String uri = null, DateTime initDate = null}) {
@@ -596,19 +600,24 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                   child: new Column(children: <Widget>[
                     StatefulBuilder(
                       builder: (context, setState) {
-                      print(_imageFile.toString());
+                        print(_imageFile.toString());
                         return Stack(
-                      alignment: AlignmentDirectional.bottomEnd,
-                      children: <Widget>[
-                      CircleAvatar(
-                      radius: 50,
-                      child: _imageFile == null ? Icon(Icons.fastfood) : null,
-                      backgroundImage: _imageFile == null ? uri == null ? null : NetworkImage(uri) : FileImage(_imageFile), 
-                      ),
-                      GestureDetector(
-                        child: CircleAvatar(radius: 20, child: Icon(Icons.camera_alt)),
-                        onTap: () {
-                          /*final snackBar = SnackBar(
+                            alignment: AlignmentDirectional.bottomEnd,
+                            children: <Widget>[
+                              CircleAvatar(
+                                radius: 50,
+                                child: _imageFile == null
+                                    ? Icon(Icons.fastfood)
+                                    : null,
+                                backgroundImage: _imageFile == null
+                                    ? uri == null ? null : NetworkImage(uri)
+                                    : FileImage(_imageFile),
+                              ),
+                              GestureDetector(
+                                child: CircleAvatar(
+                                    radius: 20, child: Icon(Icons.camera_alt)),
+                                onTap: () {
+                                  /*final snackBar = SnackBar(
                             backgroundColor: Colors.white,
                             content: Row(
                               children: <Widget>[
@@ -618,11 +627,10 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                             ),
                           );
                           Scaffold.of(this.context).showSnackBar(snackBar);*/
-                          alertForSource(context, setState);
-                        },
-                      ),
-                      ]
-                    );
+                                  alertForSource(context, setState);
+                                },
+                              ),
+                            ]);
                       },
                     ),
                     SizedBox(
@@ -736,67 +744,70 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
 
   createStyledFAB() {
     return SpeedDial(
-          animatedIcon: AnimatedIcons.menu_close,
-          animatedIconTheme: IconThemeData(size: 22, color: Color(0xff5c39f8)),
-          backgroundColor: Colors.white,
-          visible: true,
-          curve: Curves.bounceIn,
-          children: [
-                // FAB 1
-                SpeedDialChild(
-                child: Icon(Icons.filter_center_focus, color: Color(0xff5c39f8)),
-                backgroundColor: Colors.white,
-                onTap: () async {
-                  await scan();
-                  print(_barcode);
-                },
-                label: 'Scan Barcode',
-                labelStyle: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xff5c39f8),
-                    fontSize: 16.0),
-                labelBackgroundColor: Colors.white
-                /*labelWidget: Text('Scan Barcode',
+      animatedIcon: AnimatedIcons.menu_close,
+      animatedIconTheme: IconThemeData(size: 22, color: Color(0xff5c39f8)),
+      backgroundColor: Colors.white,
+      visible: true,
+      curve: Curves.bounceIn,
+      children: [
+        // FAB 1
+        SpeedDialChild(
+            child: Icon(Icons.filter_center_focus, color: Color(0xff5c39f8)),
+            backgroundColor: Colors.white,
+            onTap: () async {
+              await scan();
+              print(_barcode);
+            },
+            label: 'Scan Barcode',
+            labelStyle: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Color(0xff5c39f8),
+                fontSize: 16.0),
+            labelBackgroundColor: Colors.white
+            /*labelWidget: Text('Scan Barcode',
                     style: GoogleFonts.roboto(
                       fontWeight: FontWeight.w500,
                       color: Color(0xff5c39f8),
                       fontSize: 16.0
                     ))*/
-                ),
-                // FAB 2
-                SpeedDialChild(
-                child: Icon(Icons.add, color: Color(0xff5c39f8),),
-                backgroundColor: Colors.white,
-                onTap: () {
-                    createAlertDialog(context, true).then((onValue) {
-                    if (onValue != null) {
-                      print(onValue[0]);
-                      print(onValue[1]);
-                      String date = new DateFormat('yyyy-MM-dd')
-                          .format(onValue[1])
-                          .toString();
-                      StockItem item = new StockItem(onValue[0], date, _imageFile.path);
-                      _dBhelper.saveToStock(item);
-                      refreshItems();
-                    }
-                  });
-                },
-                label: 'Type Manually',
-                labelStyle: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xff5c39f8),
-                    fontSize: 16.0),
-                labelBackgroundColor: Colors.white,
-                /*labelWidget: Text('TYPE MANUALLY',
+            ),
+        // FAB 2
+        SpeedDialChild(
+          child: Icon(
+            Icons.add,
+            color: Color(0xff5c39f8),
+          ),
+          backgroundColor: Colors.white,
+          onTap: () {
+            createAlertDialog(context, true).then((onValue) {
+              if (onValue != null) {
+                print(onValue[0]);
+                print(onValue[1]);
+                String date =
+                    new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
+                StockItem item =
+                    new StockItem(onValue[0], date, _imageFile.path);
+                _dBhelper.saveToStock(item);
+                refreshItems();
+              }
+            });
+          },
+          label: 'Type Manually',
+          labelStyle: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: Color(0xff5c39f8),
+              fontSize: 16.0),
+          labelBackgroundColor: Colors.white,
+          /*labelWidget: Text('TYPE MANUALLY',
                     style: GoogleFonts.robotoCondensed(
                       fontWeight: FontWeight.w500,
                       color: Color(0xff5c39f8),
                       fontSize: 16.0
                     )
                   )*/
-                )
-          ],
-        );
+        )
+      ],
+    );
   }
 
   showError() {
@@ -834,7 +845,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
       if (productName == "404") {
         showError();
       } else {
-        createAlertDialog(context, true, name: productName, uri: productImg).then((onValue) {
+        createAlertDialog(context, true, name: productName, uri: productImg)
+            .then((onValue) {
           if (onValue != null) {
             print(onValue[0]);
             print(onValue[1]);
@@ -883,8 +895,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        body: displayUI(),
-        floatingActionButton: createStyledFAB(),
-        );
+      body: displayUI(),
+      floatingActionButton: createStyledFAB(),
+    );
   }
 }
