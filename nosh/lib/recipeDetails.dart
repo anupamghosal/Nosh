@@ -63,6 +63,10 @@ class RecipeDetail extends StatelessWidget {
               style: TextStyle(fontSize: 30.0),
             ),
           ),
+          Text(
+            'Ingredients',
+            style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600),
+          ),
           Expanded(
             child: BuildIngredients(),
           ),

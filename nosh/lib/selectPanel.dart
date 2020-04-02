@@ -69,7 +69,7 @@ class SelectPanelState extends State<SelectPanel> {
         if (snapshot.data == null || snapshot.data.length == 0) {
           return Center(
               child: new Text(
-            'You do not have any inventory',
+            'You do not have any food item',
             style: TextStyle(color: Colors.grey[600]),
           ));
         }
@@ -92,7 +92,7 @@ class SelectPanelState extends State<SelectPanel> {
             child: RaisedButton(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0)),
-              child: Text("Get Recipes"),
+              child: Text("get recipes"),
               color: Color(0xff5c39f8),
               textColor: Colors.white,
               disabledColor: Colors.grey[300],

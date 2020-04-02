@@ -577,92 +577,101 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     return showDialog(
         context: context,
         builder: (context) {
-          return new AlertDialog(
-              contentPadding: EdgeInsets.all(25.0),
-              title: new Text(submitButtonText),
-              actions: <Widget>[
-                new MaterialButton(
-                    child: new Text(submitButtonText,
-                        style: TextStyle(color: Color(0xff5c39f8))),
-                    onPressed: () {
-                      //print(productName);
-                      //print(date);
-                      final form = _formKey.currentState;
-                      if (form.validate()) {
-                        Navigator.of(context).pop([productName, date]);
-                      }
-                    },
-                    elevation: 5.0)
-              ],
-              content: new SingleChildScrollView(
-                child: Form(
-                  key: _formKey,
-                  child: new Column(children: <Widget>[
-                    StatefulBuilder(
-                      builder: (context, setState) {
-                        print(_imageFile.toString());
-                        return Stack(
-                            alignment: AlignmentDirectional.bottomEnd,
-                            children: <Widget>[
-                              CircleAvatar(
-                                radius: 50,
-                                child: _imageFile == null
-                                    ? Icon(Icons.fastfood)
-                                    : null,
-                                backgroundImage: _imageFile == null
-                                    ? uri == null ? null : NetworkImage(uri)
-                                    : FileImage(_imageFile),
-                              ),
-                              GestureDetector(
-                                child: CircleAvatar(
-                                    radius: 20, child: Icon(Icons.camera_alt)),
-                                onTap: () {
-                                  /*final snackBar = SnackBar(
-                            backgroundColor: Colors.white,
-                            content: Row(
-                              children: <Widget>[
-                                Column(children: <Widget>[Icon(Icons.album), Text('Gallery')]),
-                                Column(children: <Widget>[Icon(Icons.camera_alt), Text('Camera')])
-                              ],
-                            ),
-                          );
-                          Scaffold.of(this.context).showSnackBar(snackBar);*/
-                                  alertForSource(context, setState);
-                                },
-                              ),
-                            ]);
-                      },
-                    ),
-                    SizedBox(
-                      height: 30,
-                    ),
-                    new TextFormField(
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return 'please enter a product name';
+          return GestureDetector(
+            onTap: () {
+              FocusScope.of(context).unfocus();
+            },
+            child: new AlertDialog(
+                contentPadding: EdgeInsets.all(25.0),
+                title: new Text(submitButtonText),
+                actions: <Widget>[
+                  new MaterialButton(
+                      child: new Text(submitButtonText,
+                          style: TextStyle(color: Color(0xff5c39f8))),
+                      onPressed: () {
+                        //print(productName);
+                        //print(date);
+                        final form = _formKey.currentState;
+                        if (form.validate()) {
+                          Navigator.of(context).pop([productName, date]);
                         }
                       },
-                      controller: controller,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'Add product name...',
+                      elevation: 5.0)
+                ],
+                content: new SingleChildScrollView(
+                  child: Form(
+                    key: _formKey,
+                    child: new Column(children: <Widget>[
+                      StatefulBuilder(
+                        builder: (context, setState) {
+                          print(_imageFile.toString());
+                          return Stack(
+                              alignment: AlignmentDirectional.bottomEnd,
+                              children: <Widget>[
+                                CircleAvatar(
+                                  backgroundColor: Colors.grey[100],
+                                  radius: 50,
+                                  child: _imageFile == null
+                                      ? Icon(
+                                          Icons.fastfood,
+                                          color: Colors.grey[900],
+                                        )
+                                      : null,
+                                  backgroundImage: _imageFile == null
+                                      ? uri == null ? null : NetworkImage(uri)
+                                      : FileImage(_imageFile),
+                                ),
+                                GestureDetector(
+                                  child: CircleAvatar(
+                                      backgroundColor: Color(0xff5c39f8),
+                                      radius: 20,
+                                      child: Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.white,
+                                      )),
+                                  onTap: () {
+                                    /*final snackBar = SnackBar(
+                              backgroundColor: Colors.white,
+                              content: Row(
+                                children: <Widget>[
+                                  Column(children: <Widget>[Icon(Icons.album), Text('Gallery')]),
+                                  Column(children: <Widget>[Icon(Icons.camera_alt), Text('Camera')])
+                                ],
+                              ),
+                            );
+                            Scaffold.of(this.context).showSnackBar(snackBar);*/
+                                    alertForSource(context, setState);
+                                  },
+                                ),
+                              ]);
+                        },
                       ),
-                      onChanged: (String value) {
-                        productName = value;
-                      },
-                    ),
-                    /*new TableCalendar(
-            calendarController: calendarController,
-            builders: CalendarBuilders(),
-          )*/
-                    SizedBox(
-                      height: 30,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        FocusScope.of(context).unfocus();
-                      },
-                      child: new DatePickerWidget(
+                      SizedBox(
+                        height: 30,
+                      ),
+                      new TextFormField(
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'please enter a product name';
+                          }
+                        },
+                        controller: controller,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Add product name...',
+                        ),
+                        onChanged: (String value) {
+                          productName = value;
+                        },
+                      ),
+                      /*new TableCalendar(
+              calendarController: calendarController,
+              builders: CalendarBuilders(),
+            )*/
+                      SizedBox(
+                        height: 20,
+                      ),
+                      DatePickerWidget(
                         minDateTime: DateTime(2018),
                         maxDateTime: DateTime(2030),
                         initialDateTime: date,
@@ -672,10 +681,10 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                           date = dateTime;
                         },
                       ),
-                    )
-                  ]),
-                ),
-              ));
+                    ]),
+                  ),
+                )),
+          );
         });
     //preventing memory leaks
     controller.dispose();
