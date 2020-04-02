@@ -9,7 +9,8 @@ class RecipeDetail extends StatelessWidget {
 
   getIngredients() {
     final ingredientsString = recipe.ingredients;
-    List ingredients = ingredientsString.split(",");
+    List ingredients = ingredientsString.split(", ");
+    ingredients = ingredients.toSet().toList();
     return ingredients;
   }
 
@@ -21,7 +22,8 @@ class RecipeDetail extends StatelessWidget {
         itemCount: ingredients.length,
         itemBuilder: (BuildContext context, int idx) {
           return ListTile(
-            title: Text(ingredients[idx]),
+            contentPadding: EdgeInsets.symmetric(horizontal: 40.0),
+            title: Text("${idx + 1}. ${ingredients[idx]}"),
           );
         },
       ),
@@ -32,6 +34,7 @@ class RecipeDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0.0,
         title: Text(recipe.title),
         backgroundColor: Color(0xff5c39f8),
       ),
@@ -64,7 +67,7 @@ class RecipeDetail extends StatelessWidget {
             ),
           ),
           Text(
-            'Ingredients',
+            'Main ingredients',
             style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600),
           ),
           Expanded(

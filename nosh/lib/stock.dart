@@ -116,7 +116,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
 
   notifyWhenExpires(StockItem item) {
     //DateTime scheduledDate = DateTime.now().add(Duration(seconds: 5));
-    DateTime scheduledDate = DateTime.parse(item.getExpiryDate()).subtract(Duration(days: 1));
+    DateTime scheduledDate =
+        DateTime.parse(item.getExpiryDate()).subtract(Duration(days: 1));
     String groupKey = scheduledDate.toString();
     groupKey = groupKey.substring(0, groupKey.indexOf('.'));
     String groupChannelId = 'Black';
@@ -184,7 +185,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   }
 
   notifyWhenAboutToExpire(StockItem item) async {
-    DateTime scheduledDate = DateTime.parse(item.getExpiryDate()).subtract(Duration(days: 1));
+    DateTime scheduledDate =
+        DateTime.parse(item.getExpiryDate()).subtract(Duration(days: 1));
     //DateTime scheduledDate = DateTime.now().add(Duration(seconds: 5));
     //3 notifications every 8 hrs
     for (int i = 1; i <= 3; i++) {
@@ -227,7 +229,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   }
 
   Icon tileColor(String date) {
-    if(date == '') return null;
+    if (date == '') return null;
     DateTime now = new DateTime.now();
     now = new DateTime(now.year, now.month, now.day);
     int daysLeft = DateTime.parse(date).difference(now).inDays;
@@ -262,13 +264,15 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                         DateTime date =
                             DateTime.parse(items[index].getExpiryDate());
                         createAlertDialog(context, false,
-                                name: items[index].getName(), link: items[index].getImage(), initDate: date)
+                                name: items[index].getName(),
+                                link: items[index].getImage(),
+                                initDate: date)
                             .then((onValue) {
                           if (onValue != null) {
                             items[index].setName(onValue[0]);
                             String dateconverted = '';
-                            if(onValue[1] != null)
-                                  dateconverted = new DateFormat('yyyy-MM-dd')
+                            if (onValue[1] != null)
+                              dateconverted = new DateFormat('yyyy-MM-dd')
                                   .format(onValue[1])
                                   .toString();
                             items[index].setExpiryDate(dateconverted);
@@ -288,7 +292,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                             _dBhelper
                                 .deleteItemFromStock(items[index].getName());
                             //delete image file
-                            if(!items[index].getImage().startsWith('https') && items[index].getImage() != '')
+                            if (!items[index].getImage().startsWith('https') &&
+                                items[index].getImage() != '')
                               File(items[index].getImage()).delete();
                             refreshItems();
                           }
@@ -296,24 +301,32 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                       },
                     )
                   ])
-                  : Container(
+                : Container(
                     child: CircleAvatar(
-                            radius: 30.0,
-                            backgroundImage: selectImageType(items[index].getImage()),
-                            child: selectImageType(items[index].getImage()) == null ? Icon(Icons.fastfood) : null
-                          ),
+                        backgroundColor: Colors.grey[300],
+                        radius: 30.0,
+                        backgroundImage:
+                            selectImageType(items[index].getImage()),
+                        child: selectImageType(items[index].getImage()) == null
+                            ? Icon(
+                                Icons.fastfood,
+                                color: Colors.black,
+                              )
+                            : null),
                   ),
             title: new Text(items[index].getName()),
-            subtitle: new Text(items[index].getExpiryDate() == '' ? 'No Expiry Date' : items[index].getExpiryDate()),
+            subtitle: new Text(items[index].getExpiryDate() == ''
+                ? 'No expiry date'
+                : items[index].getExpiryDate()),
             trailing: tileColor(items[index].getExpiryDate()));
       },
     );
   }
 
   selectImageType(String link) {
-    if(link.startsWith('https'))
+    if (link.startsWith('https'))
       return NetworkImage(link);
-    else if(link == '')
+    else if (link == '')
       return null;
     else
       return FileImage(File(link));
@@ -347,21 +360,22 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             List<StockItem> items = snapshot.data;
             //filter dates
             for (int i = 0; i < items.length; i++) {
-              if(items[i].getExpiryDate() == '') continue;
+              if (items[i].getExpiryDate() == '') continue;
               DateTime now = new DateTime.now();
               now = new DateTime(now.year, now.month, now.day);
-              int daysLeft =
-                  DateTime.parse(items[i].getExpiryDate()).difference(now).inDays;
+              int daysLeft = DateTime.parse(items[i].getExpiryDate())
+                  .difference(now)
+                  .inDays;
               if (daysLeft < 0) {
                 //move the item to expired list: todo
-                ExpiredItem item =
-                    new ExpiredItem(items[i].getName(), items[i].getExpiryDate(), items[i].getImage());
+                ExpiredItem item = new ExpiredItem(items[i].getName(),
+                    items[i].getExpiryDate(), items[i].getImage());
                 _dBhelper.saveExpiredItem(item);
                 _dBhelper.deleteItemFromStock(items[i].getName());
                 items.remove(items[i]);
               }
             }
-            if(items.length == 0) {
+            if (items.length == 0) {
               return Column(
                 children: <Widget>[
                   createCounterPanel([]),
@@ -391,7 +405,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     int redCounter = 0, amberCounter = 0, blueCounter = 0;
     for (StockItem item in items) {
       String date = item.getExpiryDate();
-      if(date == '') continue;
+      if (date == '') continue;
       DateTime now = new DateTime.now();
       now = new DateTime(now.year, now.month, now.day);
       int daysLeft = DateTime.parse(date).difference(now).inDays;
@@ -575,7 +589,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     print(fileName);
     var cropped_saved_img = await cropped_image.copy('$path/' + fileName);
     return cropped_saved_img;
-  }  
+  }
 
   Future<List> createAlertDialog(BuildContext context, bool state,
       {String name = '', String link = '', DateTime initDate = null}) {
@@ -591,10 +605,9 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     File imageFile = null;
     String uri = null;
     bool enable = false;
-    if(link.startsWith('https'))
+    if (link.startsWith('https'))
       uri = link;
-    else if(link != '')
-      imageFile = File(link);
+    else if (link != '') imageFile = File(link);
     if (state == false) {
       date = initDate;
       productName = name;
@@ -622,20 +635,25 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                         //print(date);
                         final form = _formKey.currentState;
                         if (form.validate()) {
-                          Navigator.of(context).pop([productName, date, imageFile == null ? uri == null ? '' : uri : imageFile.path]);
+                          Navigator.of(context).pop([
+                            productName,
+                            date,
+                            imageFile == null
+                                ? uri == null ? '' : uri
+                                : imageFile.path
+                          ]);
                         }
                       },
                       elevation: 5.0)
                 ],
                 content: new SingleChildScrollView(
                   child: Form(
-                    key: _formKey,
-                    child: StatefulBuilder(
-                      builder: (context, setState) {
+                      key: _formKey,
+                      child: StatefulBuilder(builder: (context, setState) {
                         return Column(children: <Widget>[
-                      Stack(
-                        alignment: AlignmentDirectional.bottomEnd,
-                        children: <Widget>[
+                          Stack(
+                              alignment: AlignmentDirectional.bottomEnd,
+                              children: <Widget>[
                                 CircleAvatar(
                                   backgroundColor: Colors.grey[100],
                                   radius: 50,
@@ -669,61 +687,66 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                             );
                             Scaffold.of(this.context).showSnackBar(snackBar);*/
                                     alertForSourceAndGetImage().then((img) {
-                                    setState(() {
-                                      imageFile = img;
-                                      uri = null;
-                                    });
+                                      setState(() {
+                                        imageFile = img;
+                                        uri = null;
+                                      });
                                     });
                                   },
                                 ),
                               ]),
-                      SizedBox(
-                        height: 30,
-                      ),
-                      new TextFormField(
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'please enter a product name';
-                          }
-                        },
-                        controller: controller,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'Add product name...',
-                        ),
-                        onChanged: (String value) {
-                          productName = value;
-                        },
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Checkbox(
-                        value: enable,
-                        onChanged: (value) {
-                          setState(() {
-                            enable = value;
-                            print(enable);
-                          });
-                        },
-                      ),
-                      AbsorbPointer(
-                        absorbing: !enable,
-                        child: DatePickerWidget(
-                          minDateTime: DateTime(2018),
-                          maxDateTime: DateTime(2030),
-                          initialDateTime: date,
-                          locale: DATETIME_PICKER_LOCALE_DEFAULT,
-                          pickerTheme: dateTimePickerTheme,
-                          onChange: (dateTime, index) {
-                            date = dateTime;
-                          },
-                        )
-                      )
-                    ]);
-                      }
-                    )
-                  ),
+                          SizedBox(
+                            height: 30,
+                          ),
+                          new TextFormField(
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return 'please enter a product name';
+                              }
+                            },
+                            controller: controller,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Add product name...',
+                            ),
+                            onChanged: (String value) {
+                              productName = value;
+                            },
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Text("Enter an expiry?"),
+                              Checkbox(
+                                activeColor: Color(0xff5c39f8),
+                                value: enable,
+                                onChanged: (value) {
+                                  setState(() {
+                                    enable = value;
+                                    print(enable);
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 10.0,
+                          ),
+                          enable
+                              ? AbsorbPointer(
+                                  absorbing: !enable,
+                                  child: DatePickerWidget(
+                                    minDateTime: DateTime(2018),
+                                    maxDateTime: DateTime(2030),
+                                    initialDateTime: date,
+                                    locale: DATETIME_PICKER_LOCALE_DEFAULT,
+                                    pickerTheme: dateTimePickerTheme,
+                                    onChange: (dateTime, index) {
+                                      date = dateTime;
+                                    },
+                                  ))
+                              : Text("")
+                        ]);
+                      })),
                 )),
           );
         });
@@ -834,11 +857,11 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                 print(onValue[0]);
                 print(onValue[1]);
                 String date = '';
-                if(onValue[1] != null)
-                    date =
-                    new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
-                StockItem item =
-                    new StockItem(onValue[0], date, onValue[2]);
+                if (onValue[1] != null)
+                  date = new DateFormat('yyyy-MM-dd')
+                      .format(onValue[1])
+                      .toString();
+                StockItem item = new StockItem(onValue[0], date, onValue[2]);
                 _dBhelper.saveToStock(item);
                 refreshItems();
               }
@@ -864,7 +887,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
 
   showError() {
     final snackBar = SnackBar(
-      content: Text('Product not found! Enter manually?'),
+      content: Text('Product not found! \n Enter manually?'),
       action: SnackBarAction(
         label: 'OK',
         onPressed: () {
@@ -873,9 +896,9 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
               print(onValue[0]);
               print(onValue[1]);
               String date = '';
-              if(onValue[1] != null)
-                  date =
-                  new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
+              if (onValue[1] != null)
+                date =
+                    new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
               StockItem item = new StockItem(onValue[0], date, onValue[2]);
               _dBhelper.saveToStock(item);
               refreshItems();
@@ -908,10 +931,9 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
           if (onValue != null) {
             print(onValue[0]);
             print(onValue[1]);
-            String date= '';
-            if(onValue[1] != null)
-                date =
-                new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
+            String date = '';
+            if (onValue[1] != null)
+              date = new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
             StockItem item = new StockItem(onValue[0], date, onValue[2]);
             _dBhelper.saveToStock(item);
             refreshItems();

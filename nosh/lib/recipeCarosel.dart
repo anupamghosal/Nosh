@@ -43,6 +43,7 @@ class RecipeCaroselState extends State<RecipeCarosel> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          elevation: 0.0,
           title: Text('Recipes'),
           backgroundColor: Color(0xff5c39f8),
         ),
@@ -77,6 +78,7 @@ class RecipeCaroselState extends State<RecipeCarosel> {
                                     page: RecipeDetail(snapshot.data[index])));
                           },
                           leading: CircleAvatar(
+                            backgroundColor: Colors.grey[100],
                             radius: 30.0,
                             backgroundImage:
                                 NetworkImage(snapshot.data[index].picture),
