@@ -10,7 +10,10 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/services.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:path_provider/path_provider.dart';
 
 class Stock extends StatefulWidget {
   @override
@@ -18,6 +21,7 @@ class Stock extends StatefulWidget {
 }
 
 class _StockState extends State<Stock> with WidgetsBindingObserver {
+  File _imageFile;
   Future<List<StockItem>> _stockItems;
   List<StockItem> _currentStockItems;
   DBhelper _dBhelper;
@@ -303,7 +307,10 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                     )
                   ])
                 : Container(
-                    child: Text(""),
+                    child: CircleAvatar(
+                            radius: 30.0,
+                            backgroundImage: FileImage(File(items[index].getImage())),
+                          ),
                   ),
             title: new Text(items[index].getName()),
             subtitle: new Text(items[index].getExpiryDate()),
@@ -336,6 +343,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
           }
           if (snapshot.hasData) {
             //create ListUI
+            print(snapshot.data[0].getImage());
             return createUI(snapshot.data);
             //print(snapshot.data[0].NAME);
           }
@@ -470,10 +478,79 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     );
   }
 
+  Future<void> alertForSource(BuildContext context, StateSetter setState) {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return new AlertDialog(
+          title: Text('Select'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                GestureDetector(
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.camera_alt),
+                      SizedBox(width: 10),
+                      Text('Camera')
+                    ],
+                  ),
+                  onTap: () {openCamera(context, setState);},
+                ),
+                SizedBox(height: 20,),
+                GestureDetector(
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.album),
+                      SizedBox(width: 10),
+                      Text('Gallery')
+                    ],
+                  ),
+                  onTap: () {openGallery(context, setState);},
+                )
+              ]
+            )
+          ),
+        );
+      } 
+    );
+  }
+
+  openGallery(BuildContext context, StateSetter setState) async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    var cropped_image = await ImageCropper.cropImage(sourcePath: image.path);
+    Directory directory = await getApplicationDocumentsDirectory();
+    String path = directory.path;
+    String file = cropped_image.toString();
+    String fileName = file.substring(file.lastIndexOf('/') + 1, file.length - 1);
+    print(fileName);
+    var cropped_saved_img = await cropped_image.copy('$path/' + fileName);
+    setState(() {
+      _imageFile = cropped_saved_img;
+    });
+    Navigator.of(context).pop();
+  }
+
+  openCamera(BuildContext context, StateSetter setState) async {
+    var image = await ImagePicker.pickImage(source: ImageSource.camera);
+    var cropped_image = await ImageCropper.cropImage(sourcePath: image.path);
+    Directory directory = await getApplicationDocumentsDirectory();
+    String path = directory.path;
+    String file = cropped_image.toString();
+    String fileName = file.substring(file.lastIndexOf('/') + 1, file.length - 1);
+    print(fileName);
+    var cropped_saved_img = await cropped_image.copy('$path/' + fileName);
+    setState(() {
+      _imageFile = cropped_saved_img;
+    });
+    Navigator.of(context).pop();
+  }  
+
   Future<List> createAlertDialog(BuildContext context, bool state,
-      {String name = '', DateTime initDate = null}) {
+      {String name = '', String uri = null, DateTime initDate = null}) {
     TextEditingController controller = new TextEditingController();
     CalendarController calendarController = new CalendarController();
+    _imageFile = null;
     //initialization of units
     List<String> units = ['kg', 'g', 'l', 'ml', 'unit'];
     List<DropdownMenuItem<String>> menuItems = List();
@@ -483,7 +560,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     DateTimePickerTheme dateTimePickerTheme = new DateTimePickerTheme(
         cancel: Text(""), confirm: Text(""), title: Text('Select Expiry Date'));
     DateTime date = DateTime.now();
-    String productName = '';
+    String productName = name;
     String submitButtonText = 'Add Item';
     if (state == false) {
       date = initDate;
@@ -517,6 +594,40 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                 child: Form(
                   key: _formKey,
                   child: new Column(children: <Widget>[
+                    StatefulBuilder(
+                      builder: (context, setState) {
+                      print(_imageFile.toString());
+                        return Stack(
+                      alignment: AlignmentDirectional.bottomEnd,
+                      children: <Widget>[
+                      CircleAvatar(
+                      radius: 50,
+                      child: _imageFile == null ? Icon(Icons.fastfood) : null,
+                      backgroundImage: _imageFile == null ? uri == null ? null : NetworkImage(uri) : FileImage(_imageFile), 
+                      ),
+                      GestureDetector(
+                        child: CircleAvatar(radius: 20, child: Icon(Icons.camera_alt)),
+                        onTap: () {
+                          /*final snackBar = SnackBar(
+                            backgroundColor: Colors.white,
+                            content: Row(
+                              children: <Widget>[
+                                Column(children: <Widget>[Icon(Icons.album), Text('Gallery')]),
+                                Column(children: <Widget>[Icon(Icons.camera_alt), Text('Camera')])
+                              ],
+                            ),
+                          );
+                          Scaffold.of(this.context).showSnackBar(snackBar);*/
+                          alertForSource(context, setState);
+                        },
+                      ),
+                      ]
+                    );
+                      },
+                    ),
+                    SizedBox(
+                      height: 30,
+                    ),
                     new TextFormField(
                       validator: (value) {
                         if (value.isEmpty) {
@@ -587,7 +698,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
         });
   }
 
-  creatFAB() {
+  /*creatFAB() {
     return new Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
@@ -613,7 +724,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                   String date = new DateFormat('yyyy-MM-dd')
                       .format(onValue[1])
                       .toString();
-                  StockItem item = new StockItem(onValue[0], date);
+                  StockItem item = new StockItem(onValue[0], date, _imageFile.toString());
                   _dBhelper.saveToStock(item);
                   refreshItems();
                 }
@@ -621,7 +732,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             })
       ],
     );
-  }
+  }*/
 
   createStyledFAB() {
     return SpeedDial(
@@ -664,7 +775,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                       String date = new DateFormat('yyyy-MM-dd')
                           .format(onValue[1])
                           .toString();
-                      StockItem item = new StockItem(onValue[0], date);
+                      StockItem item = new StockItem(onValue[0], date, _imageFile.path);
                       _dBhelper.saveToStock(item);
                       refreshItems();
                     }
@@ -700,7 +811,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
               print(onValue[1]);
               String date =
                   new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
-              StockItem item = new StockItem(onValue[0], date);
+              StockItem item = new StockItem(onValue[0], date, _imageFile.path);
               _dBhelper.saveToStock(item);
               refreshItems();
             }
@@ -715,19 +826,21 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   Future scan() async {
     try {
       String barcode = await BarcodeScanner.scan();
-      String productName = await getProduct(barcode);
-      if (productName == null) productName = '';
+      List<String> product = await getProduct(barcode);
+      String productName, productImg;
+      if (product[0] == null) productName = '';
+      if (product[1] != "404") productImg = product[1];
       print(productName);
       if (productName == "404") {
         showError();
       } else {
-        createAlertDialog(context, true, name: productName).then((onValue) {
+        createAlertDialog(context, true, name: productName, uri: productImg).then((onValue) {
           if (onValue != null) {
             print(onValue[0]);
             print(onValue[1]);
             String date =
                 new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
-            StockItem item = new StockItem(onValue[0], date);
+            StockItem item = new StockItem(onValue[0], date, _imageFile.path);
             _dBhelper.saveToStock(item);
             refreshItems();
           }
@@ -756,14 +869,14 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     }
   }
 
-  Future<String> getProduct(String barcode) async {
+  Future<List<String>> getProduct(String barcode) async {
     ProductResult result =
         await OpenFoodAPIClient.getProduct(barcode, User.LANGUAGE_EN);
 
     if (result.status == 1) {
-      return result.product.productName;
+      return [result.product.productName, result.product.imgSmallUrl];
     } else {
-      return "404";
+      return ["404", "404"];
     }
   }
 
