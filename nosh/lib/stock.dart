@@ -25,6 +25,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   DBhelper _dBhelper;
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   String _barcode = '';
+  bool LOADING = false;
 
   final _formKey = GlobalKey<FormState>();
   bool _longPressedEventActive = false;
@@ -828,8 +829,10 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             child: Icon(Icons.filter_center_focus, color: Color(0xff5c39f8)),
             backgroundColor: Colors.white,
             onTap: () async {
+              setState(() {
+                LOADING = true;
+              });
               await scan();
-              print(_barcode);
             },
             label: 'Scan Barcode',
             labelStyle: TextStyle(
@@ -887,8 +890,14 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
 
   showError() {
     final snackBar = SnackBar(
-      content: Text('Product not found! \n Enter manually?'),
+      duration: Duration(seconds: 6),
+      backgroundColor: Color(0xff5c39f8),
+      content: Text(
+        'Product not found! \nEnter manually?',
+        style: TextStyle(color: Colors.grey[50], fontWeight: FontWeight.w300),
+      ),
       action: SnackBarAction(
+        textColor: Colors.white,
         label: 'OK',
         onPressed: () {
           createAlertDialog(context, true).then((onValue) {
@@ -923,6 +932,10 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
       print('product img');
       print(product[1]);
       print(productName);
+      setState(() {
+        LOADING = false;
+      });
+      print(LOADING);
       if (productName == "404") {
         showError();
       } else {
@@ -977,7 +990,16 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      body: displayUI(),
+      body: Stack(
+        children: <Widget>[
+          LOADING
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : SizedBox(),
+          displayUI()
+        ],
+      ),
       floatingActionButton: createStyledFAB(),
     );
   }

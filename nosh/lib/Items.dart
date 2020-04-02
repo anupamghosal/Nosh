@@ -277,57 +277,61 @@ class _ItemsState extends State<Items> {
                   ),
                 ),
           title: new Text(items[index].getName()),
-          trailing: new Wrap(
-            children: <Widget>[
-              new IconButton(
-                icon: new Icon(Icons.add_shopping_cart,
-                    color: Colors.grey[800], size: 22),
-                onPressed: () {
-                  //shift item : todo
-                  createImageAndDateAlertDialog(context).then((onValue) {
-                    if (onValue != null) {
-                      if (onValue[0] != null) {
-                        String date = new DateFormat('yyyy-MM-dd')
-                            .format(onValue[0])
-                            .toString();
-                        DateTime now = new DateTime.now();
-                        now = new DateTime(now.year, now.month, now.day);
-                        int daysLeft =
-                            DateTime.parse(date).difference(now).inDays;
-                        if (daysLeft < 0) {
-                          ExpiredItem item = new ExpiredItem(
-                              items[index].getName(), date, onValue[1]);
-                          _dBhelper.saveExpiredItem(item);
-                        } else {
-                          StockItem item = new StockItem(
-                              items[index].getName(), date, onValue[1]);
-                          _dBhelper.saveToStock(item);
-                        }
-                      } else {
-                        StockItem item = new StockItem(
-                            items[index].getName(), '', onValue[1]);
-                        _dBhelper.saveToStock(item);
-                      }
-                      _dBhelper.deleteItemFromList(items[index].getName());
-                      refreshItems();
-                    }
-                  });
-                },
-              ),
-              new IconButton(
-                icon: new Icon(Icons.remove_circle_outline,
-                    color: Colors.red, size: 22),
-                onPressed: () {
-                  createDeleteAlert(context).then((onValue) {
-                    if (onValue != null && onValue) {
-                      _dBhelper.deleteItemFromList(items[index].getName());
-                      refreshItems();
-                    }
-                  });
-                },
-              )
-            ],
-          ),
+          trailing: _longPressEventActive
+              ? new Wrap(
+                  children: <Widget>[
+                    new IconButton(
+                      icon: new Icon(Icons.add_shopping_cart,
+                          color: Colors.grey[800], size: 22),
+                      onPressed: () {
+                        //shift item : todo
+                        createImageAndDateAlertDialog(context).then((onValue) {
+                          if (onValue != null) {
+                            if (onValue[0] != null) {
+                              String date = new DateFormat('yyyy-MM-dd')
+                                  .format(onValue[0])
+                                  .toString();
+                              DateTime now = new DateTime.now();
+                              now = new DateTime(now.year, now.month, now.day);
+                              int daysLeft =
+                                  DateTime.parse(date).difference(now).inDays;
+                              if (daysLeft < 0) {
+                                ExpiredItem item = new ExpiredItem(
+                                    items[index].getName(), date, onValue[1]);
+                                _dBhelper.saveExpiredItem(item);
+                              } else {
+                                StockItem item = new StockItem(
+                                    items[index].getName(), date, onValue[1]);
+                                _dBhelper.saveToStock(item);
+                              }
+                            } else {
+                              StockItem item = new StockItem(
+                                  items[index].getName(), '', onValue[1]);
+                              _dBhelper.saveToStock(item);
+                            }
+                            _dBhelper
+                                .deleteItemFromList(items[index].getName());
+                            refreshItems();
+                          }
+                        });
+                      },
+                    ),
+                    new IconButton(
+                      icon: new Icon(Icons.remove_circle_outline,
+                          color: Colors.red, size: 22),
+                      onPressed: () {
+                        createDeleteAlert(context).then((onValue) {
+                          if (onValue != null && onValue) {
+                            _dBhelper
+                                .deleteItemFromList(items[index].getName());
+                            refreshItems();
+                          }
+                        });
+                      },
+                    )
+                  ],
+                )
+              : SizedBox(),
         );
       },
     );
