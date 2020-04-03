@@ -133,23 +133,32 @@ class _ItemsState extends State<Items> {
                                 ),
                               ],
                             ),
-                            SizedBox(
-                              height: 10.0,
-                            ),
-                            enable
-                                ? AbsorbPointer(
-                                    absorbing: !enable,
-                                    child: DatePickerWidget(
-                                      minDateTime: DateTime(2018),
-                                      maxDateTime: DateTime(2030),
-                                      initialDateTime: date,
-                                      locale: DATETIME_PICKER_LOCALE_DEFAULT,
-                                      pickerTheme: dateTimePickerTheme,
-                                      onChange: (dateTime, index) {
-                                        date = dateTime;
-                                      },
-                                    ))
-                                : Text("")
+                            AnimatedCrossFade(
+                                crossFadeState: enable
+                                    ? CrossFadeState.showFirst
+                                    : CrossFadeState.showSecond,
+                                duration: Duration(milliseconds: 300),
+                                firstChild: Column(
+                                  children: <Widget>[
+                                    SizedBox(
+                                      height: 10.0,
+                                    ),
+                                    AbsorbPointer(
+                                        absorbing: !enable,
+                                        child: DatePickerWidget(
+                                          minDateTime: DateTime(2018),
+                                          maxDateTime: DateTime(2030),
+                                          initialDateTime: date,
+                                          locale:
+                                              DATETIME_PICKER_LOCALE_DEFAULT,
+                                          pickerTheme: dateTimePickerTheme,
+                                          onChange: (dateTime, index) {
+                                            date = dateTime;
+                                          },
+                                        ))
+                                  ],
+                                ),
+                                secondChild: Text(""))
                           ],
                         );
                       })
@@ -238,101 +247,120 @@ class _ItemsState extends State<Items> {
         final name = items[index].getName();
         final alreadySelected = _selectedItems.contains(name);
         return ListTile(
-          onTap: () {
-            setState(() {
-              if (alreadySelected) {
-                _selectedItems.remove(name);
-              } else {
-                _selectedItems.add(name);
-              }
-            });
-          },
-          onLongPress: () {
-            setState(() {
-              _longPressEventActive = true;
-            });
-          },
-          leading: _longPressEventActive
-              ? new IconButton(
-                  icon: new Icon(Icons.edit, color: Colors.black),
-                  onPressed: () {
-                    createAlertDialog(context, false,
-                            name: items[index].getName())
-                        .then((onValue) {
-                      if (onValue != null) {
-                        items[index].setName(onValue);
-                        _dBhelper.updateItemFromList(items[index]);
-                        refreshItems();
-                      }
-                    });
-                  },
-                )
-              : Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: Icon(
-                    alreadySelected
-                        ? Icons.check_circle
-                        : Icons.check_circle_outline,
-                    color: alreadySelected ? Color(0xff5c39f8) : null,
-                  ),
-                ),
-          title: new Text(items[index].getName()),
-          trailing: _longPressEventActive
-              ? new Wrap(
-                  children: <Widget>[
-                    new IconButton(
-                      icon: new Icon(Icons.add_shopping_cart,
-                          color: Colors.grey[800], size: 22),
-                      onPressed: () {
-                        //shift item : todo
-                        createImageAndDateAlertDialog(context).then((onValue) {
-                          if (onValue != null) {
-                            if (onValue[0] != null) {
-                              String date = new DateFormat('yyyy-MM-dd')
-                                  .format(onValue[0])
-                                  .toString();
-                              DateTime now = new DateTime.now();
-                              now = new DateTime(now.year, now.month, now.day);
-                              int daysLeft =
-                                  DateTime.parse(date).difference(now).inDays;
-                              if (daysLeft < 0) {
-                                ExpiredItem item = new ExpiredItem(
-                                    items[index].getName(), date, onValue[1]);
-                                _dBhelper.saveExpiredItem(item);
-                              } else {
-                                StockItem item = new StockItem(
-                                    items[index].getName(), date, onValue[1]);
-                                _dBhelper.saveToStock(item);
-                              }
-                            } else {
-                              StockItem item = new StockItem(
-                                  items[index].getName(), '', onValue[1]);
-                              _dBhelper.saveToStock(item);
+            onTap: () {
+              setState(() {
+                if (alreadySelected) {
+                  _selectedItems.remove(name);
+                } else {
+                  _selectedItems.add(name);
+                }
+              });
+            },
+            onLongPress: () {
+              setState(() {
+                _longPressEventActive = true;
+              });
+            },
+            leading: AnimatedSwitcher(
+                duration: Duration(milliseconds: 200),
+                child: _longPressEventActive
+                    ? new IconButton(
+                        icon: new Icon(Icons.edit, color: Colors.black),
+                        onPressed: () {
+                          createAlertDialog(context, false,
+                                  name: items[index].getName())
+                              .then((onValue) {
+                            if (onValue != null) {
+                              items[index].setName(onValue);
+                              _dBhelper.updateItemFromList(items[index]);
+                              refreshItems();
                             }
-                            _dBhelper
-                                .deleteItemFromList(items[index].getName());
-                            refreshItems();
-                          }
-                        });
-                      },
-                    ),
-                    new IconButton(
-                      icon: new Icon(Icons.remove_circle_outline,
-                          color: Colors.red, size: 22),
-                      onPressed: () {
-                        createDeleteAlert(context).then((onValue) {
-                          if (onValue != null && onValue) {
-                            _dBhelper
-                                .deleteItemFromList(items[index].getName());
-                            refreshItems();
-                          }
-                        });
-                      },
+                          });
+                        },
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Icon(
+                          alreadySelected
+                              ? Icons.check_circle
+                              : Icons.check_circle_outline,
+                          color: alreadySelected ? Color(0xff5c39f8) : null,
+                        ),
+                      )),
+            title: new Text(items[index].getName()),
+            trailing: AnimatedSwitcher(
+              transitionBuilder: (widget, animation) {
+                return SlideTransition(
+                  position:
+                      Tween<Offset>(begin: Offset(1.0, 0.0), end: Offset.zero)
+                          .animate(animation),
+                  child: widget,
+                );
+              },
+              duration: Duration(milliseconds: 200),
+              child: _longPressEventActive
+                  ? new Wrap(
+                      children: <Widget>[
+                        new IconButton(
+                          icon: new Icon(Icons.add_shopping_cart,
+                              color: Colors.grey[800], size: 22),
+                          onPressed: () {
+                            //shift item : todo
+                            createImageAndDateAlertDialog(context)
+                                .then((onValue) {
+                              if (onValue != null) {
+                                if (onValue[0] != null) {
+                                  String date = new DateFormat('yyyy-MM-dd')
+                                      .format(onValue[0])
+                                      .toString();
+                                  DateTime now = new DateTime.now();
+                                  now = new DateTime(
+                                      now.year, now.month, now.day);
+                                  int daysLeft = DateTime.parse(date)
+                                      .difference(now)
+                                      .inDays;
+                                  if (daysLeft < 0) {
+                                    ExpiredItem item = new ExpiredItem(
+                                        items[index].getName(),
+                                        date,
+                                        onValue[1]);
+                                    _dBhelper.saveExpiredItem(item);
+                                  } else {
+                                    StockItem item = new StockItem(
+                                        items[index].getName(),
+                                        date,
+                                        onValue[1]);
+                                    _dBhelper.saveToStock(item);
+                                  }
+                                } else {
+                                  StockItem item = new StockItem(
+                                      items[index].getName(), '', onValue[1]);
+                                  _dBhelper.saveToStock(item);
+                                }
+                                _dBhelper
+                                    .deleteItemFromList(items[index].getName());
+                                refreshItems();
+                              }
+                            });
+                          },
+                        ),
+                        new IconButton(
+                          icon: new Icon(Icons.remove_circle_outline,
+                              color: Colors.red, size: 22),
+                          onPressed: () {
+                            createDeleteAlert(context).then((onValue) {
+                              if (onValue != null && onValue) {
+                                _dBhelper
+                                    .deleteItemFromList(items[index].getName());
+                                refreshItems();
+                              }
+                            });
+                          },
+                        )
+                      ],
                     )
-                  ],
-                )
-              : SizedBox(),
-        );
+                  : SizedBox(),
+            ));
       },
     );
   }

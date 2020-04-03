@@ -256,65 +256,93 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                 _longPressedEventActive = true;
               });
             },
-            leading: _longPressedEventActive
-                ? Wrap(children: <Widget>[
-                    IconButton(
-                      padding: new EdgeInsets.all(0.0),
-                      icon: new Icon(Icons.edit, color: Colors.black, size: 22),
-                      onPressed: () {
-                        DateTime date =
-                            DateTime.parse(items[index].getExpiryDate());
-                        createAlertDialog(context, false,
-                                name: items[index].getName(),
-                                link: items[index].getImage(),
-                                initDate: date)
-                            .then((onValue) {
-                          if (onValue != null) {
-                            items[index].setName(onValue[0]);
-                            String dateconverted = '';
-                            if (onValue[1] != null)
-                              dateconverted = new DateFormat('yyyy-MM-dd')
-                                  .format(onValue[1])
-                                  .toString();
-                            items[index].setExpiryDate(dateconverted);
-                            items[index].setImage(onValue[2]);
-                            _dBhelper.updateItemFromStock(items[index]);
-                            refreshItems();
-                          }
-                        });
-                      },
-                    ),
-                    IconButton(
-                      icon: new Icon(Icons.delete, color: Colors.red),
-                      padding: new EdgeInsets.all(0.0),
-                      onPressed: () {
-                        createDeleteAlert(context).then((onValue) {
-                          if (onValue != null && onValue) {
-                            _dBhelper
-                                .deleteItemFromStock(items[index].getName());
-                            //delete image file
-                            if (!items[index].getImage().startsWith('https') &&
-                                items[index].getImage() != '')
-                              File(items[index].getImage()).delete();
-                            refreshItems();
-                          }
-                        });
-                      },
-                    )
-                  ])
-                : Container(
-                    child: CircleAvatar(
-                        backgroundColor: Colors.grey[300],
-                        radius: 30.0,
-                        backgroundImage:
-                            selectImageType(items[index].getImage()),
-                        child: selectImageType(items[index].getImage()) == null
-                            ? Icon(
-                                Icons.fastfood,
-                                color: Colors.black,
-                              )
-                            : null),
+            leading: AnimatedCrossFade(
+              crossFadeState: _longPressedEventActive
+                  ? CrossFadeState.showFirst
+                  : CrossFadeState.showSecond,
+              duration: Duration(milliseconds: 200),
+              firstChild: Container(
+                height: 60.0,
+                key: ValueKey(1),
+                child: Wrap(children: <Widget>[
+                  IconButton(
+                    padding: new EdgeInsets.all(0.0),
+                    icon: new Icon(Icons.edit, color: Colors.black, size: 22),
+                    onPressed: () {
+                      DateTime date =
+                          DateTime.parse(items[index].getExpiryDate());
+                      createAlertDialog(context, false,
+                              name: items[index].getName(),
+                              link: items[index].getImage(),
+                              initDate: date)
+                          .then((onValue) {
+                        if (onValue != null) {
+                          items[index].setName(onValue[0]);
+                          String dateconverted = '';
+                          if (onValue[1] != null)
+                            dateconverted = new DateFormat('yyyy-MM-dd')
+                                .format(onValue[1])
+                                .toString();
+                          items[index].setExpiryDate(dateconverted);
+                          items[index].setImage(onValue[2]);
+                          _dBhelper.updateItemFromStock(items[index]);
+                          refreshItems();
+                        }
+                      });
+                    },
                   ),
+                  IconButton(
+                    icon: new Icon(Icons.delete, color: Colors.red),
+                    padding: new EdgeInsets.all(0.0),
+                    onPressed: () {
+                      createDeleteAlert(context).then((onValue) {
+                        if (onValue != null && onValue) {
+                          _dBhelper.deleteItemFromStock(items[index].getName());
+                          //delete image file
+                          if (!items[index].getImage().startsWith('https') &&
+                              items[index].getImage() != '')
+                            File(items[index].getImage()).delete();
+                          refreshItems();
+                        }
+                      });
+                    },
+                  )
+                ]),
+              ),
+              secondChild: Container(
+                key: ValueKey(2),
+                child: CircleAvatar(
+                    backgroundColor: Colors.grey[300],
+                    radius: 30.0,
+                    backgroundImage: selectImageType(items[index].getImage()),
+                    child: selectImageType(items[index].getImage()) == null
+                        ? Icon(
+                            Icons.fastfood,
+                            color: Colors.white,
+                          )
+                        : null),
+              ),
+              layoutBuilder:
+                  (topChild, topChildKey, bottomChild, bottomChildKey) {
+                return Stack(
+                  overflow: Overflow.visible,
+                  children: <Widget>[
+                    Positioned(
+                      key: bottomChildKey,
+                      left: 0,
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
+                      child: bottomChild,
+                    ),
+                    Positioned(
+                      key: topChildKey,
+                      child: topChild,
+                    )
+                  ],
+                );
+              },
+            ),
             title: new Text(items[index].getName()),
             subtitle: new Text(items[index].getExpiryDate() == ''
                 ? 'No expiry date'
@@ -715,6 +743,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                             },
                           ),
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: <Widget>[
                               Text("Enter an expiry?"),
                               Checkbox(
@@ -723,29 +752,36 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                                 onChanged: (value) {
                                   setState(() {
                                     enable = value;
-                                    print(enable);
                                   });
                                 },
                               ),
                             ],
                           ),
-                          SizedBox(
-                            height: 10.0,
-                          ),
-                          enable
-                              ? AbsorbPointer(
-                                  absorbing: !enable,
-                                  child: DatePickerWidget(
-                                    minDateTime: DateTime(2018),
-                                    maxDateTime: DateTime(2030),
-                                    initialDateTime: date,
-                                    locale: DATETIME_PICKER_LOCALE_DEFAULT,
-                                    pickerTheme: dateTimePickerTheme,
-                                    onChange: (dateTime, index) {
-                                      date = dateTime;
-                                    },
-                                  ))
-                              : Text("")
+                          AnimatedCrossFade(
+                              crossFadeState: enable
+                                  ? CrossFadeState.showFirst
+                                  : CrossFadeState.showSecond,
+                              duration: Duration(milliseconds: 300),
+                              firstChild: Column(
+                                children: <Widget>[
+                                  SizedBox(
+                                    height: 10.0,
+                                  ),
+                                  AbsorbPointer(
+                                      absorbing: !enable,
+                                      child: DatePickerWidget(
+                                        minDateTime: DateTime(2018),
+                                        maxDateTime: DateTime(2030),
+                                        initialDateTime: date,
+                                        locale: DATETIME_PICKER_LOCALE_DEFAULT,
+                                        pickerTheme: dateTimePickerTheme,
+                                        onChange: (dateTime, index) {
+                                          date = dateTime;
+                                        },
+                                      ))
+                                ],
+                              ),
+                              secondChild: Text(""))
                         ]);
                       })),
                 )),
