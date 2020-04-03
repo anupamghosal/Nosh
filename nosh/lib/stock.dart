@@ -829,10 +829,23 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             child: Icon(Icons.filter_center_focus, color: Color(0xff5c39f8)),
             backgroundColor: Colors.white,
             onTap: () async {
-              setState(() {
-                LOADING = true;
-              });
-              await scan();
+              Widget snackbar;
+              try {
+                final result = await InternetAddress.lookup('google.com');
+                if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+                  await scan();
+                }
+              } on SocketException catch (_) {
+                snackbar = SnackBar(
+                  duration: Duration(seconds: 2),
+                  content: Text("Internet connection not eastablished!"),
+                  backgroundColor: Color(0xff5c39f8),
+                );
+              }
+
+              if (snackbar != null) {
+                Scaffold.of(context).showSnackBar(snackbar);
+              }
             },
             label: 'Scan Barcode',
             labelStyle: TextStyle(
@@ -923,6 +936,9 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   Future scan() async {
     try {
       String barcode = await BarcodeScanner.scan();
+      setState(() {
+        LOADING = true;
+      });
       List<String> product = await getProduct(barcode);
       String productName, productImg = '';
       productName = product[0];
@@ -935,7 +951,6 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
       setState(() {
         LOADING = false;
       });
-      print(LOADING);
       if (productName == "404") {
         showError();
       } else {
@@ -989,7 +1004,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
+    return Scaffold(
       body: Stack(
         children: <Widget>[
           LOADING
@@ -997,7 +1012,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                   child: CircularProgressIndicator(),
                 )
               : SizedBox(),
-          displayUI()
+          displayUI(),
         ],
       ),
       floatingActionButton: createStyledFAB(),

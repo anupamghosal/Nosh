@@ -3,6 +3,7 @@ import 'database/stockItem.dart' as stockItem;
 import 'database/db_helper.dart' as db;
 import './recipeCarosel.dart';
 import './util/slide.dart';
+import 'dart:io';
 
 class SelectPanel extends StatefulWidget {
   @override
@@ -13,6 +14,7 @@ class SelectPanelState extends State<SelectPanel> {
   Future<List<stockItem.StockItem>> _stockItems;
   db.DBhelper _dBhelper;
   final _selectedFood = Set<String>();
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
 
   initState() {
     super.initState();
@@ -97,18 +99,37 @@ class SelectPanelState extends State<SelectPanel> {
               textColor: Colors.white,
               disabledColor: Colors.grey[300],
               onPressed: !_selectedFood.isEmpty
-                  ? () {
+                  ? () async {
                       String query = "";
-                      for (var item in _selectedFood) {
-                        if (query == "") {
-                          query = query + item;
-                        } else {
-                          query = query + "," + item;
+
+                      Widget snackbar;
+                      try {
+                        final result =
+                            await InternetAddress.lookup('google.com');
+                        if (result.isNotEmpty &&
+                            result[0].rawAddress.isNotEmpty) {
+                          for (var item in _selectedFood) {
+                            if (query == "") {
+                              query = query + item;
+                            } else {
+                              query = query + "," + item;
+                            }
+                          }
+                          Navigator.push(context,
+                              Slide(page: RecipeCarosel(query: query)));
                         }
+                      } on SocketException catch (_) {
+                        snackbar = SnackBar(
+                          duration: Duration(seconds: 2),
+                          content:
+                              Text("Internet connection not eastablished!"),
+                          backgroundColor: Colors.black,
+                        );
                       }
 
-                      Navigator.push(
-                          context, Slide(page: RecipeCarosel(query: query)));
+                      if (snackbar != null) {
+                        scaffoldKey.currentState.showSnackBar(snackbar);
+                      }
                     }
                   : null,
             ),
@@ -121,6 +142,7 @@ class SelectPanelState extends State<SelectPanel> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: scaffoldKey,
         appBar: AppBar(
           elevation: 0.0,
           title: Text('Select food items'),
