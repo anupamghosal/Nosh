@@ -752,6 +752,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                                 onChanged: (value) {
                                   setState(() {
                                     enable = value;
+                                    if(enable)
+                                      date = DateTime.now();
                                   });
                                 },
                               ),

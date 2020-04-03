@@ -59,7 +59,9 @@ class DBhelper {
 
   Future<List<StockItem>> getItemsFromStock() async {
     var dbClient = await db;
-    List<Map> maps = await dbClient.rawQuery("SELECT * FROM $STOCKTABLE ORDER BY $SDATE ASC");
+    List<Map> maps1 = await dbClient.rawQuery("SELECT * FROM $STOCKTABLE WHERE $SDATE == '' ORDER BY $SID DESC");
+    List<Map> maps2 = await dbClient.rawQuery("SELECT * FROM $STOCKTABLE WHERE $SDATE != '' ORDER BY $SDATE ASC");
+    List<Map> maps = new List.from(maps1)..addAll(maps2);
     List<StockItem> items  = [];
     if(maps.length > 0) {
       for(int i = 0; i < maps.length; i++) {
@@ -90,7 +92,7 @@ class DBhelper {
 
   Future<List<ListItem>> getItemsFromList() async {
     var dbClient = await db;
-    List<Map> maps = await dbClient.rawQuery("SELECT * FROM $LISTTABLE");
+    List<Map> maps = await dbClient.rawQuery("SELECT * FROM $LISTTABLE ORDER BY $LID DESC");
     List<ListItem> items  = [];
     if(maps.length > 0) {
       for(int i = 0; i < maps.length; i++) {
