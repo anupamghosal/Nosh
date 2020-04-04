@@ -91,7 +91,7 @@ class _ExpiredState extends State<Expired> {
                       ),
               ),
             title: new Text(items[index].getName()),
-            subtitle: new Text(items[index].getExpiryDate()),
+            subtitle: new Text(items[index].getExpiryDate() + '  ' + items[index].getQuantity()),
             trailing: Icon(Icons.report, color: Colors.red[900]));
       },
     );

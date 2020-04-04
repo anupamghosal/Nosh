@@ -16,16 +16,19 @@ class DBhelper {
   static const String SDATE = 'stockItemExpiryDate';
   static const String SID = 'stockItemId';
   static const String SIMG = 'stockItemImage';
+  static const String SQUANTITY = 'stockItemQuantity';
   //list table
   static const String LISTTABLE = 'List';
   static const String LNAME = 'listItemName';
   static const String LID = 'listItemId';
+  static const String LQUANTITY = 'listItemQuantity';
   //expired table
   static const String EXPIREDTABLE = 'Expired';
   static const String ENAME = 'expiredItemName';
   static const String EDATE = 'expiredItemExpiryDate';
   static const String EID = 'expiredItemId';
   static const String EIMG = 'expiredItemImage';
+  static const String EQUANTITY = 'expiredItemQuantity';
 
   Future<Database> get db async {
     if(_db != null) {
@@ -43,9 +46,9 @@ class DBhelper {
   }
 
   onCreate(Database db, int version) async {
-    await db.execute("CREATE TABLE $STOCKTABLE ($SID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $SNAME TEXT, $SDATE TEXT, $SIMG TEXT)");
-    await db.execute("CREATE TABLE $LISTTABLE ($LID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $LNAME TEXT)");
-    await db.execute("CREATE TABLE $EXPIREDTABLE ($EID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $ENAME TEXT, $EDATE TEXT, $EIMG TEXT)");
+    await db.execute("CREATE TABLE $STOCKTABLE ($SID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $SNAME TEXT, $SDATE TEXT, $SIMG TEXT, $SQUANTITY TEXT)");
+    await db.execute("CREATE TABLE $LISTTABLE ($LID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $LNAME TEXT, $LQUANTITY TEXT)");
+    await db.execute("CREATE TABLE $EXPIREDTABLE ($EID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $ENAME TEXT, $EDATE TEXT, $EIMG TEXT, $EQUANTITY)");
 
   }
 

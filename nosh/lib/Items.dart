@@ -63,7 +63,7 @@ class _ItemsState extends State<Items> {
                         final form = _formKey.currentState;
                         if (form.validate()) {
                           Navigator.of(context).pop(
-                              [date, imageFile == null ? '' : imageFile.path]);
+                              [enable ? date : null, imageFile == null ? '' : imageFile.path]);
                         }
                       },
                       elevation: 5.0)
@@ -268,10 +268,11 @@ class _ItemsState extends State<Items> {
                         icon: new Icon(Icons.edit, color: Colors.black),
                         onPressed: () {
                           createAlertDialog(context, false,
-                                  name: items[index].getName())
+                                  name: items[index].getName(), initQuantity: items[index].getQuantity())
                               .then((onValue) {
                             if (onValue != null) {
-                              items[index].setName(onValue);
+                              items[index].setName(onValue[0]);
+                              items[index].setQuantity(onValue[1]);
                               _dBhelper.updateItemFromList(items[index]);
                               refreshItems();
                             }
@@ -287,7 +288,7 @@ class _ItemsState extends State<Items> {
                           color: alreadySelected ? Color(0xff5c39f8) : null,
                         ),
                       )),
-            title: new Text(items[index].getName()),
+            title: new Text(items[index].getName() + '  ' + items[index].getQuantity()),
             trailing: AnimatedSwitcher(
               transitionBuilder: (widget, animation) {
                 return SlideTransition(
@@ -323,18 +324,18 @@ class _ItemsState extends State<Items> {
                                     ExpiredItem item = new ExpiredItem(
                                         items[index].getName(),
                                         date,
-                                        onValue[1]);
+                                        onValue[1], items[index].getQuantity());
                                     _dBhelper.saveExpiredItem(item);
                                   } else {
                                     StockItem item = new StockItem(
                                         items[index].getName(),
                                         date,
-                                        onValue[1]);
+                                        onValue[1], items[index].getQuantity());
                                     _dBhelper.saveToStock(item);
                                   }
                                 } else {
                                   StockItem item = new StockItem(
-                                      items[index].getName(), '', onValue[1]);
+                                      items[index].getName(), '', onValue[1], items[index].getQuantity());
                                   _dBhelper.saveToStock(item);
                                 }
                                 _dBhelper
@@ -416,15 +417,23 @@ class _ItemsState extends State<Items> {
         });
   }
 
-  Future createAlertDialog(BuildContext context, bool state,
-      {String name = ''}) {
+  Future<List<String>> createAlertDialog(BuildContext context, bool state,
+      {String name = '', String initQuantity = ''}) {
     TextEditingController controller = new TextEditingController();
+    TextEditingController quantityController = new TextEditingController();
     String productName = '';
     String submitButtonText = 'Add Item';
+    String quantity = '';
+    bool enable = false;
     if (state == false) {
       productName = name;
       controller.text = productName;
       submitButtonText = 'Update Item';
+    }
+    if(initQuantity != '') {
+      quantity = initQuantity;
+      quantityController.text = quantity;
+      enable = true;
     }
 
     return showDialog(
@@ -444,7 +453,7 @@ class _ItemsState extends State<Items> {
                       //print(date);
                       final form = _formKey.currentState;
                       if (form.validate()) {
-                        Navigator.of(context).pop(productName);
+                        Navigator.of(context).pop([productName, enable ? quantity : '']);
                       }
                     },
                     elevation: 5.0)
@@ -466,6 +475,40 @@ class _ItemsState extends State<Items> {
                     ),
                     onChanged: (String value) {
                       productName = value;
+                    },
+                  ),
+                  StatefulBuilder(
+                    builder: (context, setState) {
+                      return Column(
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: <Widget>[
+                              Text("Enter Quantity?"),
+                              Checkbox(
+                                activeColor: Color(0xff5c39f8),
+                                value: enable,
+                                onChanged: (value) {
+                                  setState(() {
+                                    enable = value;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          enable ?
+                          TextFormField(
+                            controller: quantityController,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Qty',
+                            ),
+                            onChanged: (String value) {
+                              quantity = value;
+                            }
+                          ) : Container()
+                        ]
+                      );
                     },
                   )
                 ]),
@@ -512,7 +555,7 @@ class _ItemsState extends State<Items> {
             onPressed: () {
               createAlertDialog(context, true).then((onValue) {
                 if (onValue != null) {
-                  ListItem item = new ListItem(onValue);
+                  ListItem item = new ListItem(onValue[0], onValue[1]);
                   _dBhelper.saveToList(item);
                   refreshItems();
                 }
