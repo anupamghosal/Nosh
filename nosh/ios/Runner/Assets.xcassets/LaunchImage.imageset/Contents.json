@@ -1,23 +1,23 @@
 {
   "images" : [
     {
+      "filename" : "playstore.png",
       "idiom" : "universal",
-      "filename" : "playstore-icon-2.png",
       "scale" : "1x"
     },
     {
+      "filename" : "playstore-1.png",
       "idiom" : "universal",
-      "filename" : "playstore-icon.png",
       "scale" : "2x"
     },
     {
+      "filename" : "appstore.png",
       "idiom" : "universal",
-      "filename" : "playstore-icon-1.png",
       "scale" : "3x"
     }
   ],
   "info" : {
-    "version" : 1,
-    "author" : "xcode"
+    "author" : "xcode",
+    "version" : 1
   }
 }
