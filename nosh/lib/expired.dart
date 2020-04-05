@@ -70,37 +70,62 @@ class _ExpiredState extends State<Expired> {
               });
             },
             leading: _longPressedEventActive
-            ? new IconButton(
-              icon: new Icon(Icons.delete, color: Colors.red),
-              onPressed: () {
-                createDeleteAlert(context).then((onValue) {
-                  if (onValue != null && onValue) {
-                    _dBhelper.deleteExpiredItem(items[index].getName());
-                    if(!items[index].getImage().startsWith('https') && items[index].getImage() != '')
-                        File(items[index].getImage()).delete();
-                    refreshItems();
-                  }
-                });
-              },
-            )
-            : Container(
-              child: CircleAvatar(
+                ? new IconButton(
+                    icon: new Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      createDeleteAlert(context).then((onValue) {
+                        if (onValue != null && onValue) {
+                          _dBhelper.deleteExpiredItem(items[index].getName());
+                          if (!items[index].getImage().startsWith('https') &&
+                              items[index].getImage() != '')
+                            File(items[index].getImage()).delete();
+                          refreshItems();
+                        }
+                      });
+                    },
+                  )
+                : Container(
+                    child: CircleAvatar(
                         radius: 30.0,
-                        backgroundImage: selectImageType(items[index].getImage()),
-                        child: selectImageType(items[index].getImage()) == null ? Icon(Icons.fastfood) : null
-                      ),
+                        backgroundImage:
+                            selectImageType(items[index].getImage()),
+                        child: selectImageType(items[index].getImage()) == null
+                            ? Icon(Icons.fastfood)
+                            : null),
+                  ),
+            title: Padding(
+              padding: EdgeInsets.only(bottom: 10.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text(items[index].getName()),
+                  items[index].getQuantity() != ''
+                      ? Container(
+                          decoration: BoxDecoration(
+                              color: Colors.grey[800],
+                              borderRadius: BorderRadius.circular(4.0)),
+                          margin: EdgeInsets.only(left: 20.0),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 6.0, vertical: 3.0),
+                          child: Text(
+                            items[index].getQuantity(),
+                            style: TextStyle(color: Colors.white, fontSize: 12),
+                          ),
+                        )
+                      : Container()
+                ],
               ),
-            title: new Text(items[index].getName()),
-            subtitle: new Text(items[index].getExpiryDate() + '  ' + items[index].getQuantity()),
+            ),
+            subtitle: new Text(items[index].getExpiryDate()),
             trailing: Icon(Icons.report, color: Colors.red[900]));
       },
     );
   }
 
   selectImageType(String link) {
-    if(link.startsWith('https'))
+    if (link.startsWith('https'))
       return NetworkImage(link);
-    else if(link == '')
+    else if (link == '')
       return null;
     else
       return FileImage(File(link));

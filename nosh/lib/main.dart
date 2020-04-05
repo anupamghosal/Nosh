@@ -5,14 +5,15 @@ import './Items.dart' as items;
 import './stock.dart' as stock;
 import './selectPanel.dart';
 import './util/slide.dart';
+import './onBoarding.dart';
 
-void main() {
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarBrightness: Brightness.light,
-      statusBarColor: Colors.transparent));
+void main() async {
+  bool welcome = true;
+  SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle.dark.copyWith(statusBarColor: Colors.transparent));
   runApp(new MaterialApp(
     theme: ThemeData(scaffoldBackgroundColor: Colors.white),
-    home: new AppTabs(),
+    home: welcome ? OnBoardingPage(welcome) : AppTabs(),
   ));
 }
 
@@ -22,6 +23,8 @@ class AppTabs extends StatefulWidget {
 }
 
 class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
+  AppTabsState();
+
   TabController _controller;
 
   @override
@@ -40,7 +43,9 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return MaterialApp(
         theme: ThemeData(
-            primaryColor: Colors.white, accentColor: Color(0xff5c39f8)),
+            scaffoldBackgroundColor: Colors.white,
+            primaryColor: Colors.white,
+            accentColor: Color(0xff5c39f8)),
         home: Scaffold(
           appBar: new AppBar(
               actions: <Widget>[

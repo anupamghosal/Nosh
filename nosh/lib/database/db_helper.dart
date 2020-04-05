@@ -30,8 +30,17 @@ class DBhelper {
   static const String EIMG = 'expiredItemImage';
   static const String EQUANTITY = 'expiredItemQuantity';
 
+  Future<bool> dbExists() async {
+    var status = await db;
+    if (status == null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   Future<Database> get db async {
-    if(_db != null) {
+    if (_db != null) {
       return _db;
     }
     _db = await initDb();
@@ -46,10 +55,12 @@ class DBhelper {
   }
 
   onCreate(Database db, int version) async {
-    await db.execute("CREATE TABLE $STOCKTABLE ($SID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $SNAME TEXT, $SDATE TEXT, $SIMG TEXT, $SQUANTITY TEXT)");
-    await db.execute("CREATE TABLE $LISTTABLE ($LID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $LNAME TEXT, $LQUANTITY TEXT)");
-    await db.execute("CREATE TABLE $EXPIREDTABLE ($EID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $ENAME TEXT, $EDATE TEXT, $EIMG TEXT, $EQUANTITY)");
-
+    await db.execute(
+        "CREATE TABLE $STOCKTABLE ($SID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $SNAME TEXT, $SDATE TEXT, $SIMG TEXT, $SQUANTITY TEXT)");
+    await db.execute(
+        "CREATE TABLE $LISTTABLE ($LID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $LNAME TEXT, $LQUANTITY TEXT)");
+    await db.execute(
+        "CREATE TABLE $EXPIREDTABLE ($EID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $ENAME TEXT, $EDATE TEXT, $EIMG TEXT, $EQUANTITY)");
   }
 
   //Stock db functions
@@ -62,12 +73,14 @@ class DBhelper {
 
   Future<List<StockItem>> getItemsFromStock() async {
     var dbClient = await db;
-    List<Map> maps1 = await dbClient.rawQuery("SELECT * FROM $STOCKTABLE WHERE $SDATE == '' ORDER BY $SID DESC");
-    List<Map> maps2 = await dbClient.rawQuery("SELECT * FROM $STOCKTABLE WHERE $SDATE != '' ORDER BY $SDATE ASC");
+    List<Map> maps1 = await dbClient.rawQuery(
+        "SELECT * FROM $STOCKTABLE WHERE $SDATE == '' ORDER BY $SID DESC");
+    List<Map> maps2 = await dbClient.rawQuery(
+        "SELECT * FROM $STOCKTABLE WHERE $SDATE != '' ORDER BY $SDATE ASC");
     List<Map> maps = new List.from(maps1)..addAll(maps2);
-    List<StockItem> items  = [];
-    if(maps.length > 0) {
-      for(int i = 0; i < maps.length; i++) {
+    List<StockItem> items = [];
+    if (maps.length > 0) {
+      for (int i = 0; i < maps.length; i++) {
         items.add(StockItem.fromMap(maps[i]));
       }
     }
@@ -76,12 +89,13 @@ class DBhelper {
 
   Future<int> deleteItemFromStock(String itemName) async {
     var dbClient = await db;
-    return await dbClient.delete(STOCKTABLE, where: '$SNAME = ?', whereArgs: [itemName]);
+    return await dbClient
+        .delete(STOCKTABLE, where: '$SNAME = ?', whereArgs: [itemName]);
   }
 
   Future<int> updateItemFromStock(StockItem item) async {
     var dbClient = await db;
-    return await dbClient.update(STOCKTABLE, item.toMap(), 
+    return await dbClient.update(STOCKTABLE, item.toMap(),
         where: '$SID = ?', whereArgs: [item.getId()]);
   }
 
@@ -95,10 +109,11 @@ class DBhelper {
 
   Future<List<ListItem>> getItemsFromList() async {
     var dbClient = await db;
-    List<Map> maps = await dbClient.rawQuery("SELECT * FROM $LISTTABLE ORDER BY $LID DESC");
-    List<ListItem> items  = [];
-    if(maps.length > 0) {
-      for(int i = 0; i < maps.length; i++) {
+    List<Map> maps =
+        await dbClient.rawQuery("SELECT * FROM $LISTTABLE ORDER BY $LID DESC");
+    List<ListItem> items = [];
+    if (maps.length > 0) {
+      for (int i = 0; i < maps.length; i++) {
         items.add(ListItem.fromMap(maps[i]));
       }
     }
@@ -107,12 +122,13 @@ class DBhelper {
 
   Future<int> deleteItemFromList(String itemName) async {
     var dbClient = await db;
-    return await dbClient.delete(LISTTABLE, where: '$LNAME = ?', whereArgs: [itemName]);
+    return await dbClient
+        .delete(LISTTABLE, where: '$LNAME = ?', whereArgs: [itemName]);
   }
 
   Future<int> updateItemFromList(ListItem item) async {
     var dbClient = await db;
-    return await dbClient.update(LISTTABLE, item.toMap(), 
+    return await dbClient.update(LISTTABLE, item.toMap(),
         where: '$LID = ?', whereArgs: [item.getId()]);
   }
 
@@ -127,9 +143,9 @@ class DBhelper {
   Future<List<ExpiredItem>> getExpiredItems() async {
     var dbClient = await db;
     List<Map> maps = await dbClient.rawQuery("SELECT * FROM $EXPIREDTABLE");
-    List<ExpiredItem> items  = [];
-    if(maps.length > 0) {
-      for(int i = 0; i < maps.length; i++) {
+    List<ExpiredItem> items = [];
+    if (maps.length > 0) {
+      for (int i = 0; i < maps.length; i++) {
         items.add(ExpiredItem.fromMap(maps[i]));
       }
     }
@@ -138,7 +154,8 @@ class DBhelper {
 
   Future<int> deleteExpiredItem(String itemName) async {
     var dbClient = await db;
-    return await dbClient.delete(EXPIREDTABLE, where: '$ENAME = ?', whereArgs: [itemName]);
+    return await dbClient
+        .delete(EXPIREDTABLE, where: '$ENAME = ?', whereArgs: [itemName]);
   }
 
   //close db client
@@ -146,5 +163,4 @@ class DBhelper {
     var dbClient = await db;
     dbClient.close();
   }
-
 }

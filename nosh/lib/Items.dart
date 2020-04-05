@@ -62,8 +62,10 @@ class _ItemsState extends State<Items> {
                         //print(date);
                         final form = _formKey.currentState;
                         if (form.validate()) {
-                          Navigator.of(context).pop(
-                              [enable ? date : null, imageFile == null ? '' : imageFile.path]);
+                          Navigator.of(context).pop([
+                            enable ? date : null,
+                            imageFile == null ? '' : imageFile.path
+                          ]);
                         }
                       },
                       elevation: 5.0)
@@ -268,7 +270,8 @@ class _ItemsState extends State<Items> {
                         icon: new Icon(Icons.edit, color: Colors.black),
                         onPressed: () {
                           createAlertDialog(context, false,
-                                  name: items[index].getName(), initQuantity: items[index].getQuantity())
+                                  name: items[index].getName(),
+                                  initQuantity: items[index].getQuantity())
                               .then((onValue) {
                             if (onValue != null) {
                               items[index].setName(onValue[0]);
@@ -288,7 +291,26 @@ class _ItemsState extends State<Items> {
                           color: alreadySelected ? Color(0xff5c39f8) : null,
                         ),
                       )),
-            title: new Text(items[index].getName() + '  ' + items[index].getQuantity()),
+            title: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Text(items[index].getName()),
+                items[index].getQuantity() != ''
+                    ? Container(
+                        decoration: BoxDecoration(
+                            color: Colors.grey[800],
+                            borderRadius: BorderRadius.circular(4.0)),
+                        margin: EdgeInsets.only(left: 20.0),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 6.0, vertical: 3.0),
+                        child: Text(
+                          items[index].getQuantity(),
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      )
+                    : Container()
+              ],
+            ),
             trailing: AnimatedSwitcher(
               transitionBuilder: (widget, animation) {
                 return SlideTransition(
@@ -324,18 +346,23 @@ class _ItemsState extends State<Items> {
                                     ExpiredItem item = new ExpiredItem(
                                         items[index].getName(),
                                         date,
-                                        onValue[1], items[index].getQuantity());
+                                        onValue[1],
+                                        items[index].getQuantity());
                                     _dBhelper.saveExpiredItem(item);
                                   } else {
                                     StockItem item = new StockItem(
                                         items[index].getName(),
                                         date,
-                                        onValue[1], items[index].getQuantity());
+                                        onValue[1],
+                                        items[index].getQuantity());
                                     _dBhelper.saveToStock(item);
                                   }
                                 } else {
                                   StockItem item = new StockItem(
-                                      items[index].getName(), '', onValue[1], items[index].getQuantity());
+                                      items[index].getName(),
+                                      '',
+                                      onValue[1],
+                                      items[index].getQuantity());
                                   _dBhelper.saveToStock(item);
                                 }
                                 _dBhelper
@@ -430,7 +457,7 @@ class _ItemsState extends State<Items> {
       controller.text = productName;
       submitButtonText = 'Update Item';
     }
-    if(initQuantity != '') {
+    if (initQuantity != '') {
       quantity = initQuantity;
       quantityController.text = quantity;
       enable = true;
@@ -453,7 +480,8 @@ class _ItemsState extends State<Items> {
                       //print(date);
                       final form = _formKey.currentState;
                       if (form.validate()) {
-                        Navigator.of(context).pop([productName, enable ? quantity : '']);
+                        Navigator.of(context)
+                            .pop([productName, enable ? quantity : '']);
                       }
                     },
                     elevation: 5.0)
@@ -471,7 +499,7 @@ class _ItemsState extends State<Items> {
                     controller: controller,
                     decoration: InputDecoration(
                       border: InputBorder.none,
-                      hintText: 'Product name...',
+                      hintText: 'Product name',
                     ),
                     onChanged: (String value) {
                       productName = value;
@@ -479,36 +507,34 @@ class _ItemsState extends State<Items> {
                   ),
                   StatefulBuilder(
                     builder: (context, setState) {
-                      return Column(
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: <Widget>[
-                              Text("Enter Quantity?"),
-                              Checkbox(
-                                activeColor: Color(0xff5c39f8),
-                                value: enable,
-                                onChanged: (value) {
-                                  setState(() {
-                                    enable = value;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                          enable ?
-                          TextFormField(
-                            controller: quantityController,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Qty',
+                      return Column(children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: <Widget>[
+                            Text("Enter Quantity?"),
+                            Checkbox(
+                              activeColor: Color(0xff5c39f8),
+                              value: enable,
+                              onChanged: (value) {
+                                setState(() {
+                                  enable = value;
+                                });
+                              },
                             ),
-                            onChanged: (String value) {
-                              quantity = value;
-                            }
-                          ) : Container()
-                        ]
-                      );
+                          ],
+                        ),
+                        enable
+                            ? TextFormField(
+                                controller: quantityController,
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: 'Qty',
+                                ),
+                                onChanged: (String value) {
+                                  quantity = value;
+                                })
+                            : Container()
+                      ]);
                     },
                   )
                 ]),
