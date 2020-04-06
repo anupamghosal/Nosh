@@ -294,7 +294,13 @@ class _ItemsState extends State<Items> {
             title: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                Text(items[index].getName()),
+                Flexible(
+                    flex: 6,
+                    child: Text(
+                      items[index].getName(),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    )),
                 items[index].getQuantity() != ''
                     ? Container(
                         decoration: BoxDecoration(
@@ -308,7 +314,7 @@ class _ItemsState extends State<Items> {
                           style: TextStyle(color: Colors.white, fontSize: 12),
                         ),
                       )
-                    : Container()
+                    : Container(),
               ],
             ),
             trailing: AnimatedSwitcher(

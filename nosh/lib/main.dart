@@ -15,8 +15,8 @@ void main() async {
   //bool welcome = true;
   print(welcome);
   SystemChrome.setPreferredOrientations([
-          DeviceOrientation.portraitUp,
-        ]);
+    DeviceOrientation.portraitUp,
+  ]);
   SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle.dark.copyWith(statusBarColor: Colors.transparent));
   runApp(new MaterialApp(
@@ -57,6 +57,15 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
         home: Scaffold(
           appBar: new AppBar(
               actions: <Widget>[
+                IconButton(
+                  onPressed: () => Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => OnBoardingPage(false))),
+                  icon: Icon(
+                    Icons.help_outline,
+                    size: 20,
+                    color: Colors.grey[600],
+                  ),
+                ),
                 IconButton(
                   icon: Icon(
                     Icons.restaurant,

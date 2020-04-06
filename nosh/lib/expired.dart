@@ -98,7 +98,7 @@ class _ExpiredState extends State<Expired> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Text(items[index].getName()),
+                  Flexible(flex: 6, child: Text(items[index].getName())),
                   items[index].getQuantity() != ''
                       ? Container(
                           decoration: BoxDecoration(

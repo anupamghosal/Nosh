@@ -36,11 +36,11 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
 
   @override
   Widget build(BuildContext context) {
-    const bodyStyle = TextStyle(fontSize: 18.0);
+    const bodyStyle = TextStyle(fontSize: 15.0);
     const pageDecoration = const PageDecoration(
-      titleTextStyle: TextStyle(fontSize: 28.0, fontWeight: FontWeight.w700),
+      titleTextStyle: TextStyle(fontSize: 25.0, fontWeight: FontWeight.w700),
       bodyTextStyle: bodyStyle,
-      descriptionPadding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
+      descriptionPadding: EdgeInsets.fromLTRB(18.0, 0.0, 18.0, 18.0),
       pageColor: Colors.white,
       imagePadding: EdgeInsets.zero,
     );
@@ -81,8 +81,11 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                 children: <Widget>[
                   Wrap(
                     children: <Widget>[
-                      Text("Click on ", style: bodyStyle),
-                      Icon(Icons.edit),
+                      Text("Tap on ", style: bodyStyle),
+                      Icon(
+                        Icons.edit,
+                        size: 18,
+                      ),
                       Text(" to edit a any item", style: bodyStyle),
                     ],
                   ),
@@ -91,9 +94,10 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                   ),
                   Wrap(
                     children: <Widget>[
-                      Text("Click on ", style: bodyStyle),
+                      Text("Tap on ", style: bodyStyle),
                       Icon(
                         Icons.delete,
+                        size: 18,
                         color: Colors.red,
                       ),
                       Text(" to delete an item", style: bodyStyle),
@@ -104,12 +108,13 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                   ),
                   Wrap(
                     children: <Widget>[
-                      Text("Click on ", style: bodyStyle),
+                      Text("Tap on ", style: bodyStyle),
                       Icon(
                         Icons.add_shopping_cart,
-                        color: Colors.grey[800],
+                        size: 18,
+                        color: Colors.grey[600],
                       ),
-                      Text(" an item from to stocked", style: bodyStyle),
+                      Text(" to add item to stocked", style: bodyStyle),
                     ],
                   )
                 ],
@@ -140,12 +145,13 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
       skipFlex: 0,
       nextFlex: 0,
       skip: const Text('Skip'),
-      next: const Icon(Icons.arrow_forward),
+      next: const Icon(Icons.keyboard_arrow_right),
       done: const Text('Get started',
           style:
               TextStyle(fontWeight: FontWeight.w800, color: Color(0xff5c39f8))),
       dotsDecorator: const DotsDecorator(
-        size: Size(10.0, 10.0),
+        spacing: EdgeInsets.symmetric(horizontal: 4),
+        size: Size(8.0, 8.0),
         color: Color(0xFFBDBDBD),
         activeSize: Size(22.0, 10.0),
         activeColor: Color(0xff5c39f8),

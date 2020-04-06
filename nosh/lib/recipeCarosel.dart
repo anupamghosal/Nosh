@@ -62,33 +62,42 @@ class RecipeCaroselState extends State<RecipeCarosel> {
                   ),
                 );
               } else {
-                return Theme(
-                  data: ThemeData(accentColor: Color(0xff5c39f8)),
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 16.0),
-                    child: ListView.builder(
-                      itemExtent: 80.0,
-                      itemCount: snapshot.data.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return ListTile(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                Slide(
-                                    page: RecipeDetail(snapshot.data[index])));
-                          },
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.grey[100],
-                            radius: 30.0,
-                            backgroundImage:
-                                NetworkImage(snapshot.data[index].picture),
-                          ),
-                          title: Text(snapshot.data[index].title),
-                        );
-                      },
+                if (snapshot.data.length == 0) {
+                  return Center(
+                    child: Text("No recipes found for selected items",
+                        style: TextStyle(color: Colors.grey[600])),
+                  );
+                } else {
+                  return Theme(
+                    data: ThemeData(accentColor: Color(0xff5c39f8)),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 16.0),
+                      child: ListView.builder(
+                        itemExtent: 80.0,
+                        itemCount: snapshot.data.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return ListTile(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  Slide(
+                                      page:
+                                          RecipeDetail(snapshot.data[index])));
+                            },
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.grey[100],
+                              radius: 30.0,
+                              backgroundImage:
+                                  NetworkImage(snapshot.data[index].picture),
+                            ),
+                            title: Text(snapshot.data[index].title),
+                            trailing: Icon(Icons.keyboard_arrow_right),
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                );
+                  );
+                }
               }
             },
           ),

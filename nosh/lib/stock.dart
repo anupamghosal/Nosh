@@ -334,8 +334,6 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                   children: <Widget>[
                     Positioned(
                       key: bottomChildKey,
-                      left: 0,
-                      right: 0,
                       top: 0,
                       bottom: 0,
                       child: bottomChild,
@@ -353,7 +351,16 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Text(items[index].getName()),
+                  Flexible(
+                    flex: 6,
+                    // width: MediaQuery.of(context).size.width * 0.54,
+                    child: Text(
+                      items[index].getName(),
+                      softWrap: true,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                   items[index].getQuantity() != ''
                       ? Container(
                           decoration: BoxDecoration(
@@ -367,7 +374,10 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                             style: TextStyle(color: Colors.white, fontSize: 12),
                           ),
                         )
-                      : Container()
+                      : Container(),
+                  SizedBox(
+                    width: 10,
+                  )
                 ],
               ),
             ),
@@ -575,16 +585,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                       },
                     ),
                   )
-                : InkWell(
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => OnBoardingPage(false))),
-                    child: Container(
-                      child: Icon(Icons.help_outline),
-                      padding: EdgeInsets.all(20.0),
-                    ),
-                  ),
+                : SizedBox(),
           )
         ],
       ),
