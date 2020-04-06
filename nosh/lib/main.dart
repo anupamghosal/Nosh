@@ -6,9 +6,14 @@ import './stock.dart' as stock;
 import './selectPanel.dart';
 import './util/slide.dart';
 import './onBoarding.dart';
+import 'database/db_helper.dart';
 
 void main() async {
-  bool welcome = true;
+  WidgetsFlutterBinding.ensureInitialized();
+  DBhelper dBhelper = new DBhelper();
+  bool welcome = await dBhelper.dbExists();
+  //bool welcome = true;
+  print(welcome);
   SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle.dark.copyWith(statusBarColor: Colors.transparent));
   runApp(new MaterialApp(

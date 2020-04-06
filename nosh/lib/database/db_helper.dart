@@ -29,14 +29,11 @@ class DBhelper {
   static const String EID = 'expiredItemId';
   static const String EIMG = 'expiredItemImage';
   static const String EQUANTITY = 'expiredItemQuantity';
+  bool _dbExists = false;
 
   Future<bool> dbExists() async {
-    var status = await db;
-    if (status == null) {
-      return true;
-    } else {
-      return false;
-    }
+    await db;
+    return _dbExists;
   }
 
   Future<Database> get db async {
@@ -61,6 +58,7 @@ class DBhelper {
         "CREATE TABLE $LISTTABLE ($LID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $LNAME TEXT, $LQUANTITY TEXT)");
     await db.execute(
         "CREATE TABLE $EXPIREDTABLE ($EID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $ENAME TEXT, $EDATE TEXT, $EIMG TEXT, $EQUANTITY)");
+    _dbExists = true;
   }
 
   //Stock db functions
