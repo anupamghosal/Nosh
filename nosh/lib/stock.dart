@@ -482,14 +482,13 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
         }
       }
     }
-
     final total = items.length;
     return Container(
       child: Row(
         children: <Widget>[
           Container(
               height: 40.0,
-              width: 60.0,
+              padding: EdgeInsets.only(right: 8),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: Colors.black, width: 0.5)),
@@ -518,7 +517,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             ),
             padding: EdgeInsets.symmetric(horizontal: 5.0),
             height: 40.0,
-            width: 60.0,
+            width: 70.0,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
                 gradient: LinearGradient(
@@ -535,7 +534,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             ),
             padding: EdgeInsets.symmetric(horizontal: 5.0),
             height: 40.0,
-            width: 60.0,
+            width: 70.0,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
                 gradient:
@@ -553,7 +552,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             ),
             padding: EdgeInsets.symmetric(horizontal: 5.0),
             height: 40.0,
-            width: 60.0,
+            width: 70.0,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
                 gradient: LinearGradient(colors: [
