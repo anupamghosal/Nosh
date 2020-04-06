@@ -55,7 +55,7 @@ class RecipeCaroselState extends State<RecipeCarosel> {
                 return Container(
                   child: Center(
                     child: Center(
-                        child: new CircularProgressIndicator(
+                        child: CircularProgressIndicator(
                       valueColor:
                           AlwaysStoppedAnimation<Color>(Color(0xff5c39f8)),
                     )),

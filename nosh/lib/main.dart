@@ -10,7 +10,7 @@ import 'database/db_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  DBhelper dBhelper = new DBhelper();
+  DBhelper dBhelper = DBhelper();
   bool welcome = await dBhelper.dbExists();
   //bool welcome = true;
   print(welcome);
@@ -19,7 +19,7 @@ void main() async {
   ]);
   SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle.dark.copyWith(statusBarColor: Colors.transparent));
-  runApp(new MaterialApp(
+  runApp(MaterialApp(
     theme: ThemeData(scaffoldBackgroundColor: Colors.white),
     home: welcome ? OnBoardingPage(welcome) : AppTabs(),
   ));
@@ -27,7 +27,7 @@ void main() async {
 
 class AppTabs extends StatefulWidget {
   @override
-  AppTabsState createState() => new AppTabsState();
+  AppTabsState createState() => AppTabsState();
 }
 
 class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
@@ -36,9 +36,9 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
   TabController _controller;
 
   @override
-  void initState() {
+  initState() {
     super.initState();
-    _controller = new TabController(length: 3, vsync: this);
+    _controller = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -55,7 +55,7 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
             primaryColor: Colors.white,
             accentColor: Color(0xff5c39f8)),
         home: Scaffold(
-          appBar: new AppBar(
+          appBar: AppBar(
               actions: <Widget>[
                 IconButton(
                   onPressed: () => Navigator.push(context,
@@ -77,27 +77,27 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
                 )
               ],
               elevation: 0.0,
-              title: new Container(
-                  padding: new EdgeInsets.only(top: 10.0),
-                  child: new Image(
+              title: Container(
+                  padding: EdgeInsets.only(top: 10.0),
+                  child: Image(
                       image: AssetImage('assets/nosh.png'),
                       width: 65.0,
                       height: 250.0)),
-              bottom: new TabBar(
+              bottom: TabBar(
                 controller: _controller,
                 tabs: <Tab>[
-                  new Tab(child: new Text('Stocked')),
-                  new Tab(child: new Text('Shopping List')),
-                  new Tab(child: new Text('Expired'))
+                  Tab(child: Text('Stocked')),
+                  Tab(child: Text('Shopping List')),
+                  Tab(child: Text("Expired"))
                 ],
                 indicatorColor: Color(0xff5c39f8),
                 labelColor: Colors.black,
                 unselectedLabelColor: Colors.grey[600],
               )),
-          body: new TabBarView(controller: _controller, children: <Widget>[
-            new stock.Stock(),
-            new items.Items(),
-            new expired.Expired()
+          body: TabBarView(controller: _controller, children: <Widget>[
+            stock.Stock(),
+            items.Items(),
+            expired.Expired()
           ]),
         ));
   }

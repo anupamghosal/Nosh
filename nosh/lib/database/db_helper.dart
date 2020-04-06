@@ -75,7 +75,7 @@ class DBhelper {
         "SELECT * FROM $STOCKTABLE WHERE $SDATE == '' ORDER BY $SID DESC");
     List<Map> maps2 = await dbClient.rawQuery(
         "SELECT * FROM $STOCKTABLE WHERE $SDATE != '' ORDER BY $SDATE ASC");
-    List<Map> maps = new List.from(maps1)..addAll(maps2);
+    List<Map> maps = List.from(maps1)..addAll(maps2);
     List<StockItem> items = [];
     if (maps.length > 0) {
       for (int i = 0; i < maps.length; i++) {

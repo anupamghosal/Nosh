@@ -26,7 +26,7 @@ class _ItemsState extends State<Items> {
   @override
   initState() {
     super.initState();
-    _dBhelper = new DBhelper();
+    _dBhelper = DBhelper();
     refreshItems();
   }
 
@@ -37,7 +37,7 @@ class _ItemsState extends State<Items> {
   }
 
   Future<List> createImageAndDateAlertDialog(BuildContext context) {
-    DateTimePickerTheme dateTimePickerTheme = new DateTimePickerTheme(
+    DateTimePickerTheme dateTimePickerTheme = DateTimePickerTheme(
         cancel: Text(""), confirm: Text(""), title: Text('Select Expiry Date'));
     DateTime date = null;
     File imageFile = null;
@@ -50,12 +50,12 @@ class _ItemsState extends State<Items> {
             onTap: () {
               FocusScope.of(context).unfocus();
             },
-            child: new AlertDialog(
+            child: AlertDialog(
                 contentPadding: EdgeInsets.all(25.0),
-                title: new Text('Add Item to Stock'),
+                title: Text('Add Item to Stock'),
                 actions: <Widget>[
-                  new MaterialButton(
-                      child: new Text('Add Item to Stock',
+                  MaterialButton(
+                      child: Text('Add Item to Stock',
                           style: TextStyle(color: Color(0xff5c39f8))),
                       onPressed: () {
                         //print(productName);
@@ -70,10 +70,10 @@ class _ItemsState extends State<Items> {
                       },
                       elevation: 5.0)
                 ],
-                content: new SingleChildScrollView(
+                content: SingleChildScrollView(
                   child: Form(
                     key: _formKey,
-                    child: new Column(children: <Widget>[
+                    child: Column(children: <Widget>[
                       StatefulBuilder(
                         builder: (context, setState) {
                           //print(_imageFile.toString());
@@ -175,7 +175,7 @@ class _ItemsState extends State<Items> {
     return showDialog(
         context: context,
         builder: (context) {
-          return new AlertDialog(
+          return AlertDialog(
             title: Text('Select'),
             content: SingleChildScrollView(
                 child: ListBody(children: <Widget>[
@@ -240,10 +240,10 @@ class _ItemsState extends State<Items> {
   }
 
   createListUI(List<ListItem> items) {
-    return new ListView.separated(
+    return ListView.separated(
       itemCount: items.length,
       separatorBuilder: (context, builder) {
-        return new Divider();
+        return Divider();
       },
       itemBuilder: (context, index) {
         final name = items[index].getName();
@@ -266,8 +266,8 @@ class _ItemsState extends State<Items> {
             leading: AnimatedSwitcher(
                 duration: Duration(milliseconds: 200),
                 child: _longPressEventActive
-                    ? new IconButton(
-                        icon: new Icon(Icons.edit, color: Colors.black),
+                    ? IconButton(
+                        icon: Icon(Icons.edit, color: Colors.black),
                         onPressed: () {
                           createAlertDialog(context, false,
                                   name: items[index].getName(),
@@ -328,10 +328,10 @@ class _ItemsState extends State<Items> {
               },
               duration: Duration(milliseconds: 200),
               child: _longPressEventActive
-                  ? new Wrap(
+                  ? Wrap(
                       children: <Widget>[
-                        new IconButton(
-                          icon: new Icon(Icons.add_shopping_cart,
+                        IconButton(
+                          icon: Icon(Icons.add_shopping_cart,
                               color: Colors.grey[800], size: 22),
                           onPressed: () {
                             //shift item : todo
@@ -339,24 +339,23 @@ class _ItemsState extends State<Items> {
                                 .then((onValue) {
                               if (onValue != null) {
                                 if (onValue[0] != null) {
-                                  String date = new DateFormat('yyyy-MM-dd')
+                                  String date = DateFormat('yyyy-MM-dd')
                                       .format(onValue[0])
                                       .toString();
-                                  DateTime now = new DateTime.now();
-                                  now = new DateTime(
-                                      now.year, now.month, now.day);
+                                  DateTime now = DateTime.now();
+                                  now = DateTime(now.year, now.month, now.day);
                                   int daysLeft = DateTime.parse(date)
                                       .difference(now)
                                       .inDays;
                                   if (daysLeft < 0) {
-                                    ExpiredItem item = new ExpiredItem(
+                                    ExpiredItem item = ExpiredItem(
                                         items[index].getName(),
                                         date,
                                         onValue[1],
                                         items[index].getQuantity());
                                     _dBhelper.saveExpiredItem(item);
                                   } else {
-                                    StockItem item = new StockItem(
+                                    StockItem item = StockItem(
                                         items[index].getName(),
                                         date,
                                         onValue[1],
@@ -364,7 +363,7 @@ class _ItemsState extends State<Items> {
                                     _dBhelper.saveToStock(item);
                                   }
                                 } else {
-                                  StockItem item = new StockItem(
+                                  StockItem item = StockItem(
                                       items[index].getName(),
                                       '',
                                       onValue[1],
@@ -378,8 +377,8 @@ class _ItemsState extends State<Items> {
                             });
                           },
                         ),
-                        new IconButton(
-                          icon: new Icon(Icons.remove_circle_outline,
+                        IconButton(
+                          icon: Icon(Icons.remove_circle_outline,
                               color: Colors.red, size: 22),
                           onPressed: () {
                             createDeleteAlert(context).then((onValue) {
@@ -407,8 +406,8 @@ class _ItemsState extends State<Items> {
         if (snapshot.connectionState == ConnectionState.done) {
           //temporary remove later
           if (snapshot.data == null || snapshot.data.length == 0) {
-            return new Center(
-                child: new Text(
+            return Center(
+                child: Text(
               'No items in shopping list',
               style: TextStyle(color: Colors.grey[600]),
             ));
@@ -420,7 +419,7 @@ class _ItemsState extends State<Items> {
             //print(snapshot.data[0].NAME);
           }
         } else {
-          return new Center(child: new CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator());
         }
       },
     );
@@ -430,30 +429,26 @@ class _ItemsState extends State<Items> {
     return showDialog(
         context: context,
         builder: (context) {
-          return new AlertDialog(
-              title: new Text("Are you sure?"),
-              actions: <Widget>[
-                new MaterialButton(
-                  child: new Text('Yes',
-                      style: TextStyle(color: Color(0xff5c39f8))),
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
-                ),
-                new MaterialButton(
-                    child: new Text('No',
-                        style: TextStyle(color: Color(0xff5c39f8))),
-                    onPressed: () {
-                      Navigator.of(context).pop(false);
-                    })
-              ]);
+          return AlertDialog(title: Text("Are you sure?"), actions: <Widget>[
+            MaterialButton(
+              child: Text('Yes', style: TextStyle(color: Color(0xff5c39f8))),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+            MaterialButton(
+                child: Text('No', style: TextStyle(color: Color(0xff5c39f8))),
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                })
+          ]);
         });
   }
 
   Future<List<String>> createAlertDialog(BuildContext context, bool state,
       {String name = '', String initQuantity = ''}) {
-    TextEditingController controller = new TextEditingController();
-    TextEditingController quantityController = new TextEditingController();
+    TextEditingController controller = TextEditingController();
+    TextEditingController quantityController = TextEditingController();
     String productName = '';
     String submitButtonText = 'Add Item';
     String quantity = '';
@@ -472,12 +467,12 @@ class _ItemsState extends State<Items> {
     return showDialog(
         context: context,
         builder: (context) {
-          return new AlertDialog(
+          return AlertDialog(
               contentPadding: EdgeInsets.all(25.0),
-              title: new Text(submitButtonText),
+              title: Text(submitButtonText),
               actions: <Widget>[
-                new MaterialButton(
-                    child: new Text(
+                MaterialButton(
+                    child: Text(
                       submitButtonText,
                       style: TextStyle(color: Color(0xFF5C39F8)),
                     ),
@@ -492,11 +487,11 @@ class _ItemsState extends State<Items> {
                     },
                     elevation: 5.0)
               ],
-              content: new SingleChildScrollView(
+              content: SingleChildScrollView(
                   child: Form(
                 key: _formKey,
                 child: Column(children: <Widget>[
-                  new TextFormField(
+                  TextFormField(
                     validator: (value) {
                       if (value.isEmpty) {
                         return 'Please enter a product name';
@@ -553,7 +548,7 @@ class _ItemsState extends State<Items> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
+    return Scaffold(
         body: Container(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -581,13 +576,13 @@ class _ItemsState extends State<Items> {
             ],
           ),
         ),
-        floatingActionButton: new FloatingActionButton(
+        floatingActionButton: FloatingActionButton(
             child: Icon(Icons.add, color: Color(0xff5c39f8)),
             backgroundColor: Colors.white,
             onPressed: () {
               createAlertDialog(context, true).then((onValue) {
                 if (onValue != null) {
-                  ListItem item = new ListItem(onValue[0], onValue[1]);
+                  ListItem item = ListItem(onValue[0], onValue[1]);
                   _dBhelper.saveToList(item);
                   refreshItems();
                 }
