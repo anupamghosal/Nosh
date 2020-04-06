@@ -14,6 +14,9 @@ void main() async {
   bool welcome = await dBhelper.dbExists();
   //bool welcome = true;
   print(welcome);
+  SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+        ]);
   SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle.dark.copyWith(statusBarColor: Colors.transparent));
   runApp(new MaterialApp(

@@ -56,7 +56,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
         ),
         PageViewModel(
           title: "Stock management",
-          body: "Socked and categorized as per expiry dates",
+          body: "Stocked and categorized as per expiry dates",
           image: _buildImage('manage_stock'),
           decoration: pageDecoration,
         ),
