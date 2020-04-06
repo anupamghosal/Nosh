@@ -86,6 +86,19 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                   Text("  less than 3 days to expire")
                 ],
               ),
+              SizedBox(
+                height: 15,
+              ),
+              Wrap(
+                children: <Widget>[
+                  Icon(
+                    Icons.thumb_up,
+                    size: 18,
+                    color: Color(0xff5c39f8),
+                  ),
+                  Text("  less than 3 days to expire")
+                ],
+              ),
             ],
           ),
           decoration: pageDecoration,

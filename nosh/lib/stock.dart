@@ -501,14 +501,14 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                               fontSize: 8, fontWeight: FontWeight.w600))),
                   Text(
                     total.toString(),
-                    style: TextStyle(fontSize: 35, fontWeight: FontWeight.w300),
+                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.w300),
                   )
                 ],
               )),
           Container(
             child: Row(
               children: <Widget>[
-                Icon(Icons.error_outline, color: Colors.white),
+                Icon(Icons.error_outline, color: Colors.white, size: 20),
                 Text(redCounter.toString(),
                     style: TextStyle(color: Colors.white)) //dynamic value here
               ],
@@ -517,7 +517,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             ),
             padding: EdgeInsets.symmetric(horizontal: 5.0),
             height: 40.0,
-            width: 70.0,
+            width: 75.0,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
                 gradient: LinearGradient(
@@ -526,7 +526,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
           Container(
             child: Row(
               children: <Widget>[
-                Icon(Icons.report_problem),
+                Icon(Icons.report_problem, size: 20),
                 Text(amberCounter.toString())
               ],
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -534,7 +534,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             ),
             padding: EdgeInsets.symmetric(horizontal: 5.0),
             height: 40.0,
-            width: 70.0,
+            width: 75.0,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
                 gradient:
@@ -543,7 +543,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
           Container(
             child: Row(
               children: <Widget>[
-                Icon(Icons.shopping_cart, color: Colors.white),
+                Icon(Icons.thumb_up, color: Colors.white, size: 20),
                 Text(blueCounter.toString(),
                     style: TextStyle(color: Colors.white)) // dynamic value here
               ],
@@ -552,7 +552,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             ),
             padding: EdgeInsets.symmetric(horizontal: 5.0),
             height: 40.0,
-            width: 70.0,
+            width: 75.0,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
                 gradient: LinearGradient(colors: [
@@ -565,6 +565,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
       ),
       padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
       margin: EdgeInsets.symmetric(vertical: 12.0, horizontal: 10),
+      decoration: BoxDecoration(
+          color: Colors.grey[50], borderRadius: BorderRadius.circular(10)),
     );
   }
 
