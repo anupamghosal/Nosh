@@ -96,7 +96,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                     size: 18,
                     color: Color(0xff5c39f8),
                   ),
-                  Text("  less than 3 days to expire")
+                  Text("  good to go for atleast 3 days")
                 ],
               ),
             ],
@@ -131,6 +131,13 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
               ),
             ],
           ),
+          decoration: pageDecoration,
+        ),
+        PageViewModel(
+          title: "Empowering UI design",
+          body:
+              "User empowering UI design. Long press items to reveal more options",
+          image: _buildImage('ui'),
           decoration: pageDecoration,
         ),
         PageViewModel(
@@ -183,13 +190,6 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
             ],
           ),
           image: _buildImage('managing'),
-          decoration: pageDecoration,
-        ),
-        PageViewModel(
-          title: "Empowering UI design",
-          body:
-              "User empowering UI design. Long press items to reveal more options",
-          image: _buildImage('ui'),
           decoration: pageDecoration,
         ),
         PageViewModel(
