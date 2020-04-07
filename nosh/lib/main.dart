@@ -13,8 +13,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   DBhelper dBhelper = DBhelper();
   bool welcome = await dBhelper.dbExists();
-  //bool welcome = true;
-  print(welcome);
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
@@ -114,36 +113,53 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
                   new Tab(child: new Text('Stocked')),
                   new Tab(child: new Text('Shopping List')),
                   new Tab(
-                    child: _expiredItemCount != 0 ?
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
                         Text('Expired'),
-                        SizedBox( width: 5),
-                        CircleAvatar(
-                          radius: 9,
-                          child: Text(
-                            _expiredItemCount.toString(), 
-                            style: TextStyle(
-                              color: Colors.white, 
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10.0
-                            )
+                        // SizedBox(width: 7),
+                        AnimatedCrossFade(
+                          duration: Duration(milliseconds: 300),
+                          crossFadeState: _expiredItemCount != 0
+                              ? CrossFadeState.showFirst
+                              : CrossFadeState.showSecond,
+                          firstChild: Padding(
+                            padding: const EdgeInsets.only(left: 7.0),
+                            child: CircleAvatar(
+                              radius: 9,
+                              child: Text(_expiredItemCount.toString(),
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 9)),
+                              backgroundColor: Color(0xff5c39f8),
+                            ),
                           ),
-                          backgroundColor: Color(0xff5c39f8),
+                          secondChild: SizedBox(),
                         )
-                      ]
-                    ) : Text('Expired')
-                  )
+                      ]))
+                  // : Text('Expired'))
                 ],
                 indicatorColor: Color(0xff5c39f8),
                 labelColor: Colors.black,
                 unselectedLabelColor: Colors.grey[600],
               )),
           body: new TabBarView(controller: _controller, children: <Widget>[
-            new stock.Stock(incrementExpiredItemCount: () {incrementExpiredItemCount();},),
-            new items.Items(incrementExpiredItemCount: () {incrementExpiredItemCount();},),
-            new expired.Expired(decrementExpiredItemCount: () {decrementExpiredItemCount();},)
+            new stock.Stock(
+              incrementExpiredItemCount: () {
+                incrementExpiredItemCount();
+              },
+            ),
+            new items.Items(
+              incrementExpiredItemCount: () {
+                incrementExpiredItemCount();
+              },
+            ),
+            new expired.Expired(
+              decrementExpiredItemCount: () {
+                decrementExpiredItemCount();
+              },
+            )
           ]),
         ));
   }
