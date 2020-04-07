@@ -372,7 +372,7 @@ class _ItemsState extends State<Items> {
                                   _dBhelper.saveToStock(item);
                                 }
                                 _dBhelper
-                                    .deleteItemFromList(items[index].getName());
+                                    .deleteItemFromList(items[index].getId());
                                 refreshItems();
                               }
                             });
@@ -385,7 +385,7 @@ class _ItemsState extends State<Items> {
                             createDeleteAlert(context).then((onValue) {
                               if (onValue != null && onValue) {
                                 _dBhelper
-                                    .deleteItemFromList(items[index].getName());
+                                    .deleteItemFromList(items[index].getId());
                                 refreshItems();
                               }
                             });

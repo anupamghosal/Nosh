@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:nosh/database/expiredItem.dart';
 import './expired.dart' as expired;
 import './Items.dart' as items;
 import './stock.dart' as stock;
@@ -33,12 +34,36 @@ class AppTabs extends StatefulWidget {
 class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
   AppTabsState();
 
+  DBhelper _dBhelper;
   TabController _controller;
+  int _expiredItemCount = 0;
 
   @override
   void initState() {
     super.initState();
     _controller = new TabController(length: 3, vsync: this);
+    _dBhelper = new DBhelper();
+    initializeExpiredItemCount();
+  }
+
+  initializeExpiredItemCount() async {
+    List<ExpiredItem> items = await _dBhelper.getExpiredItems();
+    print(items.length);
+    setState(() {
+      _expiredItemCount = items.length;
+    });
+  }
+
+  incrementExpiredItemCount() {
+    setState(() {
+      _expiredItemCount = _expiredItemCount + 1;
+    });
+  }
+
+  decrementExpiredItemCount() {
+    setState(() {
+      _expiredItemCount = _expiredItemCount - 1;
+    });
   }
 
   @override
@@ -88,16 +113,37 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
                 tabs: <Tab>[
                   new Tab(child: new Text('Stocked')),
                   new Tab(child: new Text('Shopping List')),
-                  new Tab(child: new Text('Expired'))
+                  new Tab(
+                    child: _expiredItemCount != 0 ?
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text('Expired'),
+                        SizedBox( width: 5),
+                        CircleAvatar(
+                          radius: 9,
+                          child: Text(
+                            _expiredItemCount.toString(), 
+                            style: TextStyle(
+                              color: Colors.white, 
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10.0
+                            )
+                          ),
+                          backgroundColor: Color(0xff5c39f8),
+                        )
+                      ]
+                    ) : Text('Expired')
+                  )
                 ],
                 indicatorColor: Color(0xff5c39f8),
                 labelColor: Colors.black,
                 unselectedLabelColor: Colors.grey[600],
               )),
           body: new TabBarView(controller: _controller, children: <Widget>[
-            new stock.Stock(),
+            new stock.Stock(incrementExpiredItemCount: () {incrementExpiredItemCount();},),
             new items.Items(),
-            new expired.Expired()
+            new expired.Expired(decrementExpiredItemCount: () {decrementExpiredItemCount();},)
           ]),
         ));
   }

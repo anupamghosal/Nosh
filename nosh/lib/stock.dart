@@ -13,9 +13,11 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:path_provider/path_provider.dart';
-import './onBoarding.dart';
+import 'main.dart';
 
 class Stock extends StatefulWidget {
+  final Function incrementExpiredItemCount;
+  Stock({this.incrementExpiredItemCount});
   @override
   _StockState createState() => _StockState();
 }
@@ -302,7 +304,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                     onPressed: () {
                       createDeleteAlert(context).then((onValue) {
                         if (onValue != null && onValue) {
-                          _dBhelper.deleteItemFromStock(items[index].getName());
+                          _dBhelper.deleteItemFromStock(items[index].getId());
                           //delete image file
                           if (!items[index].getImage().startsWith('https') &&
                               items[index].getImage() != '')
@@ -440,7 +442,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                     items[i].getImage(),
                     items[i].getQuantity());
                 _dBhelper.saveExpiredItem(item);
-                _dBhelper.deleteItemFromStock(items[i].getName());
+                _dBhelper.deleteItemFromStock(items[i].getId());
                 items.remove(items[i]);
               }
             }
@@ -474,7 +476,10 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     int redCounter = 0, amberCounter = 0, blueCounter = 0;
     for (StockItem item in items) {
       String date = item.getExpiryDate();
-      if (date == '') continue;
+      if (date == '') {
+        blueCounter = blueCounter + 1;
+        continue;
+      }
       DateTime now = new DateTime.now();
       now = new DateTime(now.year, now.month, now.day);
       int daysLeft = DateTime.parse(date).difference(now).inDays;
@@ -483,9 +488,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
           redCounter = redCounter + 1;
         } else if (daysLeft <= 2) {
           amberCounter = amberCounter + 1;
-        } else {
-          blueCounter = blueCounter + 1;
         }
+        blueCounter = blueCounter + 1;
       }
     }
     return new Container(
@@ -965,10 +969,16 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                 print(onValue[0]);
                 print(onValue[1]);
                 String date = '';
-                if (onValue[1] != null)
+                if (onValue[1] != null) {
                   date = new DateFormat('yyyy-MM-dd')
                       .format(onValue[1])
                       .toString();
+                  DateTime now = new DateTime.now();
+                  now = new DateTime(now.year, now.month, now.day);
+                  int daysLeft = onValue[1].difference(now).inDays;
+                  if(daysLeft < 0)
+                    widget.incrementExpiredItemCount();
+                }
                 StockItem item =
                     new StockItem(onValue[0], date, onValue[2], onValue[3]);
                 _dBhelper.saveToStock(item);

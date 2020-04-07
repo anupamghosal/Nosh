@@ -4,6 +4,8 @@ import 'database/db_helper.dart';
 import 'dart:io';
 
 class Expired extends StatefulWidget {
+  final Function decrementExpiredItemCount;
+  Expired({this.decrementExpiredItemCount});
   @override
   _ExpiredState createState() => _ExpiredState();
 }
@@ -75,7 +77,8 @@ class _ExpiredState extends State<Expired> {
                     onPressed: () {
                       createDeleteAlert(context).then((onValue) {
                         if (onValue != null && onValue) {
-                          _dBhelper.deleteExpiredItem(items[index].getName());
+                          _dBhelper.deleteExpiredItem(items[index].getId());
+                        widget.decrementExpiredItemCount();
                           if (!items[index].getImage().startsWith('https') &&
                               items[index].getImage() != '')
                             File(items[index].getImage()).delete();

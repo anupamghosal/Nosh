@@ -85,10 +85,10 @@ class DBhelper {
     return items;
   }
 
-  Future<int> deleteItemFromStock(String itemName) async {
+  Future<int> deleteItemFromStock(int itemID) async {
     var dbClient = await db;
     return await dbClient
-        .delete(STOCKTABLE, where: '$SNAME = ?', whereArgs: [itemName]);
+        .delete(STOCKTABLE, where: '$SID = ?', whereArgs: [itemID]);
   }
 
   Future<int> updateItemFromStock(StockItem item) async {
@@ -118,10 +118,10 @@ class DBhelper {
     return items;
   }
 
-  Future<int> deleteItemFromList(String itemName) async {
+  Future<int> deleteItemFromList(int itemID) async {
     var dbClient = await db;
     return await dbClient
-        .delete(LISTTABLE, where: '$LNAME = ?', whereArgs: [itemName]);
+        .delete(LISTTABLE, where: '$LID = ?', whereArgs: [itemID]);
   }
 
   Future<int> updateItemFromList(ListItem item) async {
@@ -150,10 +150,10 @@ class DBhelper {
     return items;
   }
 
-  Future<int> deleteExpiredItem(String itemName) async {
+  Future<int> deleteExpiredItem(int itemID) async {
     var dbClient = await db;
     return await dbClient
-        .delete(EXPIREDTABLE, where: '$ENAME = ?', whereArgs: [itemName]);
+        .delete(EXPIREDTABLE, where: '$EID = ?', whereArgs: [itemID]);
   }
 
   //close db client
