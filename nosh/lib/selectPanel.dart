@@ -14,11 +14,11 @@ class SelectPanelState extends State<SelectPanel> {
   Future<List<stockItem.StockItem>> _stockItems;
   db.DBhelper _dBhelper;
   final _selectedFood = Set<String>();
-  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   initState() {
     super.initState();
-    _dBhelper = new db.DBhelper();
+    _dBhelper = db.DBhelper();
   }
 
   refreshItems() {
@@ -55,8 +55,8 @@ class SelectPanelState extends State<SelectPanel> {
                     color: Color(0xff5c39f8),
                   )
                 : Icon(Icons.check_circle_outline),
-            title: new Text(items[index].getName()),
-            subtitle: new Text(items[index].getExpiryDate()),
+            title: Text(items[index].getName()),
+            subtitle: Text(items[index].getExpiryDate()),
           );
         },
       ),
@@ -70,7 +70,7 @@ class SelectPanelState extends State<SelectPanel> {
       builder: (context, snapshot) {
         if (snapshot.data == null || snapshot.data.length == 0) {
           return Center(
-              child: new Text(
+              child: Text(
             'You do not have any food item',
             style: TextStyle(color: Colors.grey[600]),
           ));

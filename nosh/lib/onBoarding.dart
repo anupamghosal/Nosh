@@ -56,8 +56,51 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
         ),
         PageViewModel(
           title: "Stock management",
-          body: "Stocked and categorized as per expiry dates",
           image: _buildImage('manage_stock'),
+          bodyWidget: Column(
+            children: <Widget>[
+              Text("Stocked and categorized as per expiry dates."),
+              SizedBox(
+                height: 15,
+              ),
+              Wrap(
+                children: <Widget>[
+                  Icon(
+                    Icons.error_outline,
+                    size: 18,
+                    color: Colors.red,
+                  ),
+                  Text("  1 day to expire")
+                ],
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              Wrap(
+                children: <Widget>[
+                  Icon(
+                    Icons.report_problem,
+                    size: 18,
+                    color: Colors.amber,
+                  ),
+                  Text("  less than 3 days to expire")
+                ],
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              Wrap(
+                children: <Widget>[
+                  Icon(
+                    Icons.thumb_up,
+                    size: 18,
+                    color: Color(0xff5c39f8),
+                  ),
+                  Text("  good to go for atleast 3 days")
+                ],
+              ),
+            ],
+          ),
           decoration: pageDecoration,
         ),
         PageViewModel(
@@ -68,8 +111,33 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
         ),
         PageViewModel(
           title: "Get recipes",
-          body: "Get recipe suggestions from your stocked items.",
           image: _buildImage('recipe'),
+          bodyWidget: Column(
+            children: <Widget>[
+              Text("Get recipe suggestions from your stocked items."),
+              SizedBox(
+                height: 15,
+              ),
+              Wrap(
+                children: <Widget>[
+                  Text("Tap on ", style: bodyStyle),
+                  Icon(
+                    Icons.restaurant,
+                    size: 18,
+                    color: Color(0xff5c39f8),
+                  ),
+                  Text(" to get lovely recipes", style: bodyStyle),
+                ],
+              ),
+            ],
+          ),
+          decoration: pageDecoration,
+        ),
+        PageViewModel(
+          title: "Empowering UI design",
+          body:
+              "User empowering UI design. Long press items to reveal more options",
+          image: _buildImage('ui'),
           decoration: pageDecoration,
         ),
         PageViewModel(
@@ -125,13 +193,6 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
           decoration: pageDecoration,
         ),
         PageViewModel(
-          title: "Empowering UI design",
-          body:
-              "User empowering UI design. Long press items to reveal more options",
-          image: _buildImage('ui'),
-          decoration: pageDecoration,
-        ),
-        PageViewModel(
           title: "Start saving today",
           body:
               "Start saving food today, and helping the world by not wasting some.",
@@ -151,9 +212,9 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
               TextStyle(fontWeight: FontWeight.w800, color: Color(0xff5c39f8))),
       dotsDecorator: const DotsDecorator(
         spacing: EdgeInsets.symmetric(horizontal: 4),
-        size: Size(8.0, 8.0),
+        size: Size(7.0, 7.0),
         color: Color(0xFFBDBDBD),
-        activeSize: Size(22.0, 10.0),
+        activeSize: Size(16.0, 7.0),
         activeColor: Color(0xff5c39f8),
         activeShape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(25.0)),

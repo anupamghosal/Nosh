@@ -18,7 +18,7 @@ class _ExpiredState extends State<Expired> {
   @override
   initState() {
     super.initState();
-    _dBhelper = new DBhelper();
+    _dBhelper = DBhelper();
   }
 
   refreshItems() {
@@ -52,14 +52,14 @@ class _ExpiredState extends State<Expired> {
               : Container()
         ],
       ),
-      onRefresh: () {
+      onRefresh: () async {
         refreshItems();
       },
     );
   }
 
   createListUI(List<ExpiredItem> items) {
-    return new ListView.separated(
+    return ListView.separated(
       itemCount: items.length,
       separatorBuilder: (context, index) {
         return Divider();
@@ -72,8 +72,8 @@ class _ExpiredState extends State<Expired> {
               });
             },
             leading: _longPressedEventActive
-                ? new IconButton(
-                    icon: new Icon(Icons.delete, color: Colors.red),
+                ? IconButton(
+                    icon: Icon(Icons.delete, color: Colors.red),
                     onPressed: () {
                       createDeleteAlert(context).then((onValue) {
                         if (onValue != null && onValue) {
@@ -119,7 +119,7 @@ class _ExpiredState extends State<Expired> {
                 ],
               ),
             ),
-            subtitle: new Text(items[index].getExpiryDate()),
+            subtitle: Text(items[index].getExpiryDate()),
             trailing: Icon(Icons.report, color: Colors.red[900]));
       },
     );
@@ -142,8 +142,8 @@ class _ExpiredState extends State<Expired> {
         if (snapshot.connectionState == ConnectionState.done) {
           //temporary remove later
           if (snapshot.data == null || snapshot.data.length == 0) {
-            return new Center(
-                child: new Text(
+            return Center(
+                child: Text(
               'No expired items',
               style: TextStyle(color: Colors.grey[600]),
             ));
@@ -156,7 +156,7 @@ class _ExpiredState extends State<Expired> {
             //print(snapshot.data[0].NAME);
           }
         } else {
-          return new Center(child: new CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator());
         }
       },
     );
@@ -166,29 +166,25 @@ class _ExpiredState extends State<Expired> {
     return showDialog(
         context: context,
         builder: (context) {
-          return new AlertDialog(
-              title: new Text("Are you sure?"),
-              actions: <Widget>[
-                new MaterialButton(
-                  child: new Text('Yes',
-                      style: TextStyle(color: Color(0xff5c39f8))),
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
-                ),
-                new MaterialButton(
-                    child: new Text('No',
-                        style: TextStyle(color: Color(0xff5c39f8))),
-                    onPressed: () {
-                      Navigator.of(context).pop(false);
-                    })
-              ]);
+          return AlertDialog(title: Text("Are you sure?"), actions: <Widget>[
+            MaterialButton(
+              child: Text('Yes', style: TextStyle(color: Color(0xff5c39f8))),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+            MaterialButton(
+                child: Text('No', style: TextStyle(color: Color(0xff5c39f8))),
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                })
+          ]);
         });
   }
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
+    return Scaffold(
       body: displayListUI(),
     );
   }

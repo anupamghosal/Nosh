@@ -13,7 +13,6 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:path_provider/path_provider.dart';
-import 'main.dart';
 
 class Stock extends StatefulWidget {
   final Function incrementExpiredItemCount;
@@ -37,7 +36,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _dBhelper = new DBhelper();
+    _dBhelper = DBhelper();
     initializeAndCancelNotifications();
     refreshItems();
   }
@@ -96,8 +95,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
       for (StockItem item in _currentStockItems) {
         String date = item.getExpiryDate();
         if (date == '') continue;
-        DateTime now = new DateTime.now();
-        now = new DateTime(now.year, now.month, now.day);
+        DateTime now = DateTime.now();
+        now = DateTime(now.year, now.month, now.day);
         int daysLeft = DateTime.parse(date).difference(now).inDays;
         if (daysLeft >= 0) {
           if (daysLeft == 0) {
@@ -235,8 +234,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
 
   Icon tileColor(String date) {
     if (date == '') return null;
-    DateTime now = new DateTime.now();
-    now = new DateTime(now.year, now.month, now.day);
+    DateTime now = DateTime.now();
+    now = DateTime(now.year, now.month, now.day);
     int daysLeft = DateTime.parse(date).difference(now).inDays;
     if (daysLeft == 0) {
       return Icon(Icons.error_outline, color: Colors.red);
@@ -270,8 +269,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                 key: ValueKey(1),
                 child: Wrap(children: <Widget>[
                   IconButton(
-                    padding: new EdgeInsets.all(0.0),
-                    icon: new Icon(Icons.edit, color: Colors.black, size: 22),
+                    padding: EdgeInsets.all(0.0),
+                    icon: Icon(Icons.edit, color: Colors.black, size: 22),
                     onPressed: () {
                       DateTime date = null;
                       if (items[index].getExpiryDate() != '')
@@ -286,7 +285,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                           items[index].setName(onValue[0]);
                           String dateconverted = '';
                           if (onValue[1] != null)
-                            dateconverted = new DateFormat('yyyy-MM-dd')
+                            dateconverted = DateFormat('yyyy-MM-dd')
                                 .format(onValue[1])
                                 .toString();
                           items[index].setExpiryDate(dateconverted);
@@ -299,8 +298,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                     },
                   ),
                   IconButton(
-                    icon: new Icon(Icons.delete, color: Colors.red),
-                    padding: new EdgeInsets.all(0.0),
+                    icon: Icon(Icons.delete, color: Colors.red),
+                    padding: EdgeInsets.all(0.0),
                     onPressed: () {
                       createDeleteAlert(context).then((onValue) {
                         if (onValue != null && onValue) {
@@ -383,7 +382,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                 ],
               ),
             ),
-            subtitle: new Text(items[index].getExpiryDate() == ''
+            subtitle: Text(items[index].getExpiryDate() == ''
                 ? 'No expiry date'
                 : items[index].getExpiryDate()),
             trailing: tileColor(items[index].getExpiryDate()));
@@ -409,17 +408,11 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
           _currentStockItems = snapshot.data;
           //temporary remove later
           if (snapshot.data == null || snapshot.data.length == 0) {
-            return Column(
-              children: <Widget>[
-                createCounterPanel([]),
-                Expanded(
-                    child: new Center(
-                        child: new Text(
-                  'Add food items and track their expiry',
-                  style: TextStyle(color: Colors.grey[600]),
-                )))
-              ],
-            );
+            return Center(
+                child: Text(
+              'Add food items and track their expiry',
+              style: TextStyle(color: Colors.grey[600]),
+            ));
             //print('no data was there');
           }
           if (snapshot.hasData) {
@@ -429,14 +422,14 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             //filter dates
             for (int i = 0; i < items.length; i++) {
               if (items[i].getExpiryDate() == '') continue;
-              DateTime now = new DateTime.now();
-              now = new DateTime(now.year, now.month, now.day);
+              DateTime now = DateTime.now();
+              now = DateTime(now.year, now.month, now.day);
               int daysLeft = DateTime.parse(items[i].getExpiryDate())
                   .difference(now)
                   .inDays;
               if (daysLeft < 0) {
                 //move the item to expired list: todo
-                ExpiredItem item = new ExpiredItem(
+                ExpiredItem item = ExpiredItem(
                     items[i].getName(),
                     items[i].getExpiryDate(),
                     items[i].getImage(),
@@ -451,8 +444,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                 children: <Widget>[
                   createCounterPanel([]),
                   Expanded(
-                      child: new Center(
-                          child: new Text(
+                      child: Center(
+                          child: Text(
                     'Add food items and track their expiry',
                     style: TextStyle(color: Colors.grey[600]),
                   )))
@@ -463,8 +456,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             //print(snapshot.data[0].NAME);
           }
         } else {
-          return new Center(
-              child: new CircularProgressIndicator(
+          return Center(
+              child: CircularProgressIndicator(
                   valueColor:
                       AlwaysStoppedAnimation<Color>(Color(0xff5c39f8))));
         }
@@ -473,15 +466,15 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   }
 
   createCounterPanel(List<StockItem> items) {
-    int redCounter = 0, amberCounter = 0, blueCounter = 0;
+    int redCounter = 0, amberCounter = 0, blueCounter = 0, total = 0;
     for (StockItem item in items) {
       String date = item.getExpiryDate();
       if (date == '') {
-        blueCounter = blueCounter + 1;
+        total = total + 1;
         continue;
       }
-      DateTime now = new DateTime.now();
-      now = new DateTime(now.year, now.month, now.day);
+      DateTime now = DateTime.now();
+      now = DateTime(now.year, now.month, now.day);
       int daysLeft = DateTime.parse(date).difference(now).inDays;
       if (daysLeft >= 0) {
         if (daysLeft == 0) {
@@ -489,16 +482,38 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
         } else if (daysLeft <= 2) {
           amberCounter = amberCounter + 1;
         }
-        blueCounter = blueCounter + 1;
+        else {
+          blueCounter = blueCounter + 1;
+        }
+        total = total + 1;
       }
     }
-    return new Container(
+    return Container(
       child: Row(
         children: <Widget>[
           Container(
+              height: 40.0,
+              padding: EdgeInsets.only(right: 8),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.black, width: 0.5)),
+              child: Row(
+                children: <Widget>[
+                  Transform.rotate(
+                      angle: -3.1415 / 2,
+                      child: Text("TOTAL",
+                          style: TextStyle(
+                              fontSize: 8, fontWeight: FontWeight.w600))),
+                  Text(
+                    total.toString(),
+                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.w300),
+                  )
+                ],
+              )),
+          Container(
             child: Row(
               children: <Widget>[
-                Icon(Icons.error_outline, color: Colors.white),
+                Icon(Icons.error_outline, color: Colors.white, size: 20),
                 Text(redCounter.toString(),
                     style: TextStyle(color: Colors.white)) //dynamic value here
               ],
@@ -507,37 +522,33 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             ),
             padding: EdgeInsets.symmetric(horizontal: 5.0),
             height: 40.0,
-            width: 80.0,
+            width: 75.0,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
-                gradient: LinearGradient(colors: [
-                  Colors.red[800],
-                  Colors.deepOrange
-                ])), //1Day to expire alert
+                gradient: LinearGradient(
+                    colors: [Colors.red[800], Colors.deepOrange])),
           ),
           Container(
             child: Row(
               children: <Widget>[
-                Icon(Icons.report_problem),
-                Text(amberCounter.toString()) // dynamic value here
+                Icon(Icons.report_problem, size: 20),
+                Text(amberCounter.toString())
               ],
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             ),
             padding: EdgeInsets.symmetric(horizontal: 5.0),
             height: 40.0,
-            width: 80.0,
+            width: 75.0,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
-                gradient: LinearGradient(colors: [
-                  Colors.amber[700],
-                  Colors.yellow
-                ])), //2Days to expire alert
+                gradient:
+                    LinearGradient(colors: [Colors.amber[700], Colors.yellow])),
           ),
           Container(
             child: Row(
               children: <Widget>[
-                Icon(Icons.shopping_cart, color: Colors.white),
+                Icon(Icons.thumb_up, color: Colors.white, size: 20),
                 Text(blueCounter.toString(),
                     style: TextStyle(color: Colors.white)) // dynamic value here
               ],
@@ -546,7 +557,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             ),
             padding: EdgeInsets.symmetric(horizontal: 5.0),
             height: 40.0,
-            width: 80.0,
+            width: 75.0,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
                 gradient: LinearGradient(colors: [
@@ -557,10 +568,10 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
         ],
         mainAxisAlignment: MainAxisAlignment.spaceAround,
       ),
-      padding: EdgeInsets.all(16.0),
-      margin: EdgeInsets.all(16.0),
+      padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
+      margin: EdgeInsets.symmetric(vertical: 12.0, horizontal: 10),
       decoration: BoxDecoration(
-          color: Colors.grey[100], borderRadius: BorderRadius.circular(10.0)),
+          color: Colors.grey[50], borderRadius: BorderRadius.circular(10)),
     );
   }
 
@@ -603,7 +614,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     return showDialog(
         context: context,
         builder: (context) {
-          return new AlertDialog(
+          return AlertDialog(
             title: Text('Select'),
             content: SingleChildScrollView(
                 child: ListBody(children: <Widget>[
@@ -672,9 +683,9 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
       String link = '',
       DateTime initDate = null,
       String initQuantity = ''}) {
-    TextEditingController controller = new TextEditingController();
-    TextEditingController quantityController = new TextEditingController();
-    DateTimePickerTheme dateTimePickerTheme = new DateTimePickerTheme(
+    TextEditingController controller = TextEditingController();
+    TextEditingController quantityController = TextEditingController();
+    DateTimePickerTheme dateTimePickerTheme = DateTimePickerTheme(
         cancel: Text(""), confirm: Text(""), title: Text('Select Expiry Date'));
     DateTime date = null;
     String productName = name;
@@ -703,12 +714,12 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             onPanStart: (_) {
               FocusScope.of(context).unfocus();
             },
-            child: new AlertDialog(
+            child: AlertDialog(
                 contentPadding: EdgeInsets.all(25.0),
-                title: new Text(submitButtonText),
+                title: Text(submitButtonText),
                 actions: <Widget>[
-                  new MaterialButton(
-                      child: new Text(submitButtonText,
+                  MaterialButton(
+                      child: Text(submitButtonText,
                           style: TextStyle(color: Color(0xff5c39f8))),
                       onPressed: () {
                         //print(productName);
@@ -727,7 +738,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                       },
                       elevation: 5.0)
                 ],
-                content: new SingleChildScrollView(
+                content: SingleChildScrollView(
                   child: Form(
                       key: _formKey,
                       child: StatefulBuilder(builder: (context, setState) {
@@ -769,7 +780,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                           SizedBox(
                             height: 30,
                           ),
-                          new Row(children: <Widget>[
+                          Row(children: <Widget>[
                             Flexible(
                                 flex: 3,
                                 child: TextFormField(
@@ -856,31 +867,27 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     return showDialog(
         context: context,
         builder: (context) {
-          return new AlertDialog(
-              title: new Text("Are you sure?"),
-              actions: <Widget>[
-                new MaterialButton(
-                  child: new Text('Yes',
-                      style: TextStyle(color: Color(0xff5c39f8))),
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
-                ),
-                new MaterialButton(
-                    child: new Text('No',
-                        style: TextStyle(color: Color(0xff5c39f8))),
-                    onPressed: () {
-                      Navigator.of(context).pop(false);
-                    })
-              ]);
+          return AlertDialog(title: Text("Are you sure?"), actions: <Widget>[
+            MaterialButton(
+              child: Text('Yes', style: TextStyle(color: Color(0xff5c39f8))),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+            MaterialButton(
+                child: Text('No', style: TextStyle(color: Color(0xff5c39f8))),
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                })
+          ]);
         });
   }
 
   /*creatFAB() {
-    return new Row(
+    return  Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
-        new FloatingActionButton.extended(
+         FloatingActionButton.extended(
           icon: Icon(Icons.camera_alt),
           label: Text('Scan'),
           onPressed: () async {
@@ -891,18 +898,18 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
         SizedBox(
           width: 10,
         ),
-        new FloatingActionButton(
+         FloatingActionButton(
             child: Icon(Icons.add),
-            backgroundColor: new Color(0xff5c39f8),
+            backgroundColor:  Color(0xff5c39f8),
             onPressed: () {
               createAlertDialog(context, true).then((onValue) {
                 if (onValue != null) {
                   print(onValue[0]);
                   print(onValue[1]);
-                  String date = new DateFormat('yyyy-MM-dd')
+                  String date =  DateFormat('yyyy-MM-dd')
                       .format(onValue[1])
                       .toString();
-                  StockItem item = new StockItem(onValue[0], date, _imageFile.toString());
+                  StockItem item =  StockItem(onValue[0], date, _imageFile.toString());
                   _dBhelper.saveToStock(item);
                   refreshItems();
                 }
@@ -980,7 +987,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                     widget.incrementExpiredItemCount();
                 }
                 StockItem item =
-                    new StockItem(onValue[0], date, onValue[2], onValue[3]);
+                    StockItem(onValue[0], date, onValue[2], onValue[3]);
                 _dBhelper.saveToStock(item);
                 refreshItems();
               }
@@ -1022,10 +1029,9 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
               print(onValue[1]);
               String date = '';
               if (onValue[1] != null)
-                date =
-                    new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
+                date = DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
               StockItem item =
-                  new StockItem(onValue[0], date, onValue[2], onValue[3]);
+                  StockItem(onValue[0], date, onValue[2], onValue[3]);
               _dBhelper.saveToStock(item);
               refreshItems();
             }
@@ -1065,9 +1071,9 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             print(onValue[1]);
             String date = '';
             if (onValue[1] != null)
-              date = new DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
+              date = DateFormat('yyyy-MM-dd').format(onValue[1]).toString();
             StockItem item =
-                new StockItem(onValue[0], date, onValue[2], onValue[3]);
+                StockItem(onValue[0], date, onValue[2], onValue[3]);
             _dBhelper.saveToStock(item);
             refreshItems();
           }
