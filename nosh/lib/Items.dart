@@ -583,6 +583,9 @@ class _ItemsState extends State<Items> {
             child: Icon(Icons.add, color: Color(0xff5c39f8)),
             backgroundColor: Colors.white,
             onPressed: () {
+              setState(() {
+                _longPressEventActive = false;
+              });
               createAlertDialog(context, true).then((onValue) {
                 if (onValue != null) {
                   ListItem item = ListItem(onValue[0], onValue[1]);

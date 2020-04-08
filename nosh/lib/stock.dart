@@ -884,6 +884,11 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
 
   createStyledFAB() {
     return SpeedDial(
+      onOpen: () {
+        setState(() {
+          _longPressedEventActive = false;
+        });
+      },
       animatedIcon: AnimatedIcons.menu_close,
       animatedIconTheme: IconThemeData(size: 22, color: Color(0xff5c39f8)),
       backgroundColor: Colors.white,
