@@ -46,8 +46,8 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
   }
 
   initializeExpiredItemCount() async {
-    List<ExpiredItem> items = await _dBhelper.getExpiredItems();
-    print(items.length);
+    List<ExpiredItem> items =
+        (await _dBhelper.getExpiredItems()).cast<ExpiredItem>();
     setState(() {
       _expiredItemCount = items.length;
     });
@@ -55,13 +55,15 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
 
   incrementExpiredItemCount() {
     setState(() {
-      _expiredItemCount = _expiredItemCount + 1;
+      // _expiredItemCount =  _expiredItemCount + 1;
+      initializeExpiredItemCount();
     });
   }
 
   decrementExpiredItemCount() {
     setState(() {
-      _expiredItemCount = _expiredItemCount - 1;
+      // _expiredItemCount = _expiredItemCount == 0 ? 0 : _expiredItemCount - 1;
+      initializeExpiredItemCount();
     });
   }
 

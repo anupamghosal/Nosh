@@ -481,8 +481,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
           redCounter = redCounter + 1;
         } else if (daysLeft <= 2) {
           amberCounter = amberCounter + 1;
-        }
-        else {
+        } else {
           blueCounter = blueCounter + 1;
         }
         total = total + 1;
@@ -883,42 +882,6 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
         });
   }
 
-  /*creatFAB() {
-    return  Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: <Widget>[
-         FloatingActionButton.extended(
-          icon: Icon(Icons.camera_alt),
-          label: Text('Scan'),
-          onPressed: () async {
-            await scan();
-            print(_barcode);
-          },
-        ),
-        SizedBox(
-          width: 10,
-        ),
-         FloatingActionButton(
-            child: Icon(Icons.add),
-            backgroundColor:  Color(0xff5c39f8),
-            onPressed: () {
-              createAlertDialog(context, true).then((onValue) {
-                if (onValue != null) {
-                  print(onValue[0]);
-                  print(onValue[1]);
-                  String date =  DateFormat('yyyy-MM-dd')
-                      .format(onValue[1])
-                      .toString();
-                  StockItem item =  StockItem(onValue[0], date, _imageFile.toString());
-                  _dBhelper.saveToStock(item);
-                  refreshItems();
-                }
-              });
-            })
-      ],
-    );
-  }*/
-
   createStyledFAB() {
     return SpeedDial(
       animatedIcon: AnimatedIcons.menu_close,
@@ -955,14 +918,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                 fontWeight: FontWeight.w500,
                 color: Color(0xff5c39f8),
                 fontSize: 16.0),
-            labelBackgroundColor: Colors.white
-            /*labelWidget: Text('Scan Barcode',
-                    style: GoogleFonts.roboto(
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xff5c39f8),
-                      fontSize: 16.0
-                    ))*/
-            ),
+            labelBackgroundColor: Colors.white),
         // FAB 2
         SpeedDialChild(
           child: Icon(
@@ -983,8 +939,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                   DateTime now = new DateTime.now();
                   now = new DateTime(now.year, now.month, now.day);
                   int daysLeft = onValue[1].difference(now).inDays;
-                  if(daysLeft < 0)
-                    widget.incrementExpiredItemCount();
+                  if (daysLeft < 0) widget.incrementExpiredItemCount();
                 }
                 StockItem item =
                     StockItem(onValue[0], date, onValue[2], onValue[3]);
@@ -999,13 +954,6 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
               color: Color(0xff5c39f8),
               fontSize: 16.0),
           labelBackgroundColor: Colors.white,
-          /*labelWidget: Text('TYPE MANUALLY',
-                    style: GoogleFonts.robotoCondensed(
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xff5c39f8),
-                      fontSize: 16.0
-                    )
-                  )*/
         )
       ],
     );
