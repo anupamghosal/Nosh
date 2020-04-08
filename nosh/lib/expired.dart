@@ -15,6 +15,7 @@ class _ExpiredState extends State<Expired> {
   DBhelper _dBhelper;
   bool _longPressedEventActive = false;
 
+
   @override
   initState() {
     super.initState();
@@ -78,7 +79,7 @@ class _ExpiredState extends State<Expired> {
                       createDeleteAlert(context).then((onValue) {
                         if (onValue != null && onValue) {
                           _dBhelper.deleteExpiredItem(items[index].getId());
-                        widget.decrementExpiredItemCount();
+                          widget.decrementExpiredItemCount();
                           if (!items[index].getImage().startsWith('https') &&
                               items[index].getImage() != '')
                             File(items[index].getImage()).delete();

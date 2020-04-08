@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nosh/database/expiredItem.dart';
@@ -32,10 +34,10 @@ class AppTabs extends StatefulWidget {
 
 class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
   AppTabsState();
-
   DBhelper _dBhelper;
   TabController _controller;
   int _expiredItemCount = 0;
+  Timer timer;
 
   @override
   initState() {
@@ -43,6 +45,18 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
     _controller = new TabController(length: 3, vsync: this);
     _dBhelper = new DBhelper();
     initializeExpiredItemCount();
+    timer =
+        Timer.periodic(Duration(seconds: 5), (Timer t) => refreshIfNeeded());
+  }
+
+  refreshIfNeeded() {
+    var currentHour = new DateTime.now().hour;
+
+    var currentMin = new DateTime.now().minute;
+    var currentSecond = DateTime.now().second;
+    if (currentHour == 0 && currentMin == 0 && currentSecond < 9) {
+      initializeExpiredItemCount();
+    }
   }
 
   initializeExpiredItemCount() async {
@@ -55,15 +69,13 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
 
   incrementExpiredItemCount() {
     setState(() {
-      // _expiredItemCount =  _expiredItemCount + 1;
-      initializeExpiredItemCount();
+      _expiredItemCount = _expiredItemCount + 1;
     });
   }
 
   decrementExpiredItemCount() {
     setState(() {
-      // _expiredItemCount = _expiredItemCount == 0 ? 0 : _expiredItemCount - 1;
-      initializeExpiredItemCount();
+      _expiredItemCount = _expiredItemCount == 0 ? 0 : _expiredItemCount - 1;
     });
   }
 

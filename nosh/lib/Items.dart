@@ -418,7 +418,31 @@ class _ItemsState extends State<Items> {
           }
           if (snapshot.hasData) {
             //create ListUI
-            return createListUI(snapshot.data);
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                  child: createListUI(snapshot.data),
+                ),
+                _longPressEventActive
+                    ? Container(
+                        padding: EdgeInsets.all(20.0),
+                        child: RaisedButton(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0)),
+                          child: Text("cancel"),
+                          color: Color(0xff5c39f8),
+                          textColor: Colors.white,
+                          onPressed: () {
+                            setState(() {
+                              _longPressEventActive = false;
+                            });
+                          },
+                        ),
+                      )
+                    : Container()
+              ],
+            );
             //print(snapshot.data[0].NAME);
           }
         } else {
@@ -552,33 +576,7 @@ class _ItemsState extends State<Items> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Container(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Expanded(
-                child: displayListUI(),
-              ),
-              _longPressEventActive
-                  ? Container(
-                      padding: EdgeInsets.all(20.0),
-                      child: RaisedButton(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0)),
-                        child: Text("cancel"),
-                        color: Color(0xff5c39f8),
-                        textColor: Colors.white,
-                        onPressed: () {
-                          setState(() {
-                            _longPressEventActive = false;
-                          });
-                        },
-                      ),
-                    )
-                  : Container()
-            ],
-          ),
-        ),
+        body: displayListUI(),
         floatingActionButton: FloatingActionButton(
             child: Icon(Icons.add, color: Color(0xff5c39f8)),
             backgroundColor: Colors.white,
