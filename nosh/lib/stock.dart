@@ -191,8 +191,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   notifyWhenAboutToExpire(StockItem item) async {
     DateTime scheduledDate =
         DateTime.parse(item.getExpiryDate()).add(Duration(days: 1));
-    //DateTime scheduledDate = DateTime.now().add(Duration(seconds: 5));
-    //3 notifications every 8 hrs
+
     for (int i = 1; i <= 3; i++) {
       String groupKey = scheduledDate.toString();
       groupKey = groupKey.substring(0, groupKey.indexOf('.'));

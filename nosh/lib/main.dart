@@ -22,7 +22,8 @@ void main() async {
   SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle.dark.copyWith(statusBarColor: Colors.transparent));
   runApp(MaterialApp(
-    theme: ThemeData(scaffoldBackgroundColor: Colors.white),
+    theme: ThemeData(
+        primaryColor: Color(0xff5c39f8), scaffoldBackgroundColor: Colors.white),
     home: welcome ? OnBoardingPage(welcome) : AppTabs(),
   ));
 }
@@ -69,13 +70,13 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
 
   incrementExpiredItemCount() {
     setState(() {
-      _expiredItemCount = _expiredItemCount + 1;
+      initializeExpiredItemCount();
     });
   }
 
   decrementExpiredItemCount() {
     setState(() {
-      _expiredItemCount = _expiredItemCount == 0 ? 0 : _expiredItemCount - 1;
+      initializeExpiredItemCount();
     });
   }
 
