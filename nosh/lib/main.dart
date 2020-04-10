@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nosh/database/expiredItem.dart';
@@ -22,8 +20,7 @@ void main() async {
   SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle.dark.copyWith(statusBarColor: Colors.transparent));
   runApp(MaterialApp(
-    theme: ThemeData(
-        primaryColor: Color(0xff5c39f8), scaffoldBackgroundColor: Colors.white),
+    theme: ThemeData(scaffoldBackgroundColor: Colors.white),
     home: welcome ? OnBoardingPage(welcome) : AppTabs(),
   ));
 }
@@ -35,49 +32,26 @@ class AppTabs extends StatefulWidget {
 
 class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
   AppTabsState();
-  DBhelper _dBhelper;
   TabController _controller;
-  int _expiredItemCount = 0;
-  Timer timer;
+  final _key = new GlobalKey<_CounterState>();
 
   @override
   initState() {
     super.initState();
     _controller = new TabController(length: 3, vsync: this);
-    _dBhelper = new DBhelper();
-    initializeExpiredItemCount();
-    timer =
-        Timer.periodic(Duration(seconds: 5), (Timer t) => refreshIfNeeded());
   }
 
-  refreshIfNeeded() {
-    var currentHour = new DateTime.now().hour;
-
-    var currentMin = new DateTime.now().minute;
-    var currentSecond = DateTime.now().second;
-    if (currentHour == 0 && currentMin == 0 && currentSecond < 9) {
-      initializeExpiredItemCount();
-    }
-  }
-
-  initializeExpiredItemCount() async {
-    List<ExpiredItem> items =
-        (await _dBhelper.getExpiredItems()).cast<ExpiredItem>();
-    setState(() {
-      _expiredItemCount = items.length;
-    });
-  }
-
-  incrementExpiredItemCount() {
-    setState(() {
-      initializeExpiredItemCount();
-    });
+  incrementExpiredItemCount(int count) {
+    print(count);
+    _key.currentState.incrementExpiredItemCount(count);
   }
 
   decrementExpiredItemCount() {
-    setState(() {
-      initializeExpiredItemCount();
-    });
+    _key.currentState.decrementExpiredItemCount();
+  }
+
+  initializeExpiredItemCount() {
+    _key.currentState.initializeExpiredItemCount();
   }
 
   @override
@@ -127,32 +101,7 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
                 tabs: <Tab>[
                   new Tab(child: new Text('Stocked')),
                   new Tab(child: new Text('Shopping List')),
-                  new Tab(
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                        Text('Expired'),
-                        // SizedBox(width: 7),
-                        AnimatedCrossFade(
-                          duration: Duration(milliseconds: 300),
-                          crossFadeState: _expiredItemCount != 0
-                              ? CrossFadeState.showFirst
-                              : CrossFadeState.showSecond,
-                          firstChild: Padding(
-                            padding: const EdgeInsets.only(left: 7.0),
-                            child: CircleAvatar(
-                              radius: 9,
-                              child: Text(_expiredItemCount.toString(),
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 9)),
-                              backgroundColor: Color(0xff5c39f8),
-                            ),
-                          ),
-                          secondChild: SizedBox(),
-                        )
-                      ]))
+                  new Tab(child: Counter(key: _key))
                   // : Text('Expired'))
                 ],
                 indicatorColor: Color(0xff5c39f8),
@@ -161,13 +110,13 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
               )),
           body: new TabBarView(controller: _controller, children: <Widget>[
             new stock.Stock(
-              incrementExpiredItemCount: () {
-                incrementExpiredItemCount();
+              incrementExpiredItemCount: (int count) {
+                incrementExpiredItemCount(count);
               },
             ),
             new items.Items(
               incrementExpiredItemCount: () {
-                incrementExpiredItemCount();
+                incrementExpiredItemCount(1);
               },
             ),
             new expired.Expired(
@@ -177,5 +126,78 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
             )
           ]),
         ));
+  }
+}
+
+//counter
+class Counter extends StatefulWidget {
+  Counter({Key key}) : super(key: key);
+
+  @override
+  _CounterState createState() => _CounterState();
+}
+
+class _CounterState extends State<Counter> {
+  int _expiredItemCount = 0;
+  DBhelper _dBhelper;
+
+  @override
+  void initState() {
+    _dBhelper = new DBhelper();
+    initializeExpiredItemCount();
+  }
+
+  initializeExpiredItemCount() async {
+    List<ExpiredItem> items =
+        await _dBhelper.getExpiredItems();
+    setState(() {
+      _expiredItemCount = items.length;
+    });
+    print('refreshed items');
+    print(items.length);
+  }
+
+  incrementExpiredItemCount(int count) {
+    setState(() {
+      _expiredItemCount = _expiredItemCount + count;
+    });
+    //initializeExpiredItemCount();
+  }
+
+  decrementExpiredItemCount() {
+    /*setState(() {
+      // _expiredItemCount = _expiredItemCount == 0 ? 0 : _expiredItemCount - 1;
+      //initializeExpiredItemCount();
+    });*/
+    setState(() {
+      _expiredItemCount = _expiredItemCount == 0 ? 0 : _expiredItemCount - 1;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+      Text('Expired'),
+      // SizedBox(width: 7),
+      AnimatedCrossFade(
+        duration: Duration(milliseconds: 300),
+        crossFadeState: _expiredItemCount != 0
+            ? CrossFadeState.showFirst
+            : CrossFadeState.showSecond,
+        firstChild: Padding(
+          padding: const EdgeInsets.only(left: 7.0),
+          child: CircleAvatar(
+            radius: 9,
+            child: Text(_expiredItemCount.toString(),
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 9)),
+            backgroundColor: Color(0xff5c39f8),
+          ),
+        ),
+        secondChild: SizedBox(),
+      )
+    ]);
   }
 }

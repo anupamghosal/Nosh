@@ -13,6 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:path_provider/path_provider.dart';
+import 'dart:async';
 
 class Stock extends StatefulWidget {
   final Function incrementExpiredItemCount;
@@ -28,6 +29,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   String _barcode = '';
   bool LOADING = false;
+  Timer timer;
 
   final _formKey = GlobalKey<FormState>();
   bool _longPressedEventActive = false;
@@ -39,6 +41,18 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     _dBhelper = DBhelper();
     initializeAndCancelNotifications();
     refreshItems();
+    timer =
+        Timer.periodic(Duration(seconds: 5), (Timer t) => refreshIfNeeded());
+  }
+
+  refreshIfNeeded() {
+    var currentHour = new DateTime.now().hour;
+
+    var currentMin = new DateTime.now().minute;
+    var currentSecond = DateTime.now().second;
+    if (currentHour == 0 && currentMin == 0 && currentSecond < 9) {
+      refreshItems();
+    }
   }
 
   initializeAndCancelNotifications() {
@@ -86,6 +100,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.resumed:
         initializeAndCancelNotifications();
+        refreshItems();
         break;
     }
   }
@@ -191,7 +206,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   notifyWhenAboutToExpire(StockItem item) async {
     DateTime scheduledDate =
         DateTime.parse(item.getExpiryDate()).add(Duration(days: 1));
-
+    //DateTime scheduledDate = DateTime.now().add(Duration(seconds: 5));
+    //3 notifications every 8 hrs
     for (int i = 1; i <= 3; i++) {
       String groupKey = scheduledDate.toString();
       groupKey = groupKey.substring(0, groupKey.indexOf('.'));
@@ -407,19 +423,32 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
           _currentStockItems = snapshot.data;
           //temporary remove later
           if (snapshot.data == null || snapshot.data.length == 0) {
-            return Center(
-                child: Text(
-              'Add food items and track their expiry',
-              style: TextStyle(color: Colors.grey[600]),
-            ));
+            return Column(
+                children: <Widget>[
+                  createCounterPanel([]),
+                  Expanded(
+                      child: Center(
+                          child: Text(
+                    'Add food items and track their expiry',
+                    style: TextStyle(color: Colors.grey[600]),
+                  )))
+                ],
+              );
             //print('no data was there');
           }
           if (snapshot.hasData) {
             //create ListUI
             print(snapshot.data[0].getImage());
-            List<StockItem> items = snapshot.data;
+            List<StockItem> items = new List<StockItem>();
+            items.addAll(snapshot.data);
+            List<StockItem> filteredItems = new List<StockItem>();
+            print('here');
             //filter dates
+            int expiredItemCount = 0;
             for (int i = 0; i < items.length; i++) {
+              print('this is item');
+              print(items.length);
+              print(items[i].getName());
               if (items[i].getExpiryDate() == '') continue;
               DateTime now = DateTime.now();
               now = DateTime(now.year, now.month, now.day);
@@ -435,9 +464,16 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                     items[i].getQuantity());
                 _dBhelper.saveExpiredItem(item);
                 _dBhelper.deleteItemFromStock(items[i].getId());
-                items.remove(items[i]);
+                expiredItemCount = expiredItemCount + 1;
+                print('saved expired item');
+                snapshot.data.remove(items[i]);
               }
+              else {filteredItems.add(items[i]);}
             }
+            items = filteredItems;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              widget.incrementExpiredItemCount(expiredItemCount);
+            });
             if (items.length == 0) {
               return Column(
                 children: <Widget>[
@@ -882,6 +918,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   }
 
   createStyledFAB() {
+    //refreshItems();
     return SpeedDial(
       onOpen: () {
         setState(() {
@@ -943,7 +980,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                   DateTime now = new DateTime.now();
                   now = new DateTime(now.year, now.month, now.day);
                   int daysLeft = onValue[1].difference(now).inDays;
-                  if (daysLeft < 0) widget.incrementExpiredItemCount();
+                  /*if (daysLeft < 0) widget.incrementExpiredItemCount();*/
                 }
                 StockItem item =
                     StockItem(onValue[0], date, onValue[2], onValue[3]);
@@ -1067,6 +1104,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    //print(_expiredItemCount);
+    //WidgetsBinding.instance.addPostFrameCallback((_) => widget.incrementExpiredItemCount(0));
     return Scaffold(
       body: Stack(
         children: <Widget>[
