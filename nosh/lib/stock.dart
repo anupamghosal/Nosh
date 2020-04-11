@@ -60,7 +60,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
       //initialize notifications
       flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
       var initializationSettingsAndroid =
-          AndroidInitializationSettings('app_icon');
+          AndroidInitializationSettings('notification_icon');
       var initializationSettingsIOS = IOSInitializationSettings();
       var initializationSettings = InitializationSettings(
           initializationSettingsAndroid, initializationSettingsIOS);
@@ -426,7 +426,6 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
           if (snapshot.data == null || snapshot.data.length == 0) {
             return Column(
               children: <Widget>[
-                createCounterPanel([]),
                 Expanded(
                     child: Center(
                         child: Text(
@@ -435,7 +434,6 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                 )))
               ],
             );
-            //print('no data was there');
           }
           if (snapshot.hasData) {
             //create ListUI
@@ -482,7 +480,6 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
             if (items.length == 0) {
               return Column(
                 children: <Widget>[
-                  createCounterPanel([]),
                   Expanded(
                       child: Center(
                           child: Text(
@@ -493,7 +490,6 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
               );
             }
             return createUI(items);
-            //print(snapshot.data[0].NAME);
           }
         } else {
           return Center(
