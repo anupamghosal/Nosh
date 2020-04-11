@@ -450,7 +450,10 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
               print('this is item');
               print(items.length);
               print(items[i].getName());
-              if (items[i].getExpiryDate() == '') continue;
+              if (items[i].getExpiryDate() == '') {
+                filteredItems.add(items[i]);
+                continue;
+              }
               DateTime now = DateTime.now();
               now = DateTime(now.year, now.month, now.day);
               int daysLeft = DateTime.parse(items[i].getExpiryDate())
