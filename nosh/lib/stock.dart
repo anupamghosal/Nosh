@@ -97,6 +97,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.detached:
         print('detached');
+        scheduleNotifications();
         break;
       case AppLifecycleState.resumed:
         initializeAndCancelNotifications();
@@ -424,16 +425,16 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
           //temporary remove later
           if (snapshot.data == null || snapshot.data.length == 0) {
             return Column(
-                children: <Widget>[
-                  createCounterPanel([]),
-                  Expanded(
-                      child: Center(
-                          child: Text(
-                    'Add food items and track their expiry',
-                    style: TextStyle(color: Colors.grey[600]),
-                  )))
-                ],
-              );
+              children: <Widget>[
+                createCounterPanel([]),
+                Expanded(
+                    child: Center(
+                        child: Text(
+                  'Add food items and track their expiry',
+                  style: TextStyle(color: Colors.grey[600]),
+                )))
+              ],
+            );
             //print('no data was there');
           }
           if (snapshot.hasData) {
@@ -467,8 +468,9 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                 expiredItemCount = expiredItemCount + 1;
                 print('saved expired item');
                 snapshot.data.remove(items[i]);
+              } else {
+                filteredItems.add(items[i]);
               }
-              else {filteredItems.add(items[i]);}
             }
             items = filteredItems;
             WidgetsBinding.instance.addPostFrameCallback((_) {
