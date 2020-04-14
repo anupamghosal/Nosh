@@ -679,6 +679,7 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                 ),
                 onTap: () async {
                   var img = await openGallery();
+                  if (img == "nul" || img == "") img = null;
                   Navigator.of(context).pop(img);
                 },
               )
@@ -689,13 +690,20 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
 
   openGallery() async {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-    var cropped_image = await ImageCropper.cropImage(sourcePath: image.path);
+    var cropped_image = await ImageCropper.cropImage(
+        sourcePath: image.path,
+        cropStyle: CropStyle.circle,
+        aspectRatio: CropAspectRatio(ratioY: 1, ratioX: 1),
+        androidUiSettings: AndroidUiSettings(
+          activeWidgetColor: Color(0xff0000ff),
+          activeControlsWidgetColor: Color(0xff5c39f8),
+        ));
     Directory directory = await getApplicationDocumentsDirectory();
     String path = directory.path;
     String file = cropped_image.toString();
     String fileName =
         file.substring(file.lastIndexOf('/') + 1, file.length - 1);
-    print(fileName);
+
     var cropped_saved_img = await cropped_image.copy('$path/' + fileName);
     return cropped_saved_img;
   }
