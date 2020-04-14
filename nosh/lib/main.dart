@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nosh/database/expiredItem.dart';
+import 'package:nosh/settings.dart';
 import './expired.dart' as expired;
 import './Items.dart' as items;
 import './stock.dart' as stock;
@@ -71,13 +72,12 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
           appBar: AppBar(
               actions: <Widget>[
                 IconButton(
-                  onPressed: () => Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => OnBoardingPage(false))),
                   icon: Icon(
-                    Icons.help_outline,
-                    size: 20,
+                    Icons.settings,
                     color: Colors.grey[600],
                   ),
+                  onPressed: () =>
+                      Navigator.push(context, Slide(page: Settings())),
                 ),
                 IconButton(
                   icon: Icon(
@@ -148,8 +148,7 @@ class _CounterState extends State<Counter> {
   }
 
   initializeExpiredItemCount() async {
-    List<ExpiredItem> items =
-        await _dBhelper.getExpiredItems();
+    List<ExpiredItem> items = await _dBhelper.getExpiredItems();
     setState(() {
       _expiredItemCount = items.length;
     });
