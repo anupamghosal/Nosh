@@ -9,6 +9,7 @@ import './selectPanel.dart';
 import './util/slide.dart';
 import './onBoarding.dart';
 import 'database/db_helper.dart';
+import './util/searcher.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -72,12 +73,10 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
           appBar: AppBar(
               actions: <Widget>[
                 IconButton(
-                  icon: Icon(
-                    Icons.settings,
-                    color: Colors.grey[600],
-                  ),
-                  onPressed: () =>
-                      Navigator.push(context, Slide(page: Settings())),
+                  icon: Icon(Icons.search),
+                  onPressed: () {
+                    showSearch(context: context, delegate: searchItems());
+                  },
                 ),
                 IconButton(
                   icon: Icon(
@@ -87,7 +86,14 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
                   onPressed: () {
                     Navigator.push(context, Slide(page: SelectPanel()));
                   },
-                )
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.list,
+                  ),
+                  onPressed: () =>
+                      Navigator.push(context, Slide(page: Settings())),
+                ),
               ],
               elevation: 0.0,
               title: Container(
@@ -102,7 +108,6 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
                   new Tab(child: new Text('Stocked')),
                   new Tab(child: new Text('Shopping List')),
                   new Tab(child: Counter(key: _key))
-                  // : Text('Expired'))
                 ],
                 indicatorColor: Color(0xff5c39f8),
                 labelColor: Colors.black,

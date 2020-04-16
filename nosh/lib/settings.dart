@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import './onBoarding.dart';
+import './analytics.dart';
+import './util/slide.dart';
 
 class Settings extends StatelessWidget {
-  List<String> settings = ["Help", "Privacy policy", "About us"];
+  List<String> settings = ["Analytics", "Help", "Privacy policy", "About us"];
 
   final icons = [
+    Icon(Icons.graphic_eq),
     Icon(Icons.help),
     Icon(Icons.book),
     Icon(Icons.supervised_user_circle)
@@ -34,12 +37,11 @@ class Settings extends StatelessWidget {
               leading: icons[idx],
               title: Text(settings[idx]),
               onTap: () {
-                idx != 0
-                    ? launch(urls[idx])
-                    : Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => OnBoardingPage(false)));
+                if (idx == 2 || idx == 3) launch(urls[idx]);
+                if (idx == 0) Navigator.push(context, Slide(page: Analysis()));
+                if (idx == 1)
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => OnBoardingPage(false)));
               },
             );
           },
