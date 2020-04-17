@@ -1,4 +1,10 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
+import 'database/db_helper.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
+import 'database/stockItem.dart';
+import 'database/expiredItem.dart';
 
 class Analysis extends StatefulWidget {
   @override
@@ -6,8 +12,34 @@ class Analysis extends StatefulWidget {
 }
 
 class _AnalysisState extends State<Analysis> {
-  Widget graphArea(int n, double width) {
+
+  DBhelper _dBhelper;
+  Future<List<StockItem>> _stockItems;
+  Future<List<ExpiredItem>> _expiredItems;
+
+  @override
+  void initState() {
+    super.initState();
+    _dBhelper = new DBhelper();
+  }
+
+  refreshGraphs() {
+    setState(() {
+      _stockItems = _dBhelper.getItemsFromStock();
+      _expiredItems = _dBhelper.getExpiredItems();
+    });
+  }
+
+  createGraph(int n, double width, List<ChartItem> data) {
     List<String> headings = ["Expiry trend", "Buying trend"];
+
+    List<charts.Series<ChartItem, String>> series = [
+      charts.Series(
+          id: "Subscribers",
+          data: data,
+          domainFn: (ChartItem items, _) => items.itemName,
+          measureFn: (ChartItem items, _) => items.frequency)
+    ];
 
     return Container(
       decoration: BoxDecoration(
@@ -30,10 +62,7 @@ class _AnalysisState extends State<Analysis> {
           Flexible(
             child: Container(
               child: Center(
-                child: Text(
-                  "replace this text with the graph",
-                  style: TextStyle(color: Colors.grey),
-                ),
+                child: charts.BarChart(series, animate: true)
               ),
             ),
           )
@@ -42,16 +71,47 @@ class _AnalysisState extends State<Analysis> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
+  Widget graphArea(int n, double width) {
+    return FutureBuilder(
+      future: n == 0 ? _expiredItems : _stockItems,
+      builder: (context, snapshot) {
+        if(snapshot.connectionState == ConnectionState.done) {
+          if(snapshot.data == null || snapshot.data.length == 0) {
+            return Center(child: Text('Add items for analytics'),);
+          }
+          if(snapshot.hasData) {
+            //make the chart
+            HashMap freqMap = new HashMap<String, int>();
+            for(var item in snapshot.data) {
+              String itemName = item.getName();
+              if(!freqMap.containsKey(itemName)) {
+                freqMap[itemName] = 1;
+              }
+              else {
+                freqMap[itemName] = freqMap[itemName] + 1;
+              }
+            }
+            //convert frequency map
+            List<ChartItem> chartItems = new List<ChartItem>();
+            for(var key in freqMap.keys) {
+              ChartItem item = new ChartItem(key, freqMap[key]);
+              chartItems.add(item);
+            }
+            return createGraph(n, width, chartItems); 
+          }
+        } else {
+          return Center(
+              child: CircularProgressIndicator(
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(Color(0xff5c39f8))));
+        }
+      },
+    );
+  }
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xff5c29f8),
-        title: Text("Analytics"),
-      ),
-      body: Column(
+  displayUI(var width) {
+    refreshGraphs();
+    return Column(
         children: <Widget>[
           Padding(
             padding: EdgeInsets.all(10),
@@ -77,7 +137,26 @@ class _AnalysisState extends State<Analysis> {
                 itemCount: 8),
           )
         ],
+      );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color(0xff5c29f8),
+        title: Text("Analytics"),
       ),
+      body: displayUI(width),
     );
   }
+}
+
+class ChartItem {
+  String itemName;
+  int frequency;
+
+  ChartItem(this.itemName, this.frequency);
 }
