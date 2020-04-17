@@ -5,7 +5,12 @@ import './analytics.dart';
 import './util/slide.dart';
 
 class Settings extends StatelessWidget {
-  List<String> settings = ["Analytics", "Help", "Privacy policy", "About us"];
+  List<String> settings = [
+    "Weekly analytics",
+    "Help",
+    "Privacy policy",
+    "About us"
+  ];
 
   final icons = [
     Icon(Icons.graphic_eq),
@@ -15,7 +20,6 @@ class Settings extends StatelessWidget {
   ];
 
   List<String> urls = [
-    "",
     "https://nosh.tech/privacy-policy.html",
     "https://nosh.tech/index.html#about"
   ];
@@ -37,7 +41,7 @@ class Settings extends StatelessWidget {
               leading: icons[idx],
               title: Text(settings[idx]),
               onTap: () {
-                if (idx == 2 || idx == 3) launch(urls[idx]);
+                if (idx == 2 || idx == 3) launch(urls[idx - 2]);
                 if (idx == 0) Navigator.push(context, Slide(page: Analysis()));
                 if (idx == 1)
                   Navigator.push(context,

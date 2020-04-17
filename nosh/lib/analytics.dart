@@ -108,7 +108,7 @@ class _AnalysisState extends State<Analysis> {
       },
     );
   }
-
+  
   displayUI(var width) {
     refreshGraphs();
     return Column(

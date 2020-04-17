@@ -10,6 +10,9 @@ import './util/slide.dart';
 import './onBoarding.dart';
 import 'database/db_helper.dart';
 import './util/searcher.dart';
+import 'database/expiredItem.dart';
+import 'database/stockItem.dart';
+import 'database/db_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,10 +39,15 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
   AppTabsState();
   TabController _controller;
   final _key = new GlobalKey<_CounterState>();
+  Future<List<StockItem>> _stockItems;
+  var result;
+  DBhelper _dBhelper;
 
   @override
   initState() {
+    _dBhelper = DBhelper();
     super.initState();
+    _stockItems = _dBhelper.getItemsFromStock();
     _controller = new TabController(length: 3, vsync: this);
   }
 
@@ -74,8 +82,16 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
               actions: <Widget>[
                 IconButton(
                   icon: Icon(Icons.search),
-                  onPressed: () {
-                    showSearch(context: context, delegate: searchItems());
+                  onPressed: () async {
+                    setState(() {
+                      _stockItems = _dBhelper.getItemsFromStock();
+                    });
+
+                    var items = await _stockItems;
+                    result = await showSearch(
+                        context: context, delegate: searchItems(items));
+
+                    if (result != null) result = await result.getId();
                   },
                 ),
                 IconButton(
@@ -115,6 +131,7 @@ class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
               )),
           body: new TabBarView(controller: _controller, children: <Widget>[
             new stock.Stock(
+              results: result,
               incrementExpiredItemCount: (int count) {
                 incrementExpiredItemCount(count);
               },

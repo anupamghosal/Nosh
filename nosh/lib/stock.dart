@@ -16,8 +16,9 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:async';
 
 class Stock extends StatefulWidget {
+  var results;
   final Function incrementExpiredItemCount;
-  Stock({this.incrementExpiredItemCount});
+  Stock({this.results, this.incrementExpiredItemCount});
   @override
   _StockState createState() => _StockState();
 }
@@ -30,12 +31,16 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
   String _barcode = '';
   bool LOADING = false;
   Timer timer;
+  var globalIndex;
+  ScrollController _scrollController;
+  bool highlighted;
 
   final _formKey = GlobalKey<FormState>();
   bool _longPressedEventActive = false;
 
   @override
   void initState() {
+    _scrollController = ScrollController();
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _dBhelper = DBhelper();
@@ -262,13 +267,30 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
     }
   }
 
+  Decoration myDecoration(int n) {
+    if (n == 1) {
+      return BoxDecoration(
+          border: Border.all(color: Colors.greenAccent[100], width: 2));
+    } else {
+      return BoxDecoration();
+    }
+  }
+
   createListUI(List<StockItem> items) {
     return ListView.separated(
+      controller: _scrollController,
       itemCount: items.length,
       separatorBuilder: (context, index) {
         return Divider();
       },
       itemBuilder: (context, index) {
+        if (widget.results != null && widget.results == items[index].getId()) {
+          globalIndex = index;
+          highlighted = true;
+        } else {
+          highlighted = false;
+        }
+
         return ListTile(
             onLongPress: () {
               setState(() {
@@ -373,6 +395,8 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
                     // width: MediaQuery.of(context).size.width * 0.54,
                     child: Text(
                       items[index].getName(),
+                      style: TextStyle(
+                          color: highlighted ? Colors.green : Colors.black),
                       softWrap: true,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -474,7 +498,21 @@ class _StockState extends State<Stock> with WidgetsBindingObserver {
               }
             }
             items = filteredItems;
-            WidgetsBinding.instance.addPostFrameCallback((_) {
+            WidgetsBinding.instance.addPostFrameCallback((_) async {
+              if (globalIndex != null) {
+                await _scrollController.animateTo(globalIndex * 70.0,
+                    duration: Duration(milliseconds: 1000), curve: Curves.ease);
+              }
+
+              if (widget.results != null) {
+                Timer(Duration(seconds: 4), () {
+                  setState(() {
+                    globalIndex = null;
+                    widget.results = null;
+                    highlighted = false;
+                  });
+                });
+              }
               widget.incrementExpiredItemCount(expiredItemCount);
             });
             if (items.length == 0) {
