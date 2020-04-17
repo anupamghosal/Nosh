@@ -25,12 +25,6 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
-<<<<<<< HEAD
-/*def kestorePropertiesFile = rootProject.file("key.properties")
-def keystoreProperties = new Properties()
-keystoreProperties.load(new FileInputStream(kestorePropertiesFile))*/
-=======
->>>>>>> a5a592f3be6613024225870d2530216b3cbb4357
 
 
 // def keystoreProperties = new Properties()
@@ -60,22 +54,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-<<<<<<< HEAD
-    /*signingConfigs{
-        release{
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
-
-        }
-    }*/
-    buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
-=======
     // signingConfigs{
     //     release{
     //         keyAlias keystoreProperties['keyAlias']
@@ -100,7 +78,6 @@ android {
         debug {
             debuggable true
             
->>>>>>> a5a592f3be6613024225870d2530216b3cbb4357
         }
     }
 }
