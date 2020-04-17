@@ -49,7 +49,7 @@ class _AnalysisState extends State<Analysis> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xff5c29f8),
-        title: Text("Analytics"),
+        title: Text("Weekly analytics"),
       ),
       body: Column(
         children: <Widget>[

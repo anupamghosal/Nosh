@@ -56,6 +56,11 @@ class searchItems extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
+    if (items.length == 0) {
+      return Center(
+        child: Text(("No items in stock")),
+      );
+    }
     final suggestions =
         items.where((a) => a.getName().toLowerCase().contains(query));
     return ListView(
