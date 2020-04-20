@@ -29,6 +29,13 @@ class DBhelper {
   static const String EID = 'expiredItemId';
   static const String EIMG = 'expiredItemImage';
   static const String EQUANTITY = 'expiredItemQuantity';
+  //temp expired item table
+  static const String TEMPEXPIREDTABLE = 'TempExpired';
+  static const String TENAME = 'expiredItemName';
+  static const String TEDATE = 'expiredItemExpiryDate';
+  static const String TEID = 'expiredItemId';
+  static const String TEIMG = 'expiredItemImage';
+  static const String TEQUANTITY = 'expiredItemQuantity';
   bool _dbExists = false;
 
   Future<bool> dbExists() async {
@@ -58,10 +65,12 @@ class DBhelper {
         "CREATE TABLE $LISTTABLE ($LID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $LNAME TEXT, $LQUANTITY TEXT)");
     await db.execute(
         "CREATE TABLE $EXPIREDTABLE ($EID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $ENAME TEXT, $EDATE TEXT, $EIMG TEXT, $EQUANTITY)");
+    await db.execute(
+        "CREATE TABLE $TEMPEXPIREDTABLE ($TEID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $TENAME TEXT, $TEDATE TEXT, $TEIMG TEXT, $TEQUANTITY)");
     _dbExists = true;
   }
 
-  //Stock db functions
+  //Stock table functions
   Future<StockItem> saveToStock(StockItem item) async {
     var dbClient = await db;
     int id = await dbClient.insert(STOCKTABLE, item.toMap());
@@ -97,7 +106,7 @@ class DBhelper {
         where: '$SID = ?', whereArgs: [item.getId()]);
   }
 
-  //List db functions
+  //List table functions
   Future<ListItem> saveToList(ListItem item) async {
     var dbClient = await db;
     int id = await dbClient.insert(LISTTABLE, item.toMap());
@@ -130,7 +139,7 @@ class DBhelper {
         where: '$LID = ?', whereArgs: [item.getId()]);
   }
 
-  //Expired db functions
+  //Expired table functions
   Future<ExpiredItem> saveExpiredItem(ExpiredItem item) async {
     var dbClient = await db;
     int id = await dbClient.insert(EXPIREDTABLE, item.toMap());
@@ -154,6 +163,32 @@ class DBhelper {
     var dbClient = await db;
     return await dbClient
         .delete(EXPIREDTABLE, where: '$EID = ?', whereArgs: [itemID]);
+  }
+
+  //Temp Expired table functions
+  Future<ExpiredItem> saveTempExpiredItem(ExpiredItem item) async {
+    var dbClient = await db;
+    int id = await dbClient.insert(TEMPEXPIREDTABLE, item.toMap());
+    item.setId(id);
+    return item;
+  }
+
+  Future<List<ExpiredItem>> getTempExpiredItems() async {
+    var dbClient = await db;
+    List<Map> maps = await dbClient.rawQuery("SELECT * FROM $TEMPEXPIREDTABLE");
+    List<ExpiredItem> items = [];
+    if (maps.length > 0) {
+      for (int i = 0; i < maps.length; i++) {
+        items.add(ExpiredItem.fromMap(maps[i]));
+      }
+    }
+    return items;
+  }
+
+  Future<int> deleteTempExpiredItem(int itemID) async {
+    var dbClient = await db;
+    return await dbClient
+        .delete(TEMPEXPIREDTABLE, where: '$EID = ?', whereArgs: [itemID]);
   }
 
   //close db client
