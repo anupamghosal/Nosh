@@ -34,10 +34,10 @@ class searchItems extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    final reults =
+    final results =
         items.where((a) => a.getName().toLowerCase().contains(query));
     return ListView(
-      children: reults
+      children: results
           .map<ListTile>((a) => ListTile(
                 leading: Icon(Icons.fastfood),
                 title: Text(

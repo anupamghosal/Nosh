@@ -7,14 +7,25 @@ import 'database/stockItem.dart';
 import 'database/expiredItem.dart';
 
 class Analysis extends StatefulWidget {
+  var exItems, stItems;
+
+  Analysis(this.exItems, this.stItems);
   @override
-  _AnalysisState createState() => _AnalysisState();
+  _AnalysisState createState() => _AnalysisState(exItems, stItems);
 }
 
 class _AnalysisState extends State<Analysis> {
+  var exItems, stItems;
+  _AnalysisState(this.exItems, this.stItems);
   DBhelper _dBhelper;
   Future<List<StockItem>> _stockItems;
   Future<List<ExpiredItem>> _expiredItems;
+
+  List<StockItem> sitems;
+  List<ExpiredItem> eitems;
+  var displayItems = [];
+
+  var listItems;
 
   @override
   void initState() {
@@ -26,6 +37,16 @@ class _AnalysisState extends State<Analysis> {
     setState(() {
       _stockItems = _dBhelper.getItemsFromStock();
       _expiredItems = _dBhelper.getExpiredItems();
+
+      if (exItems.length != 0)
+        for (var item in exItems) {
+          displayItems = stItems
+              .where((a) => a
+                  .getName()
+                  .toLowerCase()
+                  .contains(item.getName().toLowerCase()))
+              .toList();
+        }
     });
   }
 
@@ -109,6 +130,7 @@ class _AnalysisState extends State<Analysis> {
 
   displayUI(var width) {
     refreshGraphs();
+
     return Column(
       children: <Widget>[
         Padding(
@@ -119,51 +141,66 @@ class _AnalysisState extends State<Analysis> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              graphArea(0, width),
+              exItems.length != 0 ? graphArea(0, width) : SizedBox(),
               SizedBox(
                 height: 30,
               ),
-              graphArea(1, width)
+              stItems.length != 0 ? graphArea(1, width) : SizedBox()
             ],
           ),
         ),
-        SizedBox(
-          height: 30,
-        ),
-        Center(
-          child: Text(
-            "Mind these products",
-            style: TextStyle(fontSize: 20),
-          ),
-        ),
-        Center(
-          child: Text(
-            "You have a tendency to let them be expired",
-            style: TextStyle(color: Colors.grey),
-          ),
-        ),
-        SizedBox(
-          height: 15,
-        ),
-        Expanded(
-          child: FutureBuilder(
-            future: _expiredItems,
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              return ListView.separated(
-                  itemBuilder: (BuildContext context, int idx) {
-                    return ListTile(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 20),
-                      title: Text((idx + 1).toString() +
-                          ". " +
-                          snapshot.data[idx].getName()),
-                    );
-                  },
-                  separatorBuilder: (BuildContext context, int idx) =>
-                      Divider(),
-                  itemCount: snapshot.data.length);
-            },
-          ),
-        )
+        displayItems.length != 0
+            ? Column(
+                children: <Widget>[
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Center(
+                    child: Text(
+                      "Mind these products",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                  Center(
+                    child: Text(
+                      "You have a tendency to let them be expired",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Expanded(
+                    child: ListView.separated(
+                        itemBuilder: (BuildContext context, int idx) {
+                          if (listItems.length == 0)
+                            return Container(
+                              height: 0,
+                              width: 0,
+                            );
+                          else
+                            return ListTile(
+                              contentPadding:
+                                  EdgeInsets.symmetric(horizontal: 20),
+                              title: Text((idx + 1).toString() +
+                                  ". " +
+                                  displayItems[idx].getName()),
+                            );
+                        },
+                        separatorBuilder: (BuildContext context, int idx) =>
+                            Divider(),
+                        itemCount: displayItems.length),
+                  )
+                ],
+              )
+            : Expanded(
+                child: Center(
+                  child: Text(
+                    "Not enough data to show analysis",
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
+                ),
+              )
       ],
     );
   }

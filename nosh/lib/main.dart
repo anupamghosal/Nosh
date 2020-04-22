@@ -12,7 +12,6 @@ import 'database/db_helper.dart';
 import './util/searcher.dart';
 import 'database/expiredItem.dart';
 import 'database/stockItem.dart';
-import 'database/db_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
