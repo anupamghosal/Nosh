@@ -12,7 +12,6 @@ class Analysis extends StatefulWidget {
 }
 
 class _AnalysisState extends State<Analysis> {
-
   DBhelper _dBhelper;
   Future<List<StockItem>> _stockItems;
   Future<List<ExpiredItem>> _expiredItems;
@@ -23,7 +22,7 @@ class _AnalysisState extends State<Analysis> {
     _dBhelper = new DBhelper();
   }
 
-  refreshGraphs() {
+  refreshGraphs() async {
     setState(() {
       _stockItems = _dBhelper.getItemsFromStock();
       _expiredItems = _dBhelper.getExpiredItems();
@@ -50,7 +49,7 @@ class _AnalysisState extends State<Analysis> {
               color: Colors.grey[200], blurRadius: 20.0, offset: Offset(5, 5))
         ],
       ),
-      width: width / 2 - 30,
+      width: width - 50,
       height: width / 3 + 10,
       padding: EdgeInsets.all(8),
       child: Column(
@@ -61,11 +60,9 @@ class _AnalysisState extends State<Analysis> {
           ),
           Flexible(
             child: Container(
-              child: Center(
-                child: charts.BarChart(series, animate: true)
-              ),
+              child: Center(child: charts.BarChart(series, animate: true)),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -75,29 +72,30 @@ class _AnalysisState extends State<Analysis> {
     return FutureBuilder(
       future: n == 0 ? _expiredItems : _stockItems,
       builder: (context, snapshot) {
-        if(snapshot.connectionState == ConnectionState.done) {
-          if(snapshot.data == null || snapshot.data.length == 0) {
-            return Center(child: Text('Add items for analytics'),);
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.data == null || snapshot.data.length == 0) {
+            return Center(
+              child: Text(''),
+            );
           }
-          if(snapshot.hasData) {
+          if (snapshot.hasData) {
             //make the chart
             HashMap freqMap = new HashMap<String, int>();
-            for(var item in snapshot.data) {
+            for (var item in snapshot.data) {
               String itemName = item.getName();
-              if(!freqMap.containsKey(itemName)) {
+              if (!freqMap.containsKey(itemName)) {
                 freqMap[itemName] = 1;
-              }
-              else {
+              } else {
                 freqMap[itemName] = freqMap[itemName] + 1;
               }
             }
             //convert frequency map
             List<ChartItem> chartItems = new List<ChartItem>();
-            for(var key in freqMap.keys) {
+            for (var key in freqMap.keys) {
               ChartItem item = new ChartItem(key, freqMap[key]);
               chartItems.add(item);
             }
-            return createGraph(n, width, chartItems); 
+            return createGraph(n, width, chartItems);
           }
         } else {
           return Center(
@@ -108,36 +106,66 @@ class _AnalysisState extends State<Analysis> {
       },
     );
   }
-  
+
   displayUI(var width) {
     refreshGraphs();
     return Column(
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(10),
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.all(10),
+        ),
+        Container(
+          padding: EdgeInsets.only(top: 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              graphArea(0, width),
+              SizedBox(
+                height: 30,
+              ),
+              graphArea(1, width)
+            ],
           ),
-          Container(
-            padding: EdgeInsets.only(top: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[graphArea(0, width), graphArea(1, width)],
-            ),
+        ),
+        SizedBox(
+          height: 30,
+        ),
+        Center(
+          child: Text(
+            "Mind these products",
+            style: TextStyle(fontSize: 20),
           ),
-          SizedBox(
-            height: 10,
+        ),
+        Center(
+          child: Text(
+            "You have a tendency to let them be expired",
+            style: TextStyle(color: Colors.grey),
           ),
-          Expanded(
-            child: ListView.separated(
-                itemBuilder: (BuildContext context, int idx) {
-                  return ListTile(
-                    title: Text((idx + 1).toString() + "  some info"),
-                  );
-                },
-                separatorBuilder: (BuildContext context, int idx) => Divider(),
-                itemCount: 8),
-          )
-        ],
-      );
+        ),
+        SizedBox(
+          height: 15,
+        ),
+        Expanded(
+          child: FutureBuilder(
+            future: _expiredItems,
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              return ListView.separated(
+                  itemBuilder: (BuildContext context, int idx) {
+                    return ListTile(
+                      contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                      title: Text((idx + 1).toString() +
+                          ". " +
+                          snapshot.data[idx].getName()),
+                    );
+                  },
+                  separatorBuilder: (BuildContext context, int idx) =>
+                      Divider(),
+                  itemCount: snapshot.data.length);
+            },
+          ),
+        )
+      ],
+    );
   }
 
   @override
@@ -157,6 +185,5 @@ class _AnalysisState extends State<Analysis> {
 class ChartItem {
   String itemName;
   int frequency;
-
   ChartItem(this.itemName, this.frequency);
 }
