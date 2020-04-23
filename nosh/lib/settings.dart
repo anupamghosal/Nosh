@@ -25,7 +25,7 @@ class _SettingsState extends State<Settings> {
   }
 
   List<String> settings = [
-    "Weekly analytics",
+    "Expiration analytics",
     "Help",
     "Privacy policy",
     "About us"
@@ -69,7 +69,7 @@ class _SettingsState extends State<Settings> {
                   var exItems = await _expiredItems;
                   var stItems = await _stockItems;
 
-                  var xyz = await Navigator.push(
+                  await Navigator.push(
                       context, Slide(page: Analysis(exItems, stItems)));
                 }
                 if (idx == 1)
