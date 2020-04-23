@@ -139,7 +139,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
         PageViewModel(
           title: "Smarter Purchases",
           body:
-              "With nosh's expiration analytics, know which items you tend tolet expire.",
+              "Keep up to date with your buying and food wasting habit using the weekly analytics feature. Track items that are common in your buying and wasting habit so that it enables you to make smarter purchases.",
           image: _buildImage('charts'),
           decoration: pageDecoration,
         ),

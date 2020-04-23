@@ -15,7 +15,6 @@ class _ExpiredState extends State<Expired> {
   DBhelper _dBhelper;
   bool _longPressedEventActive = false;
 
-
   @override
   initState() {
     super.initState();
@@ -90,11 +89,15 @@ class _ExpiredState extends State<Expired> {
                   )
                 : Container(
                     child: CircleAvatar(
+                        backgroundColor: Colors.grey[300],
                         radius: 30.0,
                         backgroundImage:
                             selectImageType(items[index].getImage()),
                         child: selectImageType(items[index].getImage()) == null
-                            ? Icon(Icons.fastfood)
+                            ? Icon(
+                                Icons.fastfood,
+                                color: Colors.white,
+                              )
                             : null),
                   ),
             title: Padding(
