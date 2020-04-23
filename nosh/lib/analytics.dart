@@ -173,7 +173,9 @@ class _AnalysisState extends State<Analysis> {
             if (snapshot.hasData) {
               //make the chart
               HashMap freqMap = new HashMap<String, int>();
-              for (var i = 0; i <= 6; i++) {
+              var length =
+                  snapshot.data.length <= 4 ? snapshot.data.length - 1 : 4;
+              for (var i = 0; i <= length; i++) {
                 String itemName = snapshot.data[i].getName();
                 if (!freqMap.containsKey(itemName)) {
                   freqMap[itemName] = 1;
