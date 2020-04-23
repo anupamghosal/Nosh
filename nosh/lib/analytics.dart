@@ -290,7 +290,7 @@ class _AnalysisState extends State<Analysis> {
       body: stItems.length == 0 && exItems.length == 0
           ? Center(
               child: Text(
-                'Not enough data for me to calculate analytics',
+                'Not enough data to calculate analytics',
                 style: TextStyle(color: Colors.grey[600]),
               ),
             )
