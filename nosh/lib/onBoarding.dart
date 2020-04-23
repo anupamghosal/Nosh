@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import './main.dart';
 
@@ -45,6 +46,8 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
       imagePadding: EdgeInsets.zero,
     );
 
+    SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle.dark.copyWith(statusBarColor: Colors.transparent));
     return IntroductionScreen(
       key: introKey,
       pages: [
@@ -131,6 +134,13 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
               ),
             ],
           ),
+          decoration: pageDecoration,
+        ),
+        PageViewModel(
+          title: "Smarter Purchases",
+          body:
+              "With nosh's expiration analytics, know which items you tend tolet expire.",
+          image: _buildImage('charts'),
           decoration: pageDecoration,
         ),
         PageViewModel(
