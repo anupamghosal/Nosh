@@ -99,7 +99,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                     size: 18,
                     color: Color(0xff5c39f8),
                   ),
-                  Text("  good to go for atleast 3 days")
+                  Text("  good to go for atleast 4 days")
                 ],
               ),
             ],
