@@ -14,9 +14,9 @@ class Settings extends StatefulWidget {
 
 class _SettingsState extends State<Settings> {
   DBhelper _dBhelper;
-  Future<List<StockItem>> _stockItems;
+  // Future<List<StockItem>> _stockItems;
 
-  Future<List<ExpiredItem>> _expiredItems;
+  // Future<List<ExpiredItem>> _expiredItems;
 
   @override
   initState() {
@@ -62,14 +62,10 @@ class _SettingsState extends State<Settings> {
               onTap: () async {
                 if (idx == 2 || idx == 3) launch(urls[idx - 2]);
                 if (idx == 0) {
-                  setState(() {
-                    _stockItems = _dBhelper.getItemsFromStock();
-                    _expiredItems = _dBhelper.getExpiredItems();
-                  });
-                  var exItems = await _expiredItems;
-                  var stItems = await _stockItems;
+                  var stItems = await _dBhelper.getItemsFromStock();
+                  var exItems = await _dBhelper.getExpiredItems();
 
-                  await Navigator.push(
+                  var xyz = await Navigator.push(
                       context, Slide(page: Analysis(exItems, stItems)));
                 }
                 if (idx == 1)
