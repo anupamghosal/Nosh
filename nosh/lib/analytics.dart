@@ -252,7 +252,7 @@ class _AnalysisState extends State<Analysis> {
                       children: <Widget>[
                         Center(
                           child: Text(
-                            "Mind these products",
+                            "You have an tendency to let them expire",
                             style: TextStyle(fontSize: 20),
                           ),
                         ),
@@ -292,7 +292,7 @@ class _AnalysisState extends State<Analysis> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xff5c29f8),
-        title: Text("Expiration analytics"),
+        title: Text("Weekly analytics"),
       ),
       body: stItems.length == 0
           ? Center(

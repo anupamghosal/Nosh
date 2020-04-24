@@ -25,7 +25,7 @@ class _SettingsState extends State<Settings> {
   }
 
   List<String> settings = [
-    "Expiration analytics",
+    "Weekly analytics",
     "Help",
     "Privacy policy",
     "About us"

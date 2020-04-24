@@ -94,7 +94,7 @@ class SelectPanelState extends State<SelectPanel> {
             child: RaisedButton(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0)),
-              child: Text("get recipes"),
+              child: Text("Get recipes"),
               color: Color(0xff5c39f8),
               textColor: Colors.white,
               disabledColor: Colors.grey[300],
