@@ -1,223 +1,95 @@
 import 'package:flutter/material.dart';
+import 'package:nosh/data/middleware.dart';
+import 'package:nosh/pages/onBoarding.dart';
+import 'package:nosh/utils/theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import './homepage.dart';
+
 import 'package:flutter/services.dart';
-import 'package:nosh/database/expiredItem.dart';
-import 'package:nosh/settings.dart';
-import './expired.dart' as expired;
-import './Items.dart' as items;
-import './stock.dart' as stock;
-import './selectPanel.dart';
-import './util/slide.dart';
-import './onBoarding.dart';
-import 'database/db_helper.dart';
-import './util/searcher.dart';
-import 'database/expiredItem.dart';
-import 'database/stockItem.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  DBhelper dBhelper = DBhelper();
-  bool welcome = await dBhelper.dbExists();
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
 
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
+import './data/reducers/reducers.dart';
+import './data/appState.dart';
+import 'data/actions/actions.dart';
+import 'helpers/notificationHelper.dart';
+
+void main() {
   SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle.dark.copyWith(statusBarColor: Colors.transparent));
-  runApp(MaterialApp(
-    theme: ThemeData(scaffoldBackgroundColor: Colors.white),
-    home: welcome ? OnBoardingPage(welcome) : AppTabs(),
-  ));
+
+  runApp(MyApp());
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 }
 
-class AppTabs extends StatefulWidget {
+class MyApp extends StatefulWidget {
   @override
-  AppTabsState createState() => AppTabsState();
+  _MyAppState createState() => _MyAppState();
 }
 
-class AppTabsState extends State<AppTabs> with SingleTickerProviderStateMixin {
-  AppTabsState();
-  TabController _controller;
-  final _key = new GlobalKey<_CounterState>();
-  Future<List<StockItem>> _stockItems;
-  var result;
-  DBhelper _dBhelper;
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  final Store<AppState> store = Store<AppState>(appStateReducer,
+      initialState: AppState.initialState(), middleware: [appStateMiddleware]);
 
-  @override
-  initState() {
-    _dBhelper = DBhelper();
-    super.initState();
-    _stockItems = _dBhelper.getItemsFromStock();
-    _controller = new TabController(length: 3, vsync: this);
-  }
+  Store<AppState> _currentStore;
 
-  incrementExpiredItemCount(int count) {
-    print(count);
-    _key.currentState.incrementExpiredItemCount(count);
-  }
-
-  decrementExpiredItemCount() {
-    _key.currentState.decrementExpiredItemCount();
-  }
-
-  initializeExpiredItemCount() {
-    _key.currentState.initializeExpiredItemCount();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-        theme: ThemeData(
-            scaffoldBackgroundColor: Colors.white,
-            primaryColor: Colors.white,
-            accentColor: Color(0xff5c39f8)),
-        home: Scaffold(
-          appBar: AppBar(
-              actions: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.search),
-                  onPressed: () async {
-                    setState(() {
-                      _stockItems = _dBhelper.getItemsFromStock();
-                    });
-
-                    var items = await _stockItems;
-                    result = await showSearch(
-                        context: context, delegate: searchItems(items));
-
-                    if (result != null) result = await result.getId();
-                  },
-                ),
-                IconButton(
-                  icon: Icon(
-                    Icons.restaurant,
-                    color: Color(0xff5c39f8),
-                  ),
-                  onPressed: () {
-                    Navigator.push(context, Slide(page: SelectPanel()));
-                  },
-                ),
-                IconButton(
-                  icon: Icon(
-                    Icons.list,
-                  ),
-                  onPressed: () =>
-                      Navigator.push(context, Slide(page: Settings())),
-                ),
-              ],
-              elevation: 0.0,
-              title: Container(
-                  padding: EdgeInsets.only(top: 10.0),
-                  child: Image(
-                      image: AssetImage('assets/nosh.png'),
-                      width: 65.0,
-                      height: 250.0)),
-              bottom: TabBar(
-                controller: _controller,
-                tabs: <Tab>[
-                  new Tab(child: new Text('Stocked')),
-                  new Tab(child: new Text('Shopping List')),
-                  new Tab(child: Counter(key: _key))
-                ],
-                indicatorColor: Color(0xff5c39f8),
-                labelColor: Colors.black,
-                unselectedLabelColor: Colors.grey[600],
-              )),
-          body: new TabBarView(controller: _controller, children: <Widget>[
-            new stock.Stock(
-              results: result,
-              incrementExpiredItemCount: (int count) {
-                incrementExpiredItemCount(count);
-              },
-            ),
-            new items.Items(
-              incrementExpiredItemCount: () {
-                incrementExpiredItemCount(1);
-              },
-            ),
-            new expired.Expired(
-              decrementExpiredItemCount: () {
-                decrementExpiredItemCount();
-              },
-            )
-          ]),
-        ));
-  }
-}
-
-//counter
-class Counter extends StatefulWidget {
-  Counter({Key key}) : super(key: key);
-
-  @override
-  _CounterState createState() => _CounterState();
-}
-
-class _CounterState extends State<Counter> {
-  int _expiredItemCount = 0;
-  DBhelper _dBhelper;
-
+  bool isFirstBoot = false;
+  var thisContext;
   @override
   void initState() {
-    _dBhelper = new DBhelper();
-    initializeExpiredItemCount();
+    super.initState();
+    _currentStore = store;
+    WidgetsBinding.instance.addObserver(this);
+    initializeAndCancelNotifications();
+    checkBootSatus();
   }
 
-  initializeExpiredItemCount() async {
-    List<ExpiredItem> items = await _dBhelper.getExpiredItems();
-    setState(() {
-      _expiredItemCount = items.length;
-    });
-    print('refreshed items');
-    print(items.length);
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    switch (state) {
+      case AppLifecycleState.paused:
+        scheduleNotifications(_currentStore.state.items);
+        break;
+      case AppLifecycleState.inactive:
+        break;
+      case AppLifecycleState.detached:
+        scheduleNotifications(_currentStore.state.items);
+        break;
+      case AppLifecycleState.resumed:
+        initializeAndCancelNotifications();
+        setState(() => {});
+        break;
+    }
   }
 
-  incrementExpiredItemCount(int count) {
-    setState(() {
-      _expiredItemCount = _expiredItemCount + count;
-    });
-    //initializeExpiredItemCount();
-  }
-
-  decrementExpiredItemCount() {
-    /*setState(() {
-      // _expiredItemCount = _expiredItemCount == 0 ? 0 : _expiredItemCount - 1;
-      //initializeExpiredItemCount();
-    });*/
-    setState(() {
-      _expiredItemCount = _expiredItemCount == 0 ? 0 : _expiredItemCount - 1;
-    });
+  checkBootSatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var boot = prefs.getString('noshBoot');
+    if (boot == null) setState(() => isFirstBoot = true);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-      Text('Expired'),
-      // SizedBox(width: 7),
-      AnimatedCrossFade(
-        duration: Duration(milliseconds: 300),
-        crossFadeState: _expiredItemCount != 0
-            ? CrossFadeState.showFirst
-            : CrossFadeState.showSecond,
-        firstChild: Padding(
-          padding: const EdgeInsets.only(left: 7.0),
-          child: CircleAvatar(
-            radius: 9,
-            child: Text(_expiredItemCount.toString(),
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 9)),
-            backgroundColor: Color(0xff5c39f8),
-          ),
-        ),
-        secondChild: SizedBox(),
-      )
-    ]);
+    thisContext = context;
+    return StoreProvider<AppState>(
+      store: store,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: noshTheme(),
+        home: isFirstBoot
+            ? OnBoardingPage(store, isFirstBoot)
+            : Scaffold(
+                body: StoreBuilder<AppState>(onInit: (store) {
+                  store.dispatch(GetItemsAction());
+                  store.dispatch(GetShoppingItemsAction());
+                }, builder: (BuildContext context, Store<AppState> store) {
+                  _currentStore = store;
+                  return HomePage(store, isFirstBoot);
+                }),
+              ),
+      ),
+    );
   }
 }
