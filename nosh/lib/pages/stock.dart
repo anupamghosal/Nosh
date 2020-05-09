@@ -142,7 +142,7 @@ class _StockState extends State<Stock> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           child: Text(
-            'done',
+            'Done',
             style: TextStyle(
                 color: Theme.of(context).primaryColor,
                 fontSize: 14,
@@ -231,10 +231,8 @@ class _StockState extends State<Stock> {
                               : Theme.of(context).primaryColor.withAlpha(30),
                           borderRadius: BorderRadius.circular(10)),
                       child: ListTile(
-                        onLongPress: () {
-                          setState(() =>
-                              _longPressEventActive = !_longPressEventActive);
-                        },
+                        onLongPress: () => setState(() =>
+                            _longPressEventActive = !_longPressEventActive),
                         contentPadding:
                             EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         leading: buildLeading(sortedItems[idx]),
