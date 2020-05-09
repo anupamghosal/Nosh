@@ -94,6 +94,7 @@ class _InputModalState extends State<InputModal> {
       if (widget.recievedItem.quantity != '') willHaveQuantity = true;
       if (widget.recievedItem.expiry != null) willHaveExpiry = true;
       initialDate = widget.recievedItem.expiry ?? initialDate;
+      print(initialDate);
       if (widget.recievedItem.imageUri != '')
         imageUri = widget.recievedItem.imageUri ?? '';
     }
@@ -256,7 +257,7 @@ class _InputModalState extends State<InputModal> {
           duration: Duration(milliseconds: animationSpeed),
           firstChild: Container(
             width: MediaQuery.of(context).size.width,
-            height: 120,
+            height: 135,
             padding: EdgeInsets.symmetric(vertical: 20),
             child: SizedOverflowBox(
               alignment: Alignment.centerLeft,
@@ -294,7 +295,7 @@ class _InputModalState extends State<InputModal> {
           if (form.validate()) {
             form.save();
             if (configuration == 'STOCK_CONFIG') {
-              if (!willHaveExpiry) item.expiry = null;
+              if (willHaveExpiry) item.expiry = initialDate;
               if (modalName == 'ADD_TO_STOCKED' ||
                   modalName == 'MOVE_TO_STOCKED') {
                 widget.vm
@@ -334,10 +335,9 @@ class _InputModalState extends State<InputModal> {
           padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20),
           child: Row(
             children: <Widget>[
-              Text(
-                buttonText == '' ? '+' : '',
-                style: TextStyle(fontWeight: FontWeight.normal, fontSize: 18),
-              ),
+              Text(buttonText == '' ? '+' : '',
+                  style:
+                      TextStyle(fontWeight: FontWeight.normal, fontSize: 18)),
               Text(buttonText == '' ? "  Add item" : "Update item")
             ],
           ),
@@ -348,19 +348,16 @@ class _InputModalState extends State<InputModal> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: GestureDetector(
-        onPanStart: (_) {
-          FocusScope.of(context).unfocus();
-        },
-        child: AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          contentPadding: EdgeInsets.all(28),
-          title: buildTitle(),
-          content: buildInputForm(),
-          actions: <Widget>[buildSubmit()],
-        ),
+    return GestureDetector(
+      onPanStart: (_) {
+        FocusScope.of(context).unfocus();
+      },
+      child: AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        contentPadding: EdgeInsets.all(28),
+        title: SingleChildScrollView(child: buildTitle()),
+        content: buildInputForm(),
+        actions: <Widget>[buildSubmit()],
       ),
     );
   }

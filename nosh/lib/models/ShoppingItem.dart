@@ -26,6 +26,7 @@ class ShoppingItem {
     id = json['listItemId'].toString();
     name = json['listItemName'];
     quantity = json['listItemQuantity'];
+    isChecked = false;
   }
 
   Map toJson() =>

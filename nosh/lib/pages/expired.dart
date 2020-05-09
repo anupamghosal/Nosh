@@ -5,6 +5,7 @@ import 'package:nosh/widgets/emptyMessage.dart';
 import 'package:intl/intl.dart';
 import 'package:nosh/widgets/pageHeading.dart';
 import 'package:nosh/widgets/sliverVerticalSpace.dart';
+import 'dart:io';
 
 class Expired extends StatefulWidget {
   final List<Item> items;
@@ -17,6 +18,14 @@ class Expired extends StatefulWidget {
 class _ExpiredState extends State<Expired> {
   String itemsLength;
   String items = 'items';
+
+  selectImageType(String link) {
+    if (link == '') return null;
+    if (link.startsWith('https'))
+      return NetworkImage(link);
+    else
+      return FileImage(File(link));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +70,15 @@ class _ExpiredState extends State<Expired> {
                         foregroundColor: Colors.white,
                         backgroundColor: Colors.grey[300],
                         radius: 30,
-                        child: Icon(Icons.fastfood),
+                        backgroundImage:
+                            selectImageType(widget.items[idx].imageUri),
+                        child:
+                            selectImageType(widget.items[idx].imageUri) == null
+                                ? Icon(
+                                    Icons.fastfood,
+                                    color: Colors.white,
+                                  )
+                                : null,
                       ),
                       title: Text(widget.items[idx].name),
                       subtitle: Text(widget.items[idx].expiry == null

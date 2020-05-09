@@ -51,6 +51,7 @@ class RecipeCarosel extends StatelessWidget {
                   return SliverFillRemaining(
                     child: Center(
                       child: CircularProgressIndicator(
+                          strokeWidth: 3,
                           valueColor: AlwaysStoppedAnimation<Color>(
                               Theme.of(context).primaryColor)),
                     ),

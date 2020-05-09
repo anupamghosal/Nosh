@@ -44,7 +44,7 @@ class _AnalysisState extends State<Analysis> {
         colorFn: (_, __) =>
             charts.ColorUtil.fromDartColor(Color(0xff5c39f8).withOpacity(0.9)),
         domainFn: (ChartItem items, _) => items.itemName.length > 7
-            ? items.itemName.substring(0, 5) + '...'
+            ? items.itemName.substring(0, 8) + '...'
             : items.itemName,
         measureFn: (ChartItem items, _) => items.frequency,
       )
@@ -99,6 +99,7 @@ class _AnalysisState extends State<Analysis> {
         freqMap[itemName] = freqMap[itemName] + 1;
       }
     }
+
     //convert frequency map
     List<ChartItem> chartItems = new List<ChartItem>();
 
@@ -107,7 +108,7 @@ class _AnalysisState extends State<Analysis> {
       i++;
       ChartItem item = new ChartItem(key, freqMap[key]);
       chartItems.add(item);
-      if (i == 6) break; // using only 6 items for space constrains
+      if (i == 5) break; // using only 6 items for space constrains
     }
     return graph(graphId, width, chartItems);
   }
@@ -167,7 +168,7 @@ class _AnalysisState extends State<Analysis> {
                       padding:
                           EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                       child: Text(
-                        'Be Cautious of these',
+                        'Be cautious of these',
                         style: TextStyle(color: Colors.grey, fontSize: 18),
                       ),
                     )

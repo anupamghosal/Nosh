@@ -27,18 +27,58 @@ class SpeedDialButton extends StatelessWidget {
             Widget snackbar;
             if (await isConnected()) {
               String barcode = await getBarcode();
+              showDialog(
+                  barrierDismissible: false,
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 70),
+                      content: Container(
+                        height: 50,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 3,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    Theme.of(context).primaryColor),
+                              ),
+                            ),
+                            SizedBox(width: 20),
+                            Text(
+                              'Loading',
+                              style: TextStyle(color: Colors.grey),
+                            )
+                          ],
+                        ),
+                      ),
+                    );
+                  });
               if (barcode == 'Allow camera to use barcode' ||
-                  barcode == 'Some error occured')
+                  barcode == 'Something went wrong')
                 snackbar = showError(barcode);
               else {
                 List productData = await getProduct(barcode);
                 String productName = productData[0];
                 String productImageUri = productData[1];
+                Navigator.of(context).pop();
+
                 if (productName == '404')
                   snackbar = showError('Product Not Found');
                 else {
                   var item = Item();
                   item.name = productName;
+                  if (productImageUri == null) productImageUri = '';
+
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -55,6 +95,7 @@ class SpeedDialButton extends StatelessWidget {
             } else {
               snackbar = showError('Internet Connnection Not Established');
             }
+
             if (snackbar != null) Scaffold.of(context).showSnackBar(snackbar);
           },
           label: 'Scan barcode',
