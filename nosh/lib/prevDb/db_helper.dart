@@ -71,7 +71,7 @@ class DBhelper {
     }
     if (expiredMap.length > 0) {
       for (int i = 0; i < expiredMap.length; i++) {
-        items.add(Item.fromPrevExpiryMap(maps[i]));
+        items.add(Item.fromPrevExpiryMap(expiredMap[i]));
       }
     }
     return items;

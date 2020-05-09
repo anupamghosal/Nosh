@@ -29,15 +29,15 @@ class Item {
     id = json['stockItemId'].toString();
     name = json['stockItemName'];
     quantity = json['stockItemQuantity'];
-    expiry = json['stockItemExpiryDate'] == '' ? null : DateTime.parse(json['expiry']);
+    expiry = json['stockItemExpiryDate'] == '' ? null : DateTime.parse(json['stockItemExpiryDate']);
     imageUri = json['stockItemImage'];
   }
 
   Item.fromPrevExpiryMap(Map json) {
-    id = json['expiryItemId'].toString();
-    name = json['expiryItemName'];
-    quantity = json['expiryItemQuantity'];
-    expiry = json['expiryItemExpiryDate'] == '' ? null : DateTime.parse(json['expiry']);
+    id = json['expiredItemId'].toString();
+    name = json['expiredItemName'];
+    quantity = json['expiredItemQuantity'];
+    expiry = json['expiredItemExpiryDate'] == '' ? null : DateTime.parse(json['expiredItemExpiryDate']);
     imageUri = json['expiredItemImage'];
   }
 
