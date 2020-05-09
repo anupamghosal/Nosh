@@ -256,7 +256,7 @@ class _InputModalState extends State<InputModal> {
           duration: Duration(milliseconds: animationSpeed),
           firstChild: Container(
             width: MediaQuery.of(context).size.width,
-            height: 120,
+            height: 135,
             padding: EdgeInsets.symmetric(vertical: 20),
             child: SizedOverflowBox(
               alignment: Alignment.centerLeft,
@@ -334,10 +334,9 @@ class _InputModalState extends State<InputModal> {
           padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20),
           child: Row(
             children: <Widget>[
-              Text(
-                buttonText == '' ? '+' : '',
-                style: TextStyle(fontWeight: FontWeight.normal, fontSize: 18),
-              ),
+              Text(buttonText == '' ? '+' : '',
+                  style:
+                      TextStyle(fontWeight: FontWeight.normal, fontSize: 18)),
               Text(buttonText == '' ? "  Add item" : "Update item")
             ],
           ),
