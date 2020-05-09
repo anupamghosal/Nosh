@@ -92,9 +92,10 @@ class _InputModalState extends State<InputModal> {
       initialNameText = widget.recievedItem.name ?? '';
       initialQuantityText = widget.recievedItem.quantity ?? '';
       if (widget.recievedItem.quantity != '') willHaveQuantity = true;
-      if (widget.recievedItem.expiry != null) willHaveExpiry = true;
-      initialDate = widget.recievedItem.expiry ?? initialDate;
-      print(initialDate);
+      if (widget.recievedItem.expiry != null) {
+        willHaveExpiry = true;
+        initialDate = widget.recievedItem.expiry;
+      }
       if (widget.recievedItem.imageUri != '')
         imageUri = widget.recievedItem.imageUri ?? '';
     }
@@ -269,7 +270,7 @@ class _InputModalState extends State<InputModal> {
                 selectionColor: Theme.of(context).primaryColor,
                 selectedTextColor: Colors.white,
                 onDateChange: (date) {
-                  if (willHaveExpiry) item.expiry = date;
+                  if (willHaveExpiry) initialDate = date;
                 },
               ),
               size: Size(100, 80),
