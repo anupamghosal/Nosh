@@ -278,9 +278,7 @@ class _InputModalState extends State<InputModal> {
           ),
           secondChild: Container(),
         ),
-        SizedBox(
-          height: 10,
-        )
+        SizedBox(height: 10)
       ],
     );
   }
@@ -356,8 +354,8 @@ class _InputModalState extends State<InputModal> {
       child: AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         contentPadding: EdgeInsets.all(28),
-        title: SingleChildScrollView(child: buildTitle()),
-        content: buildInputForm(),
+        title: buildTitle(),
+        content: SingleChildScrollView(child: buildInputForm()),
         actions: <Widget>[buildSubmit()],
       ),
     );
