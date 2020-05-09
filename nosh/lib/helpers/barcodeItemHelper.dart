@@ -1,5 +1,5 @@
 import 'package:barcode_scan/barcode_scan.dart';
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
@@ -9,11 +9,9 @@ Future<String> getBarcode() async {
     String barcode = await BarcodeScanner.scan();
     return barcode;
   } on PlatformException catch (e) {
-    if (e.code == BarcodeScanner.CameraAccessDenied) {
+    if (e.code == BarcodeScanner.CameraAccessDenied)
       return 'Allow camera to use barcode';
-    } else {
-      return 'Some error occured';
-    }
+    return 'Something went wrong';
   } on FormatException {
     return null;
   } catch (e) {
@@ -32,10 +30,10 @@ Future<List<String>> getProduct(String barcode) async {
   }
 }
 
-SnackBar makeSnackBar(String text) {
-  return SnackBar(
-    duration: Duration(seconds: 2),
-    content: Text(text),
-    backgroundColor: Color(0xff5c39f8),
-  );
-}
+// SnackBar makeSnackBar(String text) {
+//   return SnackBar(
+//     duration: Duration(seconds: 2),
+//     content: Text(text),
+//     backgroundColor: Color(0xff5c39f8),
+//   );
+// }

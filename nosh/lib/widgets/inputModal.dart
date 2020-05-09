@@ -348,19 +348,16 @@ class _InputModalState extends State<InputModal> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: GestureDetector(
-        onPanStart: (_) {
-          FocusScope.of(context).unfocus();
-        },
-        child: AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          contentPadding: EdgeInsets.all(28),
-          title: buildTitle(),
-          content: buildInputForm(),
-          actions: <Widget>[buildSubmit()],
-        ),
+    return GestureDetector(
+      onPanStart: (_) {
+        FocusScope.of(context).unfocus();
+      },
+      child: AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        contentPadding: EdgeInsets.all(28),
+        title: SingleChildScrollView(child: buildTitle()),
+        content: buildInputForm(),
+        actions: <Widget>[buildSubmit()],
       ),
     );
   }

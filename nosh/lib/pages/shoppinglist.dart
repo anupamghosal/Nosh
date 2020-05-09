@@ -89,7 +89,7 @@ class _ShoppingState extends State<Shopping> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           child: Text(
-            'done',
+            'Done',
             style: TextStyle(
                 color: Theme.of(context).primaryColor,
                 fontSize: 14,
