@@ -94,6 +94,7 @@ class _InputModalState extends State<InputModal> {
       if (widget.recievedItem.quantity != '') willHaveQuantity = true;
       if (widget.recievedItem.expiry != null) willHaveExpiry = true;
       initialDate = widget.recievedItem.expiry ?? initialDate;
+      print(initialDate);
       if (widget.recievedItem.imageUri != '')
         imageUri = widget.recievedItem.imageUri ?? '';
     }
@@ -294,7 +295,7 @@ class _InputModalState extends State<InputModal> {
           if (form.validate()) {
             form.save();
             if (configuration == 'STOCK_CONFIG') {
-              if (!willHaveExpiry) item.expiry = null;
+              if (willHaveExpiry) item.expiry = initialDate;
               if (modalName == 'ADD_TO_STOCKED' ||
                   modalName == 'MOVE_TO_STOCKED') {
                 widget.vm
