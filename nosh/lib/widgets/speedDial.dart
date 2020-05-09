@@ -12,7 +12,7 @@ class SpeedDialButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SpeedDial(
-      animatedIcon: Icons.add,
+      //animatedIcon: Icons.add,
       animatedIconTheme: IconThemeData(size: 22, color: Color(0xff5c39f8)),
       backgroundColor: Colors.white,
       children: [
