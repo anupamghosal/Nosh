@@ -205,9 +205,7 @@ class _InputModalState extends State<InputModal> {
               value: willHaveQuantity,
               onChanged: (value) {
                 FocusScope.of(context).unfocus();
-                setState(() {
-                  willHaveQuantity = value;
-                });
+                setState(() => willHaveQuantity = value);
               },
             ),
           ],
@@ -218,18 +216,13 @@ class _InputModalState extends State<InputModal> {
               : CrossFadeState.showSecond,
           duration: Duration(milliseconds: animationSpeed),
           firstChild: TextFormField(
-            initialValue: initialQuantityText,
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              labelText: 'Quantity',
-            ),
-            onSaved: (val) => setState(() => item.quantity = val),
-          ),
+              initialValue: initialQuantityText,
+              decoration: InputDecoration(
+                  border: InputBorder.none, labelText: 'Quantity'),
+              onSaved: (val) => setState(() => item.quantity = val)),
           secondChild: Container(),
         ),
-        SizedBox(
-          height: 10,
-        )
+        SizedBox(height: 10)
       ],
     );
   }

@@ -117,8 +117,10 @@ class _StockState extends State<Stock> {
   buildWarningIcon(DateTime expiry) {
     if (expiry != null) {
       int daysLeft = diffInDays(expiry);
-      if (daysLeft == 0) return Icon(Icons.error_outline, color: Colors.red);
-      if (daysLeft <= 2) return Icon(Icons.report_problem, color: Colors.amber);
+      if (daysLeft == 0)
+        return Icon(Icons.error_outline, color: Colors.red[700]);
+      if (daysLeft <= 2)
+        return Icon(Icons.report_problem, color: Colors.amber[700]);
       return Icon(Icons.thumb_up, color: Colors.transparent);
     }
   }
