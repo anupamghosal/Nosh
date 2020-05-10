@@ -11,6 +11,7 @@ Future<String> getBarcode() async {
   } on PlatformException catch (e) {
     if (e.code == BarcodeScanner.CameraAccessDenied)
       return 'Allow camera to use barcode';
+    if (e.code == BarcodeScanner.UserCanceled) return '';
     return 'Something went wrong';
   } on FormatException {
     return null;
@@ -26,6 +27,7 @@ Future<List<String>> getProduct(String barcode) async {
   if (result.status == 1) {
     return [result.product.productName, result.product.imgSmallUrl];
   } else {
+    print(result.status);
     return ["404", "404"];
   }
 }

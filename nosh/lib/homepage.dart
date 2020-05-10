@@ -112,7 +112,7 @@ class _HomePageState extends State<HomePage> {
         leading: Icon(Icons.supervised_user_circle),
         title: Text('About us'),
         trailing: Icon(Icons.keyboard_arrow_right),
-        onTap: () => launch("https://nosh.tech/index.html#about.html"),
+        onTap: () => launch("https://nosh.tech/index.html#about"),
       ),
     ]);
   }

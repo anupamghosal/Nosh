@@ -12,7 +12,7 @@ class SpeedDialButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SpeedDial(
-      //animatedIcon: Icons.add,
+      animatedIcon: Icons.add,
       animatedIconTheme: IconThemeData(size: 22, color: Color(0xff5c39f8)),
       backgroundColor: Colors.white,
       children: [
@@ -54,10 +54,8 @@ class SpeedDialButton extends StatelessWidget {
                               ),
                             ),
                             SizedBox(width: 20),
-                            Text(
-                              'Loading',
-                              style: TextStyle(color: Colors.grey),
-                            )
+                            Text('Loading',
+                                style: TextStyle(color: Colors.grey))
                           ],
                         ),
                       ),
@@ -66,7 +64,10 @@ class SpeedDialButton extends StatelessWidget {
               if (barcode == 'Allow camera to use barcode' ||
                   barcode == 'Something went wrong')
                 snackbar = showError(barcode);
-              else {
+              else if (barcode == null || barcode == '') {
+                Navigator.of(context).pop();
+                return;
+              } else {
                 List productData = await getProduct(barcode);
                 String productName = productData[0];
                 String productImageUri = productData[1];
@@ -113,9 +114,8 @@ class SpeedDialButton extends StatelessWidget {
           onTap: () {
             showDialog(
                 context: context,
-                builder: (BuildContext context) {
-                  return InputModal('ADD_TO_STOCKED', vm, null);
-                });
+                builder: (BuildContext context) =>
+                    InputModal('ADD_TO_STOCKED', vm, null));
           },
           label: 'Type manually',
           labelStyle: TextStyle(

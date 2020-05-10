@@ -172,7 +172,6 @@ class _StockState extends State<Stock> {
           onPressed: () async {
             searchResult = await showSearch(
                 context: context, delegate: SearchItems(sortedItems));
-
             if (searchResult != null) navigateToItem(searchResult);
           },
           icon: Icon(Icons.search),

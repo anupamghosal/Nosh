@@ -355,7 +355,8 @@ class _InputModalState extends State<InputModal> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         contentPadding: EdgeInsets.all(28),
         title: buildTitle(),
-        content: SingleChildScrollView(child: buildInputForm()),
+        content:
+            Scrollbar(child: SingleChildScrollView(child: buildInputForm())),
         actions: <Widget>[buildSubmit()],
       ),
     );
