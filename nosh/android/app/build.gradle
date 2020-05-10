@@ -70,8 +70,8 @@ android {
             
 
             // signingConfig signingConfigs.release
-            // signingConfig signingConfigs.debug
-            // debug.signingConfig
+            signingConfig signingConfigs.debug
+            debug.signingConfig
         }
        
         debug {

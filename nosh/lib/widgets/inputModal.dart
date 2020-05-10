@@ -63,7 +63,6 @@ class _InputModalState extends State<InputModal> {
       modalTitle = "Add to inventory";
       configuration = 'STOCK_CONFIG';
       item = Item();
-      item.expiry = initialDate;
       if (widget.recievedItem != null)
         initialNameText = widget.recievedItem.name;
     }
@@ -287,7 +286,8 @@ class _InputModalState extends State<InputModal> {
           if (form.validate()) {
             form.save();
             if (configuration == 'STOCK_CONFIG') {
-              if (willHaveExpiry) item.expiry = initialDate;
+              if (willHaveExpiry == true)
+                print("will expire laaaaaaaaaaaaaaaaaaaaa");
               if (modalName == 'ADD_TO_STOCKED' ||
                   modalName == 'MOVE_TO_STOCKED') {
                 widget.vm

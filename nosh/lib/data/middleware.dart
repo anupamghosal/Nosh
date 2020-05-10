@@ -41,11 +41,10 @@ Future<AppState> loadFromPrefs() async {
 }
 
 Future<String> saveCachedImage(String cache) async {
+  if (cache.startsWith("https")) return cache;
   Directory directory = await getApplicationDocumentsDirectory();
   String path = directory.path;
-  String fileName =
-      cache.substring(cache.lastIndexOf('/') + 1, cache.length - 1);
-
+  String fileName = cache.substring(cache.lastIndexOf('/') + 1);
   var saved = await File(cache).copy('$path/' + fileName);
   return saved.path;
 }
