@@ -262,7 +262,7 @@ class _InputModalState extends State<InputModal> {
                 selectionColor: Theme.of(context).primaryColor,
                 selectedTextColor: Colors.white,
                 onDateChange: (date) {
-                  if (willHaveExpiry) initialDate = date;
+                  initialDate = date;
                 },
               ),
               size: Size(100, 80),
@@ -286,8 +286,7 @@ class _InputModalState extends State<InputModal> {
           if (form.validate()) {
             form.save();
             if (configuration == 'STOCK_CONFIG') {
-              if (willHaveExpiry == true)
-                print("will expire laaaaaaaaaaaaaaaaaaaaa");
+              item.expiry = willHaveExpiry ? initialDate : null;
               if (modalName == 'ADD_TO_STOCKED' ||
                   modalName == 'MOVE_TO_STOCKED') {
                 widget.vm
