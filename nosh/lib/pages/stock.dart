@@ -128,9 +128,9 @@ class _StockState extends State<Stock> {
 
   navigateToItem(var result) {
     setState(() => navToTileIndex = sortedItems.indexOf(result));
-    if (navToTileIndex > 3)
-      _scrollController.animateTo((navToTileIndex) * 80.0,
-          duration: Duration(seconds: 1), curve: Curves.easeOut);
+    // if (navToTileIndex > 3)
+    _scrollController.animateTo((navToTileIndex) * 80.0,
+        duration: Duration(seconds: 1), curve: Curves.easeOut);
     Timer(Duration(seconds: 3), () => setState(() => navToTileIndex = null));
   }
 
