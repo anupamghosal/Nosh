@@ -12,6 +12,7 @@ import 'package:nosh/widgets/inputModal.dart';
 import 'package:nosh/widgets/listEndLine.dart';
 import 'package:nosh/widgets/pageHeading.dart';
 import 'package:intl/intl.dart';
+// import 'package:nosh/widgets/sliverVerticalSpace.dart';
 import '../widgets/infoBar.dart';
 import 'dart:io';
 
@@ -195,85 +196,99 @@ class _StockState extends State<Stock> {
   Widget build(BuildContext context) {
     sortedItems = sortByDate();
     return Scaffold(
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: <Widget>[
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.only(right: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  PageHeading("Stocked"),
-                  _longPressEventActive && widget.items.length != 0
+      body: Scrollbar(
+        child: CustomScrollView(
+          controller: _scrollController,
+          slivers: <Widget>[
+            // SliverToBoxAdapter(
+            //   child: Padding(
+            //     padding: EdgeInsets.only(right: 8.0),
+            //     child: Row(
+            //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //       children: <Widget>[
+            //         PageHeading("Stocked"),
+            //         _longPressEventActive && widget.items.length != 0
+            //             ? doneButton()
+            //             : searchAndRecipeButton()
+            //       ],
+            //     ),
+            //   ),
+            // ),
+            SliverPersistentHeader(
+              floating: true,
+              delegate: SliverHeading(
+                  heading: 'Stocked',
+                  minExtent: 120,
+                  maxExtent: 120,
+                  trailing: _longPressEventActive && widget.items.length != 0
                       ? doneButton()
-                      : searchAndRecipeButton()
-                ],
-              ),
+                      : searchAndRecipeButton()),
             ),
-          ),
-          widget.items.length == 0
-              ? SliverToBoxAdapter()
-              : SliverPersistentHeader(
-                  floating: true,
-                  pinned: true,
-                  delegate: InfoBar(
-                      minExtent: 100, maxExtent: 120, items: sortedItems)),
-          sortedItems.length == 0
-              ? buildEmptyMessage()
-              : SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                      (BuildContext context, int idx) {
-                    return Container(
-                      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                          color: navToTileIndex != idx
-                              ? null
-                              : Theme.of(context).primaryColor.withAlpha(30),
-                          borderRadius: BorderRadius.circular(10)),
-                      child: ListTile(
-                        onLongPress: () => setState(() =>
-                            _longPressEventActive = !_longPressEventActive),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        leading: buildLeading(sortedItems[idx]),
-                        title: Row(
-                          children: <Widget>[
-                            Flexible(
-                              flex: 6,
-                              child: Text(
-                                sortedItems[idx].name,
-                                softWrap: true,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+            // VerticalSpace(30),
+            widget.items.length == 0
+                ? SliverToBoxAdapter()
+                : SliverPersistentHeader(
+                    // floating: true,
+                    pinned: true,
+                    delegate: InfoBar(
+                        minExtent: 100, maxExtent: 100, items: sortedItems)),
+            sortedItems.length == 0
+                ? buildEmptyMessage()
+                : SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                        (BuildContext context, int idx) {
+                      return Container(
+                        margin:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                            color: navToTileIndex != idx
+                                ? null
+                                : Theme.of(context).primaryColor.withAlpha(30),
+                            borderRadius: BorderRadius.circular(10)),
+                        child: ListTile(
+                          onLongPress: () => setState(() =>
+                              _longPressEventActive = !_longPressEventActive),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                          leading: buildLeading(sortedItems[idx]),
+                          title: Row(
+                            children: <Widget>[
+                              Flexible(
+                                flex: 6,
+                                child: Text(
+                                  sortedItems[idx].name,
+                                  softWrap: true,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                            ),
-                            sortedItems[idx].quantity != ''
-                                ? Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.grey[800],
-                                        borderRadius:
-                                            BorderRadius.circular(4.0)),
-                                    margin: EdgeInsets.only(left: 20.0),
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 6.0, vertical: 3.0),
-                                    child: Text(
-                                      sortedItems[idx].quantity,
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 12),
-                                    ),
-                                  )
-                                : SizedBox()
-                          ],
+                              sortedItems[idx].quantity != ''
+                                  ? Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.grey[800],
+                                          borderRadius:
+                                              BorderRadius.circular(4.0)),
+                                      margin: EdgeInsets.only(left: 20.0),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 6.0, vertical: 3.0),
+                                      child: Text(
+                                        sortedItems[idx].quantity,
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 12),
+                                      ),
+                                    )
+                                  : SizedBox()
+                            ],
+                          ),
+                          subtitle: expiryDate(sortedItems[idx].expiry),
+                          trailing: buildWarningIcon(sortedItems[idx].expiry),
                         ),
-                        subtitle: expiryDate(sortedItems[idx].expiry),
-                        trailing: buildWarningIcon(sortedItems[idx].expiry),
-                      ),
-                    );
-                  }, childCount: sortedItems.length),
-                ),
-          ListEndLine(sortedItems.length)
-        ],
+                      );
+                    }, childCount: sortedItems.length),
+                  ),
+            ListEndLine(sortedItems.length)
+          ],
+        ),
       ),
     );
   }

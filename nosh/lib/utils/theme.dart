@@ -10,8 +10,7 @@ ThemeData noshTheme() {
   final ThemeData base = ThemeData.light();
   return base.copyWith(
       textTheme: myText(base.textTheme),
-      // splashColor: Color(0xff5c39f8).withAlpha(40),
-      highlightColor: Colors.grey[200], //Color(0xff5c39f8).withAlpha(10),
+      highlightColor: Colors.grey[300], //Color(0xff5c39f8).withAlpha(10),
       iconTheme: IconThemeData(size: 22),
       appBarTheme: AppBarTheme(
           brightness: Brightness.light,

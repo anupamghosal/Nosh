@@ -34,72 +34,86 @@ class _ExpiredState extends State<Expired> {
       itemsLength = '0$itemsLength';
     if (itemsLength == '1') items = 'item';
 
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: <Widget>[
-          SliverToBoxAdapter(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                PageHeading("Expired"),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8, right: 20),
-                  child: Text(
-                    '$itemsLength  $items',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w300,
-                      color: Colors.grey[700],
-                      fontSize: 20,
-                    ),
-                  ),
-                )
-              ],
-            ),
+    Widget buildCounter() {
+      return Padding(
+        padding: const EdgeInsets.only(top: 8, right: 20),
+        child: Text(
+          '$itemsLength  $items',
+          style: TextStyle(
+            fontWeight: FontWeight.w300,
+            color: Colors.grey[700],
+            fontSize: 20,
           ),
-          VerticalSpace(30),
-          widget.items.length == 0
-              ? EmptyText(
-                  "Great! There is no expired items", 'assets/wasting.png')
-              : SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                      (BuildContext context, int idx) {
-                    return ListTile(
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      leading: CircleAvatar(
-                        foregroundColor: Colors.white,
-                        backgroundColor: Colors.grey[300],
-                        radius: 30,
-                        backgroundImage:
-                            selectImageType(widget.items[idx].imageUri),
-                        child:
-                            selectImageType(widget.items[idx].imageUri) == null
-                                ? Icon(
-                                    Icons.fastfood,
-                                    color: Colors.white,
-                                  )
-                                : null,
-                      ),
-                      title: Text(widget.items[idx].name),
-                      subtitle: Text(widget.items[idx].expiry == null
-                          ? 'No expiry date'
-                          : DateFormat('yyyy-MM-dd')
-                              .format(widget.items[idx].expiry)
-                              .toString()),
-                      trailing: IconButton(
-                          icon: Icon(
-                            Icons.delete_outline,
-                            color: Colors.red,
-                          ),
-                          onPressed: () async {
-                            var userIsSure = await getSurity(context);
-                            if (userIsSure)
-                              widget.removeItem(widget.items[idx]);
-                          }),
-                    );
-                  }, childCount: widget.items.length),
-                ),
-        ],
+        ),
+      );
+    }
+
+    return Scaffold(
+      body: Scrollbar(
+        child: CustomScrollView(
+          slivers: <Widget>[
+            SliverPersistentHeader(
+              floating: true,
+              delegate: SliverHeading(
+                  heading: 'Expired',
+                  minExtent: 120,
+                  maxExtent: 120,
+                  trailing: buildCounter()),
+            ),
+            // SliverToBoxAdapter(
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //     children: <Widget>[
+            //       PageHeading("Expired"),
+
+            //     ],
+            //   ),
+            // ),
+            VerticalSpace(30),
+            widget.items.length == 0
+                ? EmptyText(
+                    "Great! There is no expired items", 'assets/wasting.png')
+                : SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                        (BuildContext context, int idx) {
+                      return ListTile(
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        leading: CircleAvatar(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.grey[300],
+                          radius: 30,
+                          backgroundImage:
+                              selectImageType(widget.items[idx].imageUri),
+                          child: selectImageType(widget.items[idx].imageUri) ==
+                                  null
+                              ? Icon(
+                                  Icons.fastfood,
+                                  color: Colors.white,
+                                )
+                              : null,
+                        ),
+                        title: Text(widget.items[idx].name),
+                        subtitle: Text(widget.items[idx].expiry == null
+                            ? 'No expiry date'
+                            : DateFormat('yyyy-MM-dd')
+                                .format(widget.items[idx].expiry)
+                                .toString()),
+                        trailing: IconButton(
+                            icon: Icon(
+                              Icons.delete_outline,
+                              color: Colors.red,
+                            ),
+                            onPressed: () async {
+                              var userIsSure = await getSurity(context);
+                              if (userIsSure)
+                                widget.removeItem(widget.items[idx]);
+                            }),
+                      );
+                    }, childCount: widget.items.length),
+                  ),
+          ],
+        ),
       ),
     );
   }

@@ -31,9 +31,9 @@ class _ShoppingState extends State<Shopping> {
   navigateToItem(var result) {
     setState(() => navToTileIndex = widget.shopItems.indexOf(result));
 
-    if (navToTileIndex > 6)
-      _scrollController.animateTo((navToTileIndex) * 60.0,
-          duration: Duration(seconds: 1), curve: Curves.easeOut);
+    // if (navToTileIndex > 6)
+    _scrollController.animateTo((navToTileIndex) * 60.0,
+        duration: Duration(seconds: 1), curve: Curves.easeOut);
     Timer(Duration(seconds: 3), () => setState(() => navToTileIndex = null));
   }
 
@@ -150,79 +150,92 @@ class _ShoppingState extends State<Shopping> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: CustomScrollView(
-      controller: _scrollController,
-      slivers: <Widget>[
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                PageHeading("Shopping List"),
-                _longPressEventActive ? doneButton() : searchButton()
-              ],
-            ),
+        body: Scrollbar(
+      child: CustomScrollView(
+        controller: _scrollController,
+        slivers: <Widget>[
+          // SliverToBoxAdapter(
+          //   child: Padding(
+          //     padding: const EdgeInsets.only(right: 8.0),
+          //     child: Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: <Widget>[
+          //         PageHeading("Shopping List"),
+          //         _longPressEventActive ? doneButton() : searchButton()
+          //       ],
+          //     ),
+          //   ),
+          // ),
+          SliverPersistentHeader(
+            floating: true,
+            delegate: SliverHeading(
+                heading: 'Shopping List',
+                minExtent: 120,
+                maxExtent: 120,
+                trailing:
+                    _longPressEventActive ? doneButton() : searchButton()),
           ),
-        ),
-        VerticalSpace(40),
-        widget.shopItems.length == 0
-            ? EmptyText('No items in shopping list', 'assets/shopping_cart.png')
-            : SliverList(
-                delegate:
-                    SliverChildBuilderDelegate((BuildContext context, int idx) {
-                  final shopItem = widget.shopItems[idx];
-                  return Container(
-                    margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    decoration: BoxDecoration(
-                        color: navToTileIndex != idx
-                            ? shopItem.isChecked ? Colors.grey[100] : null
-                            : Theme.of(context).primaryColor.withAlpha(30),
-                        borderRadius: BorderRadius.circular(10)),
-                    child: ListTile(
-                      leading: buildLeading(shopItem),
-                      title: Row(
-                        children: <Widget>[
-                          Flexible(
-                            flex: 7,
-                            child: Text(
-                              widget.shopItems[idx].name,
-                              softWrap: true,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+          VerticalSpace(30),
+          widget.shopItems.length == 0
+              ? EmptyText(
+                  'No items in shopping list', 'assets/shopping_cart.png')
+              : SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int idx) {
+                    final shopItem = widget.shopItems[idx];
+                    return Container(
+                      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      decoration: BoxDecoration(
+                          color: navToTileIndex != idx
+                              ? shopItem.isChecked ? Colors.grey[100] : null
+                              : Theme.of(context).primaryColor.withAlpha(30),
+                          borderRadius: BorderRadius.circular(10)),
+                      child: ListTile(
+                        leading: buildLeading(shopItem),
+                        title: Row(
+                          children: <Widget>[
+                            Flexible(
+                              flex: 7,
+                              child: Text(
+                                widget.shopItems[idx].name,
+                                softWrap: true,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                          ),
-                          widget.shopItems[idx].quantity != ''
-                              ? Container(
-                                  decoration: BoxDecoration(
-                                      color: Colors.grey[800],
-                                      borderRadius: BorderRadius.circular(4.0)),
-                                  margin: EdgeInsets.only(left: 20.0),
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 6.0, vertical: 3.0),
-                                  child: Text(
-                                    widget.shopItems[idx].quantity,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 12),
-                                  ),
-                                )
-                              : SizedBox(),
-                        ],
+                            widget.shopItems[idx].quantity != ''
+                                ? Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.grey[800],
+                                        borderRadius:
+                                            BorderRadius.circular(4.0)),
+                                    margin: EdgeInsets.only(left: 20.0),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 6.0, vertical: 3.0),
+                                    child: Text(
+                                      widget.shopItems[idx].quantity,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 12),
+                                    ),
+                                  )
+                                : SizedBox(),
+                          ],
+                        ),
+                        trailing: buildTrailing(widget.shopItems[idx]),
+                        onTap: _longPressEventActive
+                            ? null
+                            : () => widget.vm.onUpdateShoppingItem(shopItem
+                                .copyWith(isChecked: !shopItem.isChecked)),
+                        onLongPress: () => setState(
+                          () => _longPressEventActive = !_longPressEventActive,
+                        ),
                       ),
-                      trailing: buildTrailing(widget.shopItems[idx]),
-                      onTap: _longPressEventActive
-                          ? null
-                          : () => widget.vm.onUpdateShoppingItem(shopItem
-                              .copyWith(isChecked: !shopItem.isChecked)),
-                      onLongPress: () => setState(
-                        () => _longPressEventActive = !_longPressEventActive,
-                      ),
-                    ),
-                  );
-                }, childCount: widget.shopItems.length),
-              ),
-        ListEndLine(widget.shopItems.length)
-      ],
+                    );
+                  }, childCount: widget.shopItems.length),
+                ),
+          ListEndLine(widget.shopItems.length)
+        ],
+      ),
     ));
   }
 }

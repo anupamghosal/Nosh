@@ -7,8 +7,9 @@ class PageHeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 16),
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
       child: Text(
         heading,
         style: TextStyle(
@@ -32,7 +33,15 @@ class SliverHeading implements SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(color: Colors.white, child: Center(child: Placeholder()));
+    return Container(
+        color: Colors.white,
+        child: Padding(
+          padding: EdgeInsets.only(right: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[PageHeading(heading), trailing],
+          ),
+        ));
   }
 
   @override
