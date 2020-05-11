@@ -71,9 +71,7 @@ class _HomePageState extends State<HomePage> {
 
   buildDrawerMenu(final items) {
     return ListView(children: <Widget>[
-      DrawerHeader(
-        child: null,
-      ),
+      SizedBox(height: 100),
       Align(alignment: Alignment.topLeft, child: PageHeading('Menu')),
       SizedBox(height: 15),
       Padding(

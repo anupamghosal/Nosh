@@ -7,8 +7,7 @@ class PageHeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
+    return Padding(
       padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
       child: Text(
         heading,
